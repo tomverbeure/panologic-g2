@@ -6,7 +6,7 @@ module dvi_top(
 	inout V_SPD,
 	output V_SPC,
 
-	output reg [11:0] V1_D,
+	output [11:0] V1_D,
 	output V1_XCLK_P,
 	output V1_XCLK_N,
 	output V1_HSYNC,
@@ -67,15 +67,11 @@ module dvi_top(
 		.PSDONE   ()
 	);
 
-	// Pixel clocks
-	wire pixel_clock = dcm_clk90;
-	wire pixel_clock_n = ~dcm_clk90;
-
 	// Positive pixel clock output
 	ODDR2 clkout_oddr_p(
 		.Q  (V1_XCLK_P),
-		.C0 (pixel_clock),
-		.C1 (pixel_clock_n),
+		.C0 (dcm_clk90),
+		.C1 (!dcm_clk90),
 		.CE (1'b1),
 		.D0 (1'b1),
 		.D1 (1'b0),
@@ -86,8 +82,8 @@ module dvi_top(
 	// Negative pixel clock output
 	ODDR2 clkout_oddr_n(
 		.Q  (V1_XCLK_N),
-		.C0 (pixel_clock_n),
-		.C1 (pixel_clock),
+		.C0 (!dcm_clk90),
+		.C1 (dcm_clk90),
 		.CE (1'b1),
 		.D0 (1'b1),
 		.D1 (1'b0),
@@ -114,29 +110,6 @@ module dvi_top(
 	wire [7:0] pixel_green = 8'hf0;
 	wire [7:0] pixel_blue = 8'h0f;
 
-	// Multiplexer states
-	reg multiplexer_state;
-	localparam
-		PA = 1'b0,
-		PB = 1'b1;
-
-	// Pixel data multiplexer
-	always @(posedge dcm_clk0 or negedge dcm_clk0) begin
-		if (reset_n && dcm_locked) begin
-			case (multiplexer_state)
-				PA: begin
-					V1_D <= {pixel_red, pixel_green[7:4]};
-					multiplexer_state <= PB;
-				end
-				PB: begin
-					V1_D <= {pixel_green[3:0], pixel_blue};
-					multiplexer_state <= PA;
-				end
-				default: multiplexer_state <= PB;
-			endcase
-		end
-	end
-
 	// Main block
 	always @(posedge dcm_clk0) begin
 		if (!reset_n || !dcm_locked) begin
@@ -154,4 +127,126 @@ module dvi_top(
 			end
 		end
 	end
+
+	// Pixel data DDR blocks
+	ODDR2 v1_d_11(
+		.Q  (V1_D[11]),
+		.C0 (dcm_clk0),
+		.C1 (!dcm_clk0),
+		.CE (1'b1),
+		.D0 (pixel_green[3]),
+		.D1 (pixel_red[7]),
+		.R  (1'b0),
+		.S  (1'b0)
+	);
+	ODDR2 v1_d_10(
+		.Q  (V1_D[10]),
+		.C0 (dcm_clk0),
+		.C1 (!dcm_clk0),
+		.CE (1'b1),
+		.D0 (pixel_green[2]),
+		.D1 (pixel_red[6]),
+		.R  (1'b0),
+		.S  (1'b0)
+	);
+	ODDR2 v1_d_9(
+		.Q  (V1_D[9]),
+		.C0 (dcm_clk0),
+		.C1 (!dcm_clk0),
+		.CE (1'b1),
+		.D0 (pixel_green[1]),
+		.D1 (pixel_red[5]),
+		.R  (1'b0),
+		.S  (1'b0)
+	);
+	ODDR2 v1_d_8(
+		.Q  (V1_D[8]),
+		.C0 (dcm_clk0),
+		.C1 (!dcm_clk0),
+		.CE (1'b1),
+		.D0 (pixel_green[0]),
+		.D1 (pixel_red[4]),
+		.R  (1'b0),
+		.S  (1'b0)
+	);
+	ODDR2 v1_d_7(
+		.Q  (V1_D[7]),
+		.C0 (dcm_clk0),
+		.C1 (!dcm_clk0),
+		.CE (1'b1),
+		.D0 (pixel_blue[7]),
+		.D1 (pixel_red[3]),
+		.R  (1'b0),
+		.S  (1'b0)
+	);
+	ODDR2 v1_d_6(
+		.Q  (V1_D[6]),
+		.C0 (dcm_clk0),
+		.C1 (!dcm_clk0),
+		.CE (1'b1),
+		.D0 (pixel_blue[6]),
+		.D1 (pixel_red[2]),
+		.R  (1'b0),
+		.S  (1'b0)
+	);
+	ODDR2 v1_d_5(
+		.Q  (V1_D[5]),
+		.C0 (dcm_clk0),
+		.C1 (!dcm_clk0),
+		.CE (1'b1),
+		.D0 (pixel_blue[5]),
+		.D1 (pixel_red[1]),
+		.R  (1'b0),
+		.S  (1'b0)
+	);
+	ODDR2 v1_d_4(
+		.Q  (V1_D[4]),
+		.C0 (dcm_clk0),
+		.C1 (!dcm_clk0),
+		.CE (1'b1),
+		.D0 (pixel_blue[4]),
+		.D1 (pixel_red[0]),
+		.R  (1'b0),
+		.S  (1'b0)
+	);
+	ODDR2 v1_d_3(
+		.Q  (V1_D[3]),
+		.C0 (dcm_clk0),
+		.C1 (!dcm_clk0),
+		.CE (1'b1),
+		.D0 (pixel_blue[3]),
+		.D1 (pixel_green[7]),
+		.R  (1'b0),
+		.S  (1'b0)
+	);
+	ODDR2 v1_d_2(
+		.Q  (V1_D[2]),
+		.C0 (dcm_clk0),
+		.C1 (!dcm_clk0),
+		.CE (1'b1),
+		.D0 (pixel_blue[2]),
+		.D1 (pixel_green[6]),
+		.R  (1'b0),
+		.S  (1'b0)
+	);
+	ODDR2 v1_d_1(
+		.Q  (V1_D[1]),
+		.C0 (dcm_clk0),
+		.C1 (!dcm_clk0),
+		.CE (1'b1),
+		.D0 (pixel_blue[1]),
+		.D1 (pixel_green[5]),
+		.R  (1'b0),
+		.S  (1'b0)
+	);
+	ODDR2 v1_d_0(
+		.Q  (V1_D[0]),
+		.C0 (dcm_clk0),
+		.C1 (!dcm_clk0),
+		.CE (1'b1),
+		.D0 (pixel_blue[0]),
+		.D1 (pixel_green[4]),
+		.R  (1'b0),
+		.S  (1'b0)
+	);
 endmodule
