@@ -67,11 +67,28 @@ module dvi_top(
 		.PSDONE   ()
 	);
 
-	// Pixel clock output
-	OBUFDS clkout_oddr_p(
-		.I  (dcm_clk90),
-		.O  (V1_XCLK_P),
-		.OB (V1_XCLK_N)
+	// Positive pixel clock output
+	ODDR2 clkout_oddr_p(
+		.Q  (V1_XCLK_P),
+		.C0 (dcm_clk90),
+		.C1 (!dcm_clk90),
+		.CE (1'b1),
+		.D0 (1'b1),
+		.D1 (1'b0),
+		.R  (1'b0),
+		.S  (1'b0)
+	);
+
+	// Negative pixel clock output
+	ODDR2 clkout_oddr_n(
+		.Q  (V1_XCLK_N),
+		.C0 (!dcm_clk90),
+		.C1 (dcm_clk90),
+		.CE (1'b1),
+		.D0 (1'b1),
+		.D1 (1'b0),
+		.R  (1'b0),
+		.S  (1'b0)
 	);
 
 	// TODO: Implement I2C
