@@ -9,9 +9,9 @@ module dvi_top(
 	output [11:0] V1_D,
 	output V1_XCLK_P,
 	output V1_XCLK_N,
-	output V1_HSYNC,
-	output V1_VSYNC,
-	output V1_DE,
+	output reg V1_HSYNC,
+	output reg V1_VSYNC,
+	output reg V1_DE,
 	output V1_RESET_N
 	);
 
@@ -106,9 +106,9 @@ module dvi_top(
 	// Video signals
 	reg [31:0] x_counter;
 	reg [31:0] y_counter;
-	assign V1_HSYNC = (x_counter < X_RESOLUTION + X_FRONT_PORCH) || (x_counter >= X_RESOLUTION + X_FRONT_PORCH + X_SYNC_PULSE);
-	assign V1_VSYNC = (y_counter < Y_RESOLUTION + Y_FRONT_PORCH) || (y_counter >= Y_RESOLUTION + Y_FRONT_PORCH + Y_SYNC_PULSE);
-	assign V1_DE = (x_counter < X_RESOLUTION) && (y_counter < Y_RESOLUTION);
+	wire hsync = (x_counter < X_RESOLUTION + X_FRONT_PORCH) || (x_counter >= X_RESOLUTION + X_FRONT_PORCH + X_SYNC_PULSE);
+	wire vsync = (y_counter < Y_RESOLUTION + Y_FRONT_PORCH) || (y_counter >= Y_RESOLUTION + Y_FRONT_PORCH + Y_SYNC_PULSE);
+	wire data_enable = (x_counter < X_RESOLUTION) && (y_counter < Y_RESOLUTION);
 
 	// Chrontel reset
 	assign V1_RESET_N = reset_n && dcm_locked;
@@ -123,7 +123,13 @@ module dvi_top(
 		if (!reset_n || !dcm_locked) begin
 			x_counter <= 0;
 			y_counter <= 0;
+			V1_HSYNC <= 1;
+			V1_VSYNC <= 1;
+			V1_DE <= 0;
 		end else begin
+			V1_HSYNC <= hsync;
+			V1_VSYNC <= vsync;
+			V1_DE <= data_enable;
 			if (x_counter==X_RESOLUTION + X_FRONT_PORCH + X_SYNC_PULSE + X_BACK_PORCH - 1) begin
 				x_counter <= 0;
 				if (y_counter==Y_RESOLUTION + Y_FRONT_PORCH + Y_SYNC_PULSE + Y_BACK_PORCH - 1)
