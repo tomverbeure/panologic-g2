@@ -119,7 +119,7 @@ module dvi_top(
 	wire [7:0] pixel_blue = 8'h0f;
 
 	// Main block
-	always @(posedge dcm_clk0) begin
+	always @(posedge dcm_clk0, negedge reset_n, negedge dcm_locked) begin
 		if (!reset_n || !dcm_locked) begin
 			x_counter <= 0;
 			y_counter <= 0;
