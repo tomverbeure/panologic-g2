@@ -68,26 +68,34 @@ module dvi_top(
 	);
 
 	// Positive pixel clock output
-	ODDR2 clkout_oddr_p(
+	ODDR2 #(
+		.DDR_ALIGNMENT ("C0"),
+		.SRTYPE        ("ASYNC")
+	)
+	clkout_oddr_p(
 		.Q  (V1_XCLK_P),
 		.C0 (dcm_clk90),
 		.C1 (!dcm_clk90),
 		.CE (1'b1),
 		.D0 (1'b1),
 		.D1 (1'b0),
-		.R  (1'b0),
+		.R  (!reset_n),
 		.S  (1'b0)
 	);
 
 	// Negative pixel clock output
-	ODDR2 clkout_oddr_n(
+	ODDR2 #(
+		.DDR_ALIGNMENT ("C0"),
+		.SRTYPE        ("ASYNC")
+	)
+	clkout_oddr_n(
 		.Q  (V1_XCLK_N),
-		.C0 (!dcm_clk90),
-		.C1 (dcm_clk90),
+		.C0 (dcm_clk90),
+		.C1 (!dcm_clk90),
 		.CE (1'b1),
-		.D0 (1'b1),
-		.D1 (1'b0),
-		.R  (1'b0),
+		.D0 (1'b0),
+		.D1 (1'b1),
+		.R  (!reset_n),
 		.S  (1'b0)
 	);
 
@@ -129,124 +137,172 @@ module dvi_top(
 	end
 
 	// Pixel data DDR blocks
-	ODDR2 v1_d_11(
+	ODDR2 #(
+		.DDR_ALIGNMENT ("C0"),
+		.SRTYPE        ("ASYNC")
+	)
+	v1_d_11(
 		.Q  (V1_D[11]),
 		.C0 (dcm_clk0),
 		.C1 (!dcm_clk0),
 		.CE (1'b1),
 		.D0 (pixel_green[3]),
 		.D1 (pixel_red[7]),
-		.R  (1'b0),
+		.R  (!reset_n),
 		.S  (1'b0)
 	);
-	ODDR2 v1_d_10(
+	ODDR2 #(
+		.DDR_ALIGNMENT ("C0"),
+		.SRTYPE        ("ASYNC")
+	)
+	v1_d_10(
 		.Q  (V1_D[10]),
 		.C0 (dcm_clk0),
 		.C1 (!dcm_clk0),
 		.CE (1'b1),
 		.D0 (pixel_green[2]),
 		.D1 (pixel_red[6]),
-		.R  (1'b0),
+		.R  (!reset_n),
 		.S  (1'b0)
 	);
-	ODDR2 v1_d_9(
+	ODDR2 #(
+		.DDR_ALIGNMENT ("C0"),
+		.SRTYPE        ("ASYNC")
+	)
+	v1_d_9(
 		.Q  (V1_D[9]),
 		.C0 (dcm_clk0),
 		.C1 (!dcm_clk0),
 		.CE (1'b1),
 		.D0 (pixel_green[1]),
 		.D1 (pixel_red[5]),
-		.R  (1'b0),
+		.R  (!reset_n),
 		.S  (1'b0)
 	);
-	ODDR2 v1_d_8(
+	ODDR2 #(
+		.DDR_ALIGNMENT ("C0"),
+		.SRTYPE        ("ASYNC")
+	)
+	v1_d_8(
 		.Q  (V1_D[8]),
 		.C0 (dcm_clk0),
 		.C1 (!dcm_clk0),
 		.CE (1'b1),
 		.D0 (pixel_green[0]),
 		.D1 (pixel_red[4]),
-		.R  (1'b0),
+		.R  (!reset_n),
 		.S  (1'b0)
 	);
-	ODDR2 v1_d_7(
+	ODDR2 #(
+		.DDR_ALIGNMENT ("C0"),
+		.SRTYPE        ("ASYNC")
+	)
+	v1_d_7(
 		.Q  (V1_D[7]),
 		.C0 (dcm_clk0),
 		.C1 (!dcm_clk0),
 		.CE (1'b1),
 		.D0 (pixel_blue[7]),
 		.D1 (pixel_red[3]),
-		.R  (1'b0),
+		.R  (!reset_n),
 		.S  (1'b0)
 	);
-	ODDR2 v1_d_6(
+	ODDR2 #(
+		.DDR_ALIGNMENT ("C0"),
+		.SRTYPE        ("ASYNC")
+	)
+	v1_d_6(
 		.Q  (V1_D[6]),
 		.C0 (dcm_clk0),
 		.C1 (!dcm_clk0),
 		.CE (1'b1),
 		.D0 (pixel_blue[6]),
 		.D1 (pixel_red[2]),
-		.R  (1'b0),
+		.R  (!reset_n),
 		.S  (1'b0)
 	);
-	ODDR2 v1_d_5(
+	ODDR2 #(
+		.DDR_ALIGNMENT ("C0"),
+		.SRTYPE        ("ASYNC")
+	)
+	v1_d_5(
 		.Q  (V1_D[5]),
 		.C0 (dcm_clk0),
 		.C1 (!dcm_clk0),
 		.CE (1'b1),
 		.D0 (pixel_blue[5]),
 		.D1 (pixel_red[1]),
-		.R  (1'b0),
+		.R  (!reset_n),
 		.S  (1'b0)
 	);
-	ODDR2 v1_d_4(
+	ODDR2 #(
+		.DDR_ALIGNMENT ("C0"),
+		.SRTYPE        ("ASYNC")
+	)
+	v1_d_4(
 		.Q  (V1_D[4]),
 		.C0 (dcm_clk0),
 		.C1 (!dcm_clk0),
 		.CE (1'b1),
 		.D0 (pixel_blue[4]),
 		.D1 (pixel_red[0]),
-		.R  (1'b0),
+		.R  (!reset_n),
 		.S  (1'b0)
 	);
-	ODDR2 v1_d_3(
+	ODDR2 #(
+		.DDR_ALIGNMENT ("C0"),
+		.SRTYPE        ("ASYNC")
+	)
+	v1_d_3(
 		.Q  (V1_D[3]),
 		.C0 (dcm_clk0),
 		.C1 (!dcm_clk0),
 		.CE (1'b1),
 		.D0 (pixel_blue[3]),
 		.D1 (pixel_green[7]),
-		.R  (1'b0),
+		.R  (!reset_n),
 		.S  (1'b0)
 	);
-	ODDR2 v1_d_2(
+	ODDR2 #(
+		.DDR_ALIGNMENT ("C0"),
+		.SRTYPE        ("ASYNC")
+	)
+	v1_d_2(
 		.Q  (V1_D[2]),
 		.C0 (dcm_clk0),
 		.C1 (!dcm_clk0),
 		.CE (1'b1),
 		.D0 (pixel_blue[2]),
 		.D1 (pixel_green[6]),
-		.R  (1'b0),
+		.R  (!reset_n),
 		.S  (1'b0)
 	);
-	ODDR2 v1_d_1(
+	ODDR2 #(
+		.DDR_ALIGNMENT ("C0"),
+		.SRTYPE        ("ASYNC")
+	)
+	v1_d_1(
 		.Q  (V1_D[1]),
 		.C0 (dcm_clk0),
 		.C1 (!dcm_clk0),
 		.CE (1'b1),
 		.D0 (pixel_blue[1]),
 		.D1 (pixel_green[5]),
-		.R  (1'b0),
+		.R  (!reset_n),
 		.S  (1'b0)
 	);
-	ODDR2 v1_d_0(
+	ODDR2 #(
+		.DDR_ALIGNMENT ("C0"),
+		.SRTYPE        ("ASYNC")
+	)
+	v1_d_0(
 		.Q  (V1_D[0]),
 		.C0 (dcm_clk0),
 		.C1 (!dcm_clk0),
 		.CE (1'b1),
 		.D0 (pixel_blue[0]),
 		.D1 (pixel_green[4]),
-		.R  (1'b0),
+		.R  (!reset_n),
 		.S  (1'b0)
 	);
 endmodule
