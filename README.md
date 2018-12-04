@@ -2,8 +2,6 @@
 
 ## Introduction
 
-https://pano-wiki.cyrozap.com/wiki:g2_zero_client
-
 This project contains the reverse engineering results of the Pano Logic Zero Client G2.
 
 It was started by [cyrozap](https://github.com/cyrozap/Pano-Logic-Zero-Client-G2-FPGA-Demo), who
@@ -40,6 +38,8 @@ Compared to the G1, the most important improvements of G2 are:
 ## Disassembly
 
 Overly detailed disassembly pictures can be found [here](https://tomverbeure.github.io/pano/logic/2018/12/02/Pano-Logic-G2-Disassembly.html).
+
+![Disassembly Complete](./assets/5-Disassembly Complete.JPG)
 
 ## JTAG
 
