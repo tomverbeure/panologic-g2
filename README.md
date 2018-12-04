@@ -39,7 +39,7 @@ Compared to the G1, the most important improvements of G2 are:
 
 Overly detailed disassembly pictures can be found [here](https://tomverbeure.github.io/pano/logic/2018/12/02/Pano-Logic-G2-Disassembly.html).
 
-![Disassembly Complete]("./assets/5-Disassembly Complete.JPG")
+![Disassembly Complete](./assets/5-Disassembly-Complete.JPG)
 
 ## JTAG
 
