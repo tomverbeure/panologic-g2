@@ -95,8 +95,6 @@ Instructions on how to get the JTAG going are [here](https://tomverbeure.github.
     
     There is no support for HDCP.
 
-* [SMSC USB2514HZH USB 4-Port Hub Controller](https://www.microchip.com/wwwproducts/en/USB2514)
-
 * Marvell 88E1119R-NNW2 
 
     https://www.mikrocontroller.net/attachment/139158/88E1111_DS.pdf is the closest. Both 1111 and 1119R have a regular GMII interface, it should be possible to get this working without. 
@@ -114,6 +112,18 @@ Instructions on how to get the JTAG going are [here](https://tomverbeure.github.
     Marked as 25P28V6G. Which translates to M25P128 with [this code translator](https://www.micron.com/~/media/Documents/Products/Technical%20Note/NOR%20Flash/tn1224_spi_marking.pdf).
 
 *  [SMSC 3300-EKZ](https://www.microchip.com/wwwproducts/en/USB3300) USB ULPI to USB PHY Transceiver
+
+    ULPI is parallel replacement for the serial USB protocol that's typically used to provide USB PHY
+    capabilities to chips that don't have built-in USB PHY, such a FPGAs.
+    
+    It's still up to the FPGA to implement a full USB host controller. This is contrary to the Pano
+    Logic G1, which has a USB chip that includes both controller and PHY.
+
+* [SMSC USB2514HZH USB 4-Port Hub Controller](https://www.microchip.com/wwwproducts/en/USB2514)
+
+    This chip has sensible zero-configuration power-up settings to operate as a 4-port hub. Right now,
+    there don't seem to be any connections between the FPGA and this chip, so it's likely configured
+    in this mode. If so, that's great: it's at least one less chip to get up and running.
 
 * [TI LM339](http://www.ti.com/product/LM339) Quad Differential Comparators
 
