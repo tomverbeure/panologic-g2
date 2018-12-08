@@ -17,11 +17,10 @@ You should be able to distinguish between the two by the revision code: LX150 is
 
 Compared to the G1, the most important improvements of G2 are:
 
-* Much larger FPGA: a [Xilinx Spartan-6 XC6SLX150](https://www.xilinx.com/support/documentation/data_sheets/ds160.pdf) instead 
+* Much larger FPGA: a [Xilinx Spartan-6 XC6SLX150 or XC6SLX100](https://www.xilinx.com/support/documentation/data_sheets/ds160.pdf) instead 
   of a Xilinx Spartan-3E XC3S1600E.
 
-    This is one of the largest Spartan-6 devices, with 147k logic cells, 1.3Mbit of distributed RAM, 4.8Mbit of block RAM
-    and 180 DSPs. A huge upgrade compared to the 33k logic cells, 231kbit of block RAM and 36 multipliers of the G1 FPGA!
+    This is one of the largest Spartan-6 devices, and a huge upgrade compared to the Spartan-3 1600 FPGA of the G1!
     
     For the longest time, this device was not supported by the free Xilinx ISE 14.7, and it's still not supported
     by that Linux version. However, there is now an ISE 14.7 for Win10 version that not only supports Spartan-6,
