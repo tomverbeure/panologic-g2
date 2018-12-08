@@ -19,11 +19,10 @@ Compared to the G1, the most important improvements of G2 are:
 
     This is one of the largest Spartan-6 devices, with 147k logic cells, 1.3Mbit of block RAM and 180 DSPs. A huge upgrade compared to 
     the 33k logic cells, 231kbit of block RAM and 36 multipliers of the G1 FPGA.
-
-    Unfortunately, this FPGA is also the biggest disadvantage: *it's not supported by the free Xilinx Webpack version of ISE!*
-
-    Since the commercial version costs many thousands of dollars, this makes this device out of reach for more, if not all, 
-    hobbyists.
+    
+    For the longest time, this device was not supported by the free Xilinx ISE 14.7, and it's still not supported
+    by that Linux version. However, there is now an ISE 14.7 for Win10 version that not only supports Spartan-6,
+    but it supports the larger devices such as the LX150 as well!
 
 * 256MByte of DDR2 SDRAM instead of 32MByte of LPDDR SDRAM.
 
