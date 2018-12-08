@@ -88,6 +88,13 @@ Instructions on how to get the JTAG going are [here](https://tomverbeure.github.
 
 * 2x [Chrontel CH7301C-TF](http://www.chrontel.com/product/detail/38#) DVI Transmitter
 
+    Supports pixel clocks up to 165MHz, which corresponds to 1920x1200x60 (with reduced blanking.) Also supports
+    analog VGA output. Built-in conversion from YUV to RGB.
+    
+    Since HDMI is a superset of DVI, the same chip is also used for HDMI, without support for audio.
+    
+    There is no support for HDCP.
+
 * [SMSC USB2514HZH USB 4-Port Hub Controller](https://www.microchip.com/wwwproducts/en/USB2514)
 
 * Marvell 88E1119R-NNW2 
