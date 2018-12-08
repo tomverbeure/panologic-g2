@@ -90,7 +90,13 @@ Instructions on how to get the JTAG going are [here](https://tomverbeure.github.
 
 * Marvell 88E1119R-NNW2 
 
-    No exact data sheet found! However, since this is a regular GMII interface, it should be possible to get this working without.
+    https://www.mikrocontroller.net/attachment/139158/88E1111_DS.pdf is the closest. Both 1111 and 1119R have a regular GMII interface, it should be possible to get this working without. 
+    
+    http://static6.arrow.com/aropdfconversion/80d635a18100a0f0c187b633911ff93001715194/ethernetphypsg_v2_ndafr002.pdf shows the differences.
+    
+    https://github.com/tardfs/frontend/blob/master/ethertest/xapp1042/marvell_88e1111.c supports the same family of GigE PHYs.
+    
+    https://github.com/Undrizzle/apps/blob/master/DSDT_3.0/phy/ supports 88E1119R directly and highlights the differences with 88E111.
 
 * [Micron M25P128 Serial Flash with SPI](https://www.micron.com/~/media/documents/products/data-sheet/nor-flash/serial-nor/m25p/m25p_128.pdf)
 
