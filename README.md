@@ -83,6 +83,9 @@ Instructions on how to get the JTAG going are [here](https://tomverbeure.github.
   That's right: there are 2 SDRAM chips on this board! Each one has 512Mbit in x16 configuration, good for 128MByte per DRAM and 256MByte total.
 
   Theoretical peak BW is 3.2GByte/s, which is pretty decent.
+  
+  1920x1200x24@60 requires an average BW of only 3.3 Gbit/s, or 6.6Gbit/s with 2 screen attached. So there's definitely
+  way more BW available than strictly needed.
     
 * Wolfson WM8750BG Audio Codec
 
