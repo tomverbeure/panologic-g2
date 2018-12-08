@@ -47,7 +47,7 @@ Overly detailed disassembly pictures can be found [here](https://tomverbeure.git
 
 Instructions on how to get the JTAG going are [here](https://tomverbeure.github.io/pano/logic/2018/12/03/Pano-logic-JTAG-First-Contact.html).
 
-![JTAG Connected](./assets/JTAG-Connected.JPG)
+![JTAG Connected](./assets/JTAG-connected.JPG)
 
 ## FPGA Connections
 
