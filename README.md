@@ -51,7 +51,7 @@ Instructions on how to get the JTAG going are [here](https://tomverbeure.github.
 
   See the [Pano.ucf](Pano.ucf) file for all the FPGA connections.
 
-  There were all reverse engineered by cyrozap.
+  These were all reverse engineered by cyrozap.
 
 ## Resources
 
