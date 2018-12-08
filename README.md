@@ -12,6 +12,9 @@ this GitHub repo should now all have that information as well.
 The Pano Logic G2 is the successor of the [Pano Logic G1](https://github.com/tomverbeure/panologic). Like the
 G1, it has all the interfaces that are needed to build a small mini-computer with an FPGA.
 
+**IMPORTANT: There are 2 versions of the Pano Logic G2: some use a Spartan 6 LX150 while others use an LX100, which is smaller but still very large, and with equal amount of block RAM and DSPs.** 
+You should be able to distinguish between the two by the revision code: LX150 is rev B and LX100 is rev C. But beware: there are VGA-based Pano G1s that are also called rev C. So always check first that your unit has the right video connector.
+
 Compared to the G1, the most important improvements of G2 are:
 
 * Much larger FPGA: a [Xilinx Spartan-6 XC6SLX150](https://www.xilinx.com/support/documentation/data_sheets/ds160.pdf) instead 
@@ -57,16 +60,16 @@ Instructions on how to get the JTAG going are [here](https://tomverbeure.github.
 
 ## Resources
 
-* Xilinx Spartan-6 XC6SLX150 FGG484 (Speed Grade 2)
+* Xilinx Spartan-6 XC6SLX150 FGG484 speed grade 2 / Spartan-6 XC6SLX100
 
   Features:
 
-  * 147K logic cells
-  * 23K slices (4 6-input LUTs per slice, 8 FFs per slice)
-  * 184K FFs
-  * 1355Kbit max distributed RAM
-  * 4824Kbit max block RAM (268 RAMs)
-  * 180 DSPs (1 18x18 multiplier + pre-addr + accumulator)
+  * 147K / 101K logic cells 
+  * 23K / 16K  slices (4 6-input LUTs per slice, 8 FFs per slice)
+  * 184K / 127K FFs
+  * 1355 / 976 Kbit max distributed RAM
+  * 4824 / 4824 Kbit max block RAM (268 RAMs)
+  * 180 / 180 DSPs (1 18x18 multiplier + pre-addr + accumulator)
   * 6 CMTs (2 DCMs and 1 PLL per CMT)
   * 4 memory controllers (2 used for the DDR2 SDRAM)
 
