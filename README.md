@@ -108,9 +108,11 @@ Instructions on how to get the JTAG going are [here](https://tomverbeure.github.
     of all components in the same product series. The 1119R is the only one that still supports the original
     MII interface.
     
-    https://github.com/tardfs/frontend/blob/master/ethertest/xapp1042/marvell_88e1111.c supports the same family of GigE PHYs.
+    [Some driver code](https://github.com/tardfs/frontend/blob/master/ethertest/xapp1042/marvell_88e1111.c)
+    for this Ethernet PHY family.
     
-    https://github.com/Undrizzle/apps/blob/master/DSDT_3.0/phy/ supports 88E1119R directly and highlights the differences with 88E111.
+    [More driver code](https://github.com/Undrizzle/apps/blob/master/DSDT_3.0/phy/) that supports 88E1119R directly 
+    and highlights the differences with 88E111.
 
 * [Micron M25P128 Serial Flash with SPI](https://www.micron.com/~/media/documents/products/data-sheet/nor-flash/serial-nor/m25p/m25p_128.pdf)
 
