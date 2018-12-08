@@ -30,6 +30,9 @@ Compared to the G1, the most important improvements of G2 are:
 
 * DVI instead of VGA output
 
+    The Chrontel chip that drives the DVI part also supports VGA, and these VGA pins are connected to the
+    analog DVI pins. So VGA is still supported with a simple, passive DVI-to-VGA adapter.
+
 * Micro-HDMI output
 
 * Gigabit Ethernet 
