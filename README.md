@@ -97,6 +97,9 @@ Instructions on how to get the JTAG going are [here](https://tomverbeure.github.
     Since HDMI is a superset of DVI, the same chip is also used for HDMI, without support for audio.
     
     There is no support for HDCP.
+    
+    These chips have an I2C slave interface to access configuration and status registers. After bootup, the
+    chips are in power down mode, so you always need an I2C master of some sort to make video work.
 
 * Marvell 88E1119R-NNW2 
 
