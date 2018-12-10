@@ -2,9 +2,9 @@
 package pano
 
 import spinal.core._
-import spinal.lib.Counter
-import spinal.lib.CounterFreeRun
-import spinal.lib.GrayCounter
+
+import spinal.lib._
+import spinal.lib.io._
 
 class Pano extends Component {
 
@@ -16,6 +16,16 @@ class Pano extends Component {
         val led_blue            = out(Bool)
 
         val pano_button         = in(Bool)
+
+        // I2C control for both Chrontel chips
+        val dvi_spc             = master(TriState(Bool))
+        val dvi_spd             = master(TriState(Bool))
+
+        val dvi0_clk            = out(Bool)
+        val dvi0_reset_         = out(Bool)
+
+        val dvi1_clk            = out(Bool)
+        val dvi1_reset_         = out(Bool)
     }
 
     noIoPrefix()
@@ -60,6 +70,12 @@ class Pano extends Component {
         )
     )
 
+    io.dvi0_clk     := clk25
+    io.dvi0_reset_  := True
+
+    io.dvi1_clk     := clk25
+    io.dvi1_reset_  := True
+
     val core = new ClockingArea(clkMainClockDomain) {
 
         val u_pano_core = new PanoCore()
@@ -69,6 +85,9 @@ class Pano extends Component {
         u_pano_core.io.led_blue     <> io.led_blue
 
         u_pano_core.io.switch_      <> io.pano_button
+
+        u_pano_core.io.dvi_ctrl_scl <> io.dvi_spc
+        u_pano_core.io.dvi_ctrl_sda <> io.dvi_spd
     }
 
 }
@@ -79,7 +98,7 @@ object PanoVerilog{
         val config = SpinalConfig()
         config.generateVerilog({
             val toplevel = new Pano()
-            toplevel
+            InOutWrapper(toplevel)
         })
         println("DONE")
     }

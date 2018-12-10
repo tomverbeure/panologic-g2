@@ -4,6 +4,7 @@
 #include "reg.h"
 #include "top_defines.h"
 #include "print.h"
+#include "i2c.h"
 
 static inline uint32_t rdcycle(void) {
     uint32_t cycle;
@@ -40,10 +41,40 @@ int button_pressed()
     return REG_RD(BUTTON) == 0x01;
 }
 
+i2c_ctx_t dvi_ctrl_i2c_ctx;
+
+void dvi_ctrl_init()
+{
+    dvi_ctrl_i2c_ctx.base_addr = 0;
+    dvi_ctrl_i2c_ctx.scl_pin_nr = 0;
+    dvi_ctrl_i2c_ctx.sda_pin_nr = 1;
+
+    i2c_init(&dvi_ctrl_i2c_ctx);
+}
+
 
 int main() {
 
     REG_WR(LED_CONFIG, 0x00);
+
+    dvi_ctrl_init();
+
+    int addr = 0x75;
+    while(1){
+        {
+            bool ack = i2c_write_reg_nr(&dvi_ctrl_i2c_ctx, (addr & 0x7f)<<1, 0x5a);
+            if (ack){
+                REG_WR(LED_CONFIG, 0xff);
+                wait(10000);
+            }
+            else{
+                REG_WR(LED_CONFIG, 0x00);
+            }
+            wait(250);
+        }
+
+        addr ^= 0x03;
+    }
 
 #if 0
     clear();
@@ -55,6 +86,9 @@ int main() {
     print("\n");
     print("Code at github.com/tomverbeure/rt\n");
 #endif
+
+    
+
 
     while(1){
         if (!button_pressed()){

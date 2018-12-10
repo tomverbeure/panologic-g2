@@ -3,6 +3,8 @@ package mr1
 
 import java.nio.file.{Files, Paths}
 import spinal.core._
+import spinal.lib._
+import spinal.lib.io._
 
 class MR1Top(config: MR1Config) extends Component {
 
@@ -12,6 +14,9 @@ class MR1Top(config: MR1Config) extends Component {
         val led3    = out(Bool)
 
         val switch_ = in(Bool)
+
+        val dvi_ctrl_scl        = master(TriState(Bool))
+        val dvi_ctrl_sda        = master(TriState(Bool))
     }
 
     val mr1 = new MR1(config)
@@ -92,8 +97,41 @@ class MR1Top(config: MR1Config) extends Component {
     val button = Reg(Bool) init(False)
     button := !io.switch_
 
-    reg_rd_data :=   (RegNext(button_addr)      ? (B(0, 31 bits) ## button) |
-                                                   B(0, 32 bits))
+
+    //============================================================
+    // DVI_CTRL I2C
+    //============================================================
+
+    val dvi_ctrl_addr     = (mr1.io.data_req.addr === U"32'h00080010")
+    val dvi_ctrl_set_addr = (mr1.io.data_req.addr === U"32'h00080014")
+    val dvi_ctrl_clr_addr = (mr1.io.data_req.addr === U"32'h00080018")
+    val dvi_ctrl_rd_addr  = (mr1.io.data_req.addr === U"32'h0008001c")
+
+    val dvi_ctrl_scl = Reg(Bool) init(True)
+    val dvi_ctrl_sda = Reg(Bool) init(True)
+
+    dvi_ctrl_scl :=  dvi_ctrl_addr                                  ? mr1.io.data_req.data(0) | 
+                    ((dvi_ctrl_set_addr && mr1.io.data_req.data(0)) ? True                    |
+                    ((dvi_ctrl_clr_addr && mr1.io.data_req.data(0)) ? False                   |
+                                                                      dvi_ctrl_scl))
+
+    dvi_ctrl_sda :=  dvi_ctrl_addr                                  ? mr1.io.data_req.data(1) | 
+                    ((dvi_ctrl_set_addr && mr1.io.data_req.data(1)) ? True                    |
+                    ((dvi_ctrl_clr_addr && mr1.io.data_req.data(1)) ? False                   |
+                                                                      dvi_ctrl_sda))
+
+    io.dvi_ctrl_scl.writeEnable := (dvi_ctrl_scl === False)
+    io.dvi_ctrl_scl.write       := dvi_ctrl_scl
+
+    io.dvi_ctrl_sda.writeEnable := (dvi_ctrl_sda === False)
+    io.dvi_ctrl_sda.write       := dvi_ctrl_sda
+
+    reg_rd_data :=  (RegNext(button_addr)       ? (B(0, 31 bits) ## button) |
+                    (RegNext(dvi_ctrl_addr)     ? (B(0, 30 bits) ## dvi_ctrl_sda ## dvi_ctrl_scl) |
+                    (RegNext(dvi_ctrl_set_addr) ? (B(0, 30 bits) ## dvi_ctrl_sda ## dvi_ctrl_scl) |
+                    (RegNext(dvi_ctrl_clr_addr) ? (B(0, 30 bits) ## dvi_ctrl_sda ## dvi_ctrl_scl) |
+                    (RegNext(dvi_ctrl_rd_addr)  ? (B(0, 30 bits) ## io.dvi_ctrl_sda.read ## io.dvi_ctrl_scl.read) |
+                                                   B(0, 32 bits))))))
 
 }
 

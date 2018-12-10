@@ -1,7 +1,7 @@
 
 MEM_WORDS       = 2048
 
-OBJ_FILES       = start.o progmem.o print.o
+OBJ_FILES       = start.o progmem.o print.o i2c.o
 
 TOOLS_PREFIX    = /opt/riscv32i/bin
 TARGET          = $(TOOLS_PREFIX)/riscv32-unknown-elf
@@ -54,10 +54,10 @@ progmem.bin: progmem.elf
 progmem8k.bin: progmem.elf
 	$(OBJCOPY) --pad-to=8192 -O binary $< $@
 
-progmem.elf: fpxx_sin_table.h $(OBJ_FILES) top_defines.h start.o sections.lds Makefile
+progmem.elf: fpxx_sin_table.h $(OBJ_FILES) top_defines.h sections.lds Makefile
 	$(LD) $(LDFLAGS) -s -o $@ $(OBJ_FILES) > progmem.map
 
-progmem_dis.elf: fpxx_sin_table.h progmem.o print.o top_defines.h start.o sections.lds Makefile
+progmem_dis.elf: fpxx_sin_table.h $(OBJ_FILES) top_defines.h sections.lds Makefile
 	$(LD) $(LDFLAGS) -o $@ $(OBJ_FILES) > progmem.map
 
 fpxx_sin_table.h: create_sin_table Makefile
