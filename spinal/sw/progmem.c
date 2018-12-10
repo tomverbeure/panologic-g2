@@ -35,6 +35,11 @@ void wait(int cycles)
 
 #define WAIT_CYCLES 1000000
 
+int button_pressed()
+{
+    return REG_RD(BUTTON) == 0x01;
+}
+
 
 int main() {
 
@@ -52,9 +57,14 @@ int main() {
 #endif
 
     while(1){
-        REG_WR(LED_CONFIG, 0xff);
-        wait(WAIT_CYCLES);
-        REG_WR(LED_CONFIG, 0x0);
-        wait(WAIT_CYCLES);
+        if (!button_pressed()){
+            REG_WR(LED_CONFIG, 0xff);
+            wait(WAIT_CYCLES);
+            REG_WR(LED_CONFIG, 0x0);
+            wait(WAIT_CYCLES);
+        }
+        else{
+            REG_WR(LED_CONFIG, 0x00);
+        }
     }
 }

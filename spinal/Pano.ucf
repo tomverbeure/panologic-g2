@@ -226,3 +226,8 @@ NET "pano_button"           LOC = H12 | IOSTANDARD = LVCMOS33;
 #NET "DDR2B_LDQS_N" LOC = L1 | IOSTANDARD = LVCMOS18;
 #NET "DDR2B_UDQS_P" LOC = T2 | IOSTANDARD = LVCMOS18;
 #NET "DDR2B_UDQS_N" LOC = T1 | IOSTANDARD = LVCMOS18;
+
+INST "core_u_pano_core/u_mr1_top/Mram_ram_cpu_ram_symbol0" LOC = RAMB16_X3Y86;
+INST "core_u_pano_core/u_mr1_top/Mram_ram_cpu_ram_symbol1" LOC = RAMB16_X3Y84;
+INST "core_u_pano_core/u_mr1_top/Mram_ram_cpu_ram_symbol2" LOC = RAMB16_X3Y82;
+INST "core_u_pano_core/u_mr1_top/Mram_ram_cpu_ram_symbol3" LOC = RAMB16_X3Y80;
