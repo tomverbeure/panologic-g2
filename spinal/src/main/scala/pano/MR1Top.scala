@@ -4,10 +4,7 @@ package mr1
 import java.nio.file.{Files, Paths}
 import spinal.core._
 
-import rt._
-import math._
-
-class MR1Top(config: MR1Config, rtConfig: RTConfig) extends Component {
+class MR1Top(config: MR1Config) extends Component {
 
     val io = new Bundle {
         val led1    = out(Bool)
@@ -93,7 +90,7 @@ class MR1Top(config: MR1Config, rtConfig: RTConfig) extends Component {
     val button_addr  = (mr1.io.data_req.addr === U"32'h00080004")
 
     val button = Reg(Bool) init(False)
-    button := !switch_
+    button := !io.switch_
 
     reg_rd_data :=   (RegNext(button_addr)      ? (B(0, 31 bits) ## button) |
                                                    B(0, 32 bits))

@@ -46,8 +46,10 @@ class Pano extends Component {
         val osc_reset_ = RegNext(reset_unbuffered_)
     }
 
-    val clk25       = io.osc_clk
-    val reset25_    = resetCtrl.osc_reset_
+    val clk25    = Bool
+    val reset25_ = Bool
+    clk25       := io.osc_clk
+    reset25_    := resetCtrl.osc_reset_
 
     val clkMainClockDomain = ClockDomain(
         clock = clk25,
@@ -58,7 +60,7 @@ class Pano extends Component {
         )
     )
 
-    val core = new ClockingArea(clkVoClockDomain) {
+    val core = new ClockingArea(clkMainClockDomain) {
 
         val u_pano_core = new PanoCore()
 
@@ -66,7 +68,7 @@ class Pano extends Component {
         u_pano_core.io.led_green    <> io.led_green
         u_pano_core.io.led_blue     <> io.led_blue
 
-        u_pano_core.io.pano_button   <> io.pano_button
+        u_pano_core.io.switch_      <> io.pano_button
     }
 
 }

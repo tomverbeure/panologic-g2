@@ -32,8 +32,9 @@ class PanoCore extends Component {
     }
 
     val mr1Config = MR1Config()
-    val u_mr1_top = new MR1Top(mr1Config, rtConfig)
-    u_mr1_top.io.led1       <> io.led_blue
+    val u_mr1_top = new MR1Top(mr1Config)
+    u_mr1_top.io.led1       <> io.led_red
+    u_mr1_top.io.led2       <> io.led_blue
     u_mr1_top.io.switch_    <> io.switch_
 
 }

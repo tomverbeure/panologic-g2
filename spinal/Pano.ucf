@@ -6,7 +6,7 @@ CONFIG VCCAUX = "2.5";
 # 25 MHz System Clock
 NET "osc_clk"               LOC = Y13 | IOSTANDARD = LVCMOS33;
 TIMESPEC TS_CLK = PERIOD "osc_clk" 25 MHz HIGH 50%;
-NET "osc_clk" TNM_NET = clk_osc;
+NET "osc_clk" TNM_NET = osc_clk;
 
 # Reset Signals
 #NET "SYSRST_N" LOC = AB14 | IOSTANDARD = LVCMOS33;
