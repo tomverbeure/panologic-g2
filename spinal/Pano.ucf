@@ -32,51 +32,50 @@ NET "pano_button"           LOC = H12 | IOSTANDARD = LVCMOS33;
 NET "dvi_spc"               LOC = E8 | IOSTANDARD = LVCMOS33;
 NET "dvi_spd"               LOC = D9 | IOSTANDARD = LVCMOS33;
 
-# DVI Interface 1 (DVI)
-#NET "V1_D[0]" LOC = D17 | IOSTANDARD = LVCMOS33;
-#NET "V1_D[1]" LOC = A14 | IOSTANDARD = LVCMOS33;
-#NET "V1_D[2]" LOC = A15 | IOSTANDARD = LVCMOS33;
-#NET "V1_D[3]" LOC = A16 | IOSTANDARD = LVCMOS33;
-#NET "V1_D[4]" LOC = A17 | IOSTANDARD = LVCMOS33;
-#NET "V1_D[5]" LOC = A18 | IOSTANDARD = LVCMOS33;
-#NET "V1_D[6]" LOC = D14 | IOSTANDARD = LVCMOS33;
-#NET "V1_D[7]" LOC = B14 | IOSTANDARD = LVCMOS33;
-#NET "V1_D[8]" LOC = B16 | IOSTANDARD = LVCMOS33;
-#NET "V1_D[9]" LOC = B18 | IOSTANDARD = LVCMOS33;
-#NET "V1_D[10]" LOC = E16 | IOSTANDARD = LVCMOS33;
-#NET "V1_D[11]" LOC = D15 | IOSTANDARD = LVCMOS33;
-NET "dvi0_clk" LOC = E14 | IOSTANDARD = LVCMOS33;
-#NET "V1_XCLK_P" LOC = E14 | IOSTANDARD = LVCMOS33;
-#NET "V1_XCLK_N" LOC = F15 | IOSTANDARD = LVCMOS33;
-#NET "V1_HSYNC" LOC = F12 | IOSTANDARD = LVCMOS33;
-#NET "V1_VSYNC" LOC = C16 | IOSTANDARD = LVCMOS33;
-#NET "V1_DE" LOC = F14 | IOSTANDARD = LVCMOS33;
-NET "dvi0_reset_" LOC = C15 | IOSTANDARD = LVCMOS33;
-#NET "V1_RESET_N" LOC = C15 | IOSTANDARD = LVCMOS33;
-#NET "DDC1_SCK" LOC = C14 | IOSTANDARD = LVCMOS33;
-#NET "DDC1_SDA" LOC = C17 | IOSTANDARD = LVCMOS33;
-#NET "V1_HPINT" LOC = D13 | IOSTANDARD = LVCMOS33; # Hot-plug detect interrupt input, active low
+# Chrontel 1 (DVI)
+NET "dvi_reset_"            LOC = C15 | IOSTANDARD = LVCMOS33;
+NET "dvi_xclk_p"            LOC = E14 | IOSTANDARD = LVCMOS33;
+NET "dvi_xclk_n"            LOC = F15 | IOSTANDARD = LVCMOS33;
+NET "dvi_v"                 LOC = C16 | IOSTANDARD = LVCMOS33;
+NET "dvi_h"                 LOC = F12 | IOSTANDARD = LVCMOS33;
+NET "dvi_de"                LOC = F14 | IOSTANDARD = LVCMOS33;
+NET "dvi_d[0]"              LOC = D17 | IOSTANDARD = LVCMOS33;
+NET "dvi_d[1]"              LOC = A14 | IOSTANDARD = LVCMOS33;
+NET "dvi_d[2]"              LOC = A15 | IOSTANDARD = LVCMOS33;
+NET "dvi_d[3]"              LOC = A16 | IOSTANDARD = LVCMOS33;
+NET "dvi_d[4]"              LOC = A17 | IOSTANDARD = LVCMOS33;
+NET "dvi_d[5]"              LOC = A18 | IOSTANDARD = LVCMOS33;
+NET "dvi_d[6]"              LOC = D14 | IOSTANDARD = LVCMOS33;
+NET "dvi_d[7]"              LOC = B14 | IOSTANDARD = LVCMOS33;
+NET "dvi_d[8]"              LOC = B16 | IOSTANDARD = LVCMOS33;
+NET "dvi_d[9]"              LOC = B18 | IOSTANDARD = LVCMOS33;
+NET "dvi_d[10]"             LOC = E16 | IOSTANDARD = LVCMOS33;
+NET "dvi_d[11]"             LOC = D15 | IOSTANDARD = LVCMOS33;
 
-# DVI Interface 2 (micro-HDMI)
-#NET "V2_D[0]" LOC = T18 | IOSTANDARD = LVCMOS33;
-#NET "V2_D[1]" LOC = U16 | IOSTANDARD = LVCMOS33;
-#NET "V2_D[2]" LOC = V17 | IOSTANDARD = LVCMOS33;
-#NET "V2_D[3]" LOC = V19 | IOSTANDARD = LVCMOS33;
-#NET "V2_D[4]" LOC = V18 | IOSTANDARD = LVCMOS33;
-#NET "V2_D[5]" LOC = W17 | IOSTANDARD = LVCMOS33;
-#NET "V2_D[6]" LOC = Y17 | IOSTANDARD = LVCMOS33;
-#NET "V2_D[7]" LOC = Y15 | IOSTANDARD = LVCMOS33;
-#NET "V2_D[8]" LOC = Y18 | IOSTANDARD = LVCMOS33;
-#NET "V2_D[9]" LOC = Y19 | IOSTANDARD = LVCMOS33;
-#NET "V2_D[10]" LOC = AB21 | IOSTANDARD = LVCMOS33;
-#NET "V2_D[11]" LOC = T17 | IOSTANDARD = LVCMOS33;
-NET "dvi1_clk" LOC = T15 | IOSTANDARD = LVCMOS33; # Clock output
-#NET "V2_XCLK_P" LOC = T15 | IOSTANDARD = LVCMOS33; # Clock output
-#NET "V2_HSYNC" LOC = AB15 | IOSTANDARD = LVCMOS33; # H-sync output
-#NET "V2_VSYNC" LOC = T16 | IOSTANDARD = LVCMOS33; # V-sync output
-#NET "V2_DE" LOC = AB16 | IOSTANDARD = LVCMOS33; # Data enable output
-NET "dvi1_reset_" LOC = W18 | IOSTANDARD = LVCMOS33; # Reset output, active low
-#NET "V2_RESET_N" LOC = W18 | IOSTANDARD = LVCMOS33; # Reset output, active low
+#NET "dvi0_ddc_scl"          LOC = C14 | IOSTANDARD = LVCMOS33;
+#NET "dvi0_ddc_sda"          LOC = C17 | IOSTANDARD = LVCMOS33;
+#NET "dvi0_hpint"            LOC = D13 | IOSTANDARD = LVCMOS33; # Hot-plug detect interrupt input, active low
+
+# Chrontel 2 (micro-HDMI)
+
+NET "hdmi_reset_"           LOC = W18  | IOSTANDARD = LVCMOS33; # Reset output, active low
+NET "hdmi_xclk_p"           LOC = T15  | IOSTANDARD = LVCMOS33; # Clock output
+NET "hdmi_v"                LOC = T16  | IOSTANDARD = LVCMOS33; # V-sync output
+NET "hdmi_h"                LOC = AB15 | IOSTANDARD = LVCMOS33; # H-sync output
+NET "hdmi_de"               LOC = AB16 | IOSTANDARD = LVCMOS33; # Data enable output
+NET "hdmi_d[0]"             LOC = T18  | IOSTANDARD = LVCMOS33;
+NET "hdmi_d[1]"             LOC = U16  | IOSTANDARD = LVCMOS33;
+NET "hdmi_d[2]"             LOC = V17  | IOSTANDARD = LVCMOS33;
+NET "hdmi_d[3]"             LOC = V19  | IOSTANDARD = LVCMOS33;
+NET "hdmi_d[4]"             LOC = V18  | IOSTANDARD = LVCMOS33;
+NET "hdmi_d[5]"             LOC = W17  | IOSTANDARD = LVCMOS33;
+NET "hdmi_d[6]"             LOC = Y17  | IOSTANDARD = LVCMOS33;
+NET "hdmi_d[7]"             LOC = Y15  | IOSTANDARD = LVCMOS33;
+NET "hdmi_d[8]"             LOC = Y18  | IOSTANDARD = LVCMOS33;
+NET "hdmi_d[9]"             LOC = Y19  | IOSTANDARD = LVCMOS33;
+NET "hdmi_d[10]"            LOC = AB21 | IOSTANDARD = LVCMOS33;
+NET "hdmi_d[11]"            LOC = T17  | IOSTANDARD = LVCMOS33;
+
 #NET "DDC2_SCK" LOC = AA21 | IOSTANDARD = LVCMOS33; # Display data channel clock
 #NET "DDC2_SDA" LOC = AB19 | IOSTANDARD = LVCMOS33; # Display data channel data
 #NET "V2_HPINT" LOC = AB18 | IOSTANDARD = LVCMOS33; # Hot-plug detect interrupt input, active low

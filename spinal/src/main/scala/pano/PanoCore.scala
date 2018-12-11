@@ -18,6 +18,8 @@ class PanoCore extends Component {
 
         val dvi_ctrl_scl        = master(TriState(Bool))
         val dvi_ctrl_sda        = master(TriState(Bool))
+
+        val vo                  = out(VgaData())
     }
 
     val leds = new Area {
@@ -40,6 +42,32 @@ class PanoCore extends Component {
     u_mr1_top.io.switch_    <> io.switch_
     u_mr1_top.io.dvi_ctrl_scl    <> io.dvi_ctrl_scl
     u_mr1_top.io.dvi_ctrl_sda    <> io.dvi_ctrl_sda
+
+    val timings = VideoTimings()
+    timings.h_active        := 640
+    timings.h_fp            := 16
+    timings.h_sync          := 96
+    timings.h_bp            := 48
+    timings.h_sync_positive := False
+    timings.h_total_m1      := (timings.h_active + timings.h_fp + timings.h_sync + timings.h_bp -1).resize(timings.h_total_m1.getWidth)
+
+    timings.v_active        := 480
+    timings.v_fp            := 11
+    timings.v_sync          := 2
+    timings.v_bp            := 31
+    timings.v_sync_positive := False
+    timings.v_total_m1      := (timings.v_active + timings.v_fp + timings.v_sync + timings.v_bp -1).resize(timings.v_total_m1.getWidth)
+
+    val vi_gen_pixel_out = PixelStream()
+
+    val u_vi_gen = new VideoTimingGen()
+    u_vi_gen.io.timings         <> timings
+    u_vi_gen.io.pixel_out       <> vi_gen_pixel_out
+
+    val u_vo = new VideoOut()
+    u_vo.io.timings             <> timings
+    u_vo.io.pixel_in            <> vi_gen_pixel_out
+    u_vo.io.vga_out             <> io.vo
 
 }
 

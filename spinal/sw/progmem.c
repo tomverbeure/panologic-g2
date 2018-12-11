@@ -50,6 +50,31 @@ void dvi_ctrl_init()
     dvi_ctrl_i2c_ctx.sda_pin_nr = 1;
 
     i2c_init(&dvi_ctrl_i2c_ctx);
+
+    byte chrontel_registers[][2] = {
+        {   0x1c,       0x00},              // 1x DDR clocking
+        {   0x1d,       0x48},              // internal clock delay
+        {   0x1f,       0x80},              // input data format. Bit 4: vsp, bit 4: hsp
+        {   0x33,       0x08},              // charge pump settings. See table 10
+        {   0x34,       0x16},              // charge pump settings. See table 10
+        {   0x36,       0x60},              // charge pump settings. See table 10
+//        {   0x48,       0x1e},              // Test Image: luminance ramp
+        {   0x48,       0x19},              // Test Image: color bars
+        {   0x49,       0xc0},              // DVI on
+
+        {   0xff,       0xff}               // The end
+    };
+
+    int i=0;
+    while(chrontel_registers[i][0] != 0xff){
+        byte reg_nr  = chrontel_registers[i][0];
+        byte reg_val = chrontel_registers[i][1];
+
+//        i2c_write_regs(&dvi_ctrl_i2c_ctx, 0x75<<1, reg_nr, &reg_val, 1);
+        i2c_write_regs(&dvi_ctrl_i2c_ctx, 0x76<<1, reg_nr, &reg_val, 1);
+
+        ++i;
+    }
 }
 
 
@@ -59,6 +84,7 @@ int main() {
 
     dvi_ctrl_init();
 
+#if 0
     int addr = 0x75;
     while(1){
         {
@@ -75,6 +101,7 @@ int main() {
 
         addr ^= 0x03;
     }
+#endif
 
 #if 0
     clear();
@@ -87,8 +114,7 @@ int main() {
     print("Code at github.com/tomverbeure/rt\n");
 #endif
 
-    
-
+    while(1);
 
     while(1){
         if (!button_pressed()){

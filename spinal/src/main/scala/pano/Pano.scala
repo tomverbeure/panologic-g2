@@ -21,11 +21,8 @@ class Pano extends Component {
         val dvi_spc             = master(TriState(Bool))
         val dvi_spd             = master(TriState(Bool))
 
-        val dvi0_clk            = out(Bool)
-        val dvi0_reset_         = out(Bool)
-
-        val dvi1_clk            = out(Bool)
-        val dvi1_reset_         = out(Bool)
+        val dvi                 = out(ChrontelIntfc(includeXClkN = true))
+        val hdmi                = out(ChrontelIntfc(includeXClkN = false))
     }
 
     noIoPrefix()
@@ -56,6 +53,7 @@ class Pano extends Component {
         val osc_reset_ = RegNext(reset_unbuffered_)
     }
 
+
     val clk25    = Bool
     val reset25_ = Bool
     clk25       := io.osc_clk
@@ -70,13 +68,40 @@ class Pano extends Component {
         )
     )
 
-    io.dvi0_clk     := clk25
-    io.dvi0_reset_  := True
-
-    io.dvi1_clk     := clk25
-    io.dvi1_reset_  := True
-
     val core = new ClockingArea(clkMainClockDomain) {
+
+        val vo = VgaData()
+
+        //============================================================
+        // Chrontel Pads DVI
+        //============================================================
+    
+        val u_dvi = new ChrontelPads(includeXClkN = true)
+        u_dvi.io.pads             <> io.dvi
+        u_dvi.io.vsync            <> vo.vsync
+        u_dvi.io.hsync            <> vo.hsync
+        u_dvi.io.de               <> vo.de
+        u_dvi.io.r                <> vo.r
+        u_dvi.io.g                <> vo.g
+        u_dvi.io.b                <> vo.b
+
+        //============================================================
+        // Chrontel Pads HDMI
+        //============================================================
+    
+        val u_hdmi = new ChrontelPads(includeXClkN = false)
+        u_hdmi.io.pads            <> io.hdmi
+        u_hdmi.io.vsync           <> vo.vsync
+        u_hdmi.io.hsync           <> vo.hsync
+        u_hdmi.io.de              <> vo.de
+        u_hdmi.io.r               <> vo.r
+        u_hdmi.io.g               <> vo.g
+        u_hdmi.io.b               <> vo.b
+
+        //============================================================
+        // Core logic
+        //============================================================
+
 
         val u_pano_core = new PanoCore()
 
@@ -88,6 +113,8 @@ class Pano extends Component {
 
         u_pano_core.io.dvi_ctrl_scl <> io.dvi_spc
         u_pano_core.io.dvi_ctrl_sda <> io.dvi_spd
+
+        u_pano_core.io.vo           <> vo
     }
 
 }
