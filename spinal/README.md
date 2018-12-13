@@ -25,3 +25,5 @@ straight onto the Pano box, if you really don't want to build anything.
 It's possible to update the firmware that's baked in this bitstream by doing `make update_ram`
 in the `./ise` directory. This will replace the `Pano.bit` with an updated version.
 
+I sometimes also add a `Pano.lx100.bit` file in the `./ise` directory because rev C
+versions of the Pano G2 use that instead of the lx150. These are completely untested though.
