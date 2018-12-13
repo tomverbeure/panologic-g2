@@ -53,13 +53,14 @@ void dvi_ctrl_init()
 
     byte chrontel_registers[][2] = {
         {   0x1c,       0x00},              // 1x DDR clocking
-        {   0x1d,       0x48},              // internal clock delay
+        {   0x1d,       0x40},              // internal clock delay
         {   0x1f,       0x80},              // input data format. Bit 4: vsp, bit 4: hsp
         {   0x33,       0x08},              // charge pump settings. See table 10
         {   0x34,       0x16},              // charge pump settings. See table 10
         {   0x36,       0x60},              // charge pump settings. See table 10
+        {   0x48,       0x18},              // Test Image: none
+//        {   0x48,       0x19},              // Test Image: color bars
 //        {   0x48,       0x1e},              // Test Image: luminance ramp
-        {   0x48,       0x19},              // Test Image: color bars
         {   0x49,       0xc0},              // DVI on
 
         {   0xff,       0xff}               // The end
