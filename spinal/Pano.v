@@ -1,7 +1,16 @@
 // Generator : SpinalHDL v1.2.0    git head : cf3b44dbd881428e70669e5b623479c23b2d0ddd
-// Date      : 12/12/2018, 21:01:03
+// Date      : 12/12/2018, 21:58:50
 // Component : Pano
 
+
+`define InstrFormat_defaultEncoding_type [6:0]
+`define InstrFormat_defaultEncoding_R 7'b0000001
+`define InstrFormat_defaultEncoding_I 7'b0000010
+`define InstrFormat_defaultEncoding_S 7'b0000100
+`define InstrFormat_defaultEncoding_B 7'b0001000
+`define InstrFormat_defaultEncoding_U 7'b0010000
+`define InstrFormat_defaultEncoding_J 7'b0100000
+`define InstrFormat_defaultEncoding_Shamt 7'b1000000
 
 `define InstrType_defaultEncoding_type [12:0]
 `define InstrType_defaultEncoding_Undef 13'b0000000000001
@@ -22,15 +31,6 @@
 `define Op1Kind_binary_sequential_Rs1 2'b00
 `define Op1Kind_binary_sequential_Zero 2'b01
 `define Op1Kind_binary_sequential_Pc 2'b10
-
-`define InstrFormat_defaultEncoding_type [6:0]
-`define InstrFormat_defaultEncoding_R 7'b0000001
-`define InstrFormat_defaultEncoding_I 7'b0000010
-`define InstrFormat_defaultEncoding_S 7'b0000100
-`define InstrFormat_defaultEncoding_B 7'b0001000
-`define InstrFormat_defaultEncoding_U 7'b0010000
-`define InstrFormat_defaultEncoding_J 7'b0100000
-`define InstrFormat_defaultEncoding_Shamt 7'b1000000
 
 `define PcState_defaultEncoding_type [4:0]
 `define PcState_defaultEncoding_Idle 5'b00001
@@ -1685,29 +1685,33 @@ module MR1Top (
       input   io_dvi_ctrl_sda_read,
       output  io_dvi_ctrl_sda_write,
       output  io_dvi_ctrl_sda_writeEnable,
+      output [3:0] io_test_pattern_nr,
+      output [7:0] io_test_pattern_const_color_r,
+      output [7:0] io_test_pattern_const_color_g,
+      output [7:0] io_test_pattern_const_color_b,
       input   clk25,
       input   reset25_);
-  wire  _zz_11_;
-  wire [31:0] _zz_12_;
-  wire  _zz_13_;
-  wire [31:0] _zz_14_;
-  reg [31:0] _zz_15_;
-  reg [31:0] _zz_16_;
+  wire  _zz_15_;
+  wire [31:0] _zz_16_;
   wire  _zz_17_;
   wire [31:0] _zz_18_;
-  wire  _zz_19_;
-  wire [31:0] _zz_20_;
+  reg [31:0] _zz_19_;
+  reg [31:0] _zz_20_;
   wire  _zz_21_;
-  wire [1:0] _zz_22_;
-  wire [31:0] _zz_23_;
-  wire [10:0] _zz_24_;
-  wire [10:0] _zz_25_;
-  wire [29:0] _zz_26_;
-  wire [0:0] _zz_27_;
-  wire [30:0] _zz_28_;
-  wire [0:0] _zz_29_;
-  wire [31:0] _zz_30_;
-  wire [31:0] _zz_31_;
+  wire [31:0] _zz_22_;
+  wire  _zz_23_;
+  wire [31:0] _zz_24_;
+  wire  _zz_25_;
+  wire [1:0] _zz_26_;
+  wire [31:0] _zz_27_;
+  wire [10:0] _zz_28_;
+  wire [10:0] _zz_29_;
+  wire [29:0] _zz_30_;
+  wire [0:0] _zz_31_;
+  wire [30:0] _zz_32_;
+  wire [0:0] _zz_33_;
+  wire [31:0] _zz_34_;
+  wire [31:0] _zz_35_;
   reg [3:0] _zz_1_;
   wire [3:0] wmask;
   reg  instr_req_valid_regNext;
@@ -3777,8 +3781,19 @@ module MR1Top (
   wire  dvi_ctrl_set_addr;
   wire  dvi_ctrl_clr_addr;
   wire  dvi_ctrl_rd_addr;
+  wire  update_dvi_ctrl;
+  wire  update_dvi_ctrl_set;
+  wire  update_dvi_ctrl_clr;
   reg  dvi_ctrl_scl;
   reg  dvi_ctrl_sda;
+  wire  test_pattern_nr_addr;
+  wire  test_pattern_const_color_addr;
+  wire  update_test_pattern_nr;
+  wire  update_test_pattern_const_color;
+  reg [3:0] _zz_11_;
+  reg [7:0] _zz_12_;
+  reg [7:0] _zz_13_;
+  reg [7:0] _zz_14_;
   reg  button_addr_regNext;
   reg  dvi_ctrl_addr_regNext;
   reg  dvi_ctrl_set_addr_regNext;
@@ -3788,22 +3803,22 @@ module MR1Top (
   reg [7:0] ram_cpu_ram_symbol1 [0:2047];
   reg [7:0] ram_cpu_ram_symbol2 [0:2047];
   reg [7:0] ram_cpu_ram_symbol3 [0:2047];
-  reg [7:0] _zz_32_;
-  reg [7:0] _zz_33_;
-  reg [7:0] _zz_34_;
-  reg [7:0] _zz_35_;
   reg [7:0] _zz_36_;
   reg [7:0] _zz_37_;
   reg [7:0] _zz_38_;
   reg [7:0] _zz_39_;
-  assign _zz_24_ = _zz_4_[10:0];
-  assign _zz_25_ = _zz_6_[10:0];
-  assign _zz_26_ = (30'b000000000000000000000000000000);
-  assign _zz_27_ = dvi_ctrl_sda;
-  assign _zz_28_ = {(30'b000000000000000000000000000000),dvi_ctrl_sda};
-  assign _zz_29_ = dvi_ctrl_scl;
-  assign _zz_30_ = {{(30'b000000000000000000000000000000),io_dvi_ctrl_sda_read},io_dvi_ctrl_scl_read};
-  assign _zz_31_ = (32'b00000000000000000000000000000000);
+  reg [7:0] _zz_40_;
+  reg [7:0] _zz_41_;
+  reg [7:0] _zz_42_;
+  reg [7:0] _zz_43_;
+  assign _zz_28_ = _zz_4_[10:0];
+  assign _zz_29_ = _zz_6_[10:0];
+  assign _zz_30_ = (30'b000000000000000000000000000000);
+  assign _zz_31_ = dvi_ctrl_sda;
+  assign _zz_32_ = {(30'b000000000000000000000000000000),dvi_ctrl_sda};
+  assign _zz_33_ = dvi_ctrl_scl;
+  assign _zz_34_ = {{(30'b000000000000000000000000000000),io_dvi_ctrl_sda_read},io_dvi_ctrl_scl_read};
+  assign _zz_35_ = (32'b00000000000000000000000000000000);
   initial begin
     $readmemb("Pano.v_toplevel_core_u_pano_core_u_mr1_top_ram_cpu_ram_symbol0.bin",ram_cpu_ram_symbol0);
     $readmemb("Pano.v_toplevel_core_u_pano_core_u_mr1_top_ram_cpu_ram_symbol1.bin",ram_cpu_ram_symbol1);
@@ -3811,60 +3826,60 @@ module MR1Top (
     $readmemb("Pano.v_toplevel_core_u_pano_core_u_mr1_top_ram_cpu_ram_symbol3.bin",ram_cpu_ram_symbol3);
   end
   always @ (*) begin
-    _zz_16_ = {_zz_35_, _zz_34_, _zz_33_, _zz_32_};
+    _zz_20_ = {_zz_39_, _zz_38_, _zz_37_, _zz_36_};
   end
   always @ (*) begin
-    _zz_15_ = {_zz_39_, _zz_38_, _zz_37_, _zz_36_};
+    _zz_19_ = {_zz_43_, _zz_42_, _zz_41_, _zz_40_};
   end
   always @ (posedge clk25) begin
-    if(wmask[0] && _zz_5_ && _zz_21_ ) begin
-      ram_cpu_ram_symbol0[_zz_25_] <= _zz_7_[7 : 0];
+    if(wmask[0] && _zz_5_ && _zz_25_ ) begin
+      ram_cpu_ram_symbol0[_zz_29_] <= _zz_7_[7 : 0];
     end
-    if(wmask[1] && _zz_5_ && _zz_21_ ) begin
-      ram_cpu_ram_symbol1[_zz_25_] <= _zz_7_[15 : 8];
+    if(wmask[1] && _zz_5_ && _zz_25_ ) begin
+      ram_cpu_ram_symbol1[_zz_29_] <= _zz_7_[15 : 8];
     end
-    if(wmask[2] && _zz_5_ && _zz_21_ ) begin
-      ram_cpu_ram_symbol2[_zz_25_] <= _zz_7_[23 : 16];
+    if(wmask[2] && _zz_5_ && _zz_25_ ) begin
+      ram_cpu_ram_symbol2[_zz_29_] <= _zz_7_[23 : 16];
     end
-    if(wmask[3] && _zz_5_ && _zz_21_ ) begin
-      ram_cpu_ram_symbol3[_zz_25_] <= _zz_7_[31 : 24];
+    if(wmask[3] && _zz_5_ && _zz_25_ ) begin
+      ram_cpu_ram_symbol3[_zz_29_] <= _zz_7_[31 : 24];
     end
     if(_zz_5_) begin
-      _zz_32_ <= ram_cpu_ram_symbol0[_zz_25_];
-      _zz_33_ <= ram_cpu_ram_symbol1[_zz_25_];
-      _zz_34_ <= ram_cpu_ram_symbol2[_zz_25_];
-      _zz_35_ <= ram_cpu_ram_symbol3[_zz_25_];
+      _zz_36_ <= ram_cpu_ram_symbol0[_zz_29_];
+      _zz_37_ <= ram_cpu_ram_symbol1[_zz_29_];
+      _zz_38_ <= ram_cpu_ram_symbol2[_zz_29_];
+      _zz_39_ <= ram_cpu_ram_symbol3[_zz_29_];
     end
   end
 
   always @ (posedge clk25) begin
-    if(_zz_17_) begin
-      _zz_36_ <= ram_cpu_ram_symbol0[_zz_24_];
-      _zz_37_ <= ram_cpu_ram_symbol1[_zz_24_];
-      _zz_38_ <= ram_cpu_ram_symbol2[_zz_24_];
-      _zz_39_ <= ram_cpu_ram_symbol3[_zz_24_];
+    if(_zz_21_) begin
+      _zz_40_ <= ram_cpu_ram_symbol0[_zz_28_];
+      _zz_41_ <= ram_cpu_ram_symbol1[_zz_28_];
+      _zz_42_ <= ram_cpu_ram_symbol2[_zz_28_];
+      _zz_43_ <= ram_cpu_ram_symbol3[_zz_28_];
     end
   end
 
   MR1 mr1_1_ ( 
-    .instr_req_valid(_zz_17_),
-    .instr_req_ready(_zz_11_),
-    .instr_req_addr(_zz_18_),
+    .instr_req_valid(_zz_21_),
+    .instr_req_ready(_zz_15_),
+    .instr_req_addr(_zz_22_),
     .instr_rsp_valid(instr_req_valid_regNext),
-    .instr_rsp_data(_zz_12_),
-    .data_req_valid(_zz_19_),
-    .data_req_ready(_zz_13_),
-    .data_req_addr(_zz_20_),
-    .data_req_wr(_zz_21_),
-    .data_req_size(_zz_22_),
-    .data_req_data(_zz_23_),
+    .instr_rsp_data(_zz_16_),
+    .data_req_valid(_zz_23_),
+    .data_req_ready(_zz_17_),
+    .data_req_addr(_zz_24_),
+    .data_req_wr(_zz_25_),
+    .data_req_size(_zz_26_),
+    .data_req_data(_zz_27_),
     .data_rsp_valid(_zz_2_),
-    .data_rsp_data(_zz_14_),
+    .data_rsp_data(_zz_18_),
     .clk25(clk25),
     .reset25_(reset25_) 
   );
   always @ (*) begin
-    case(_zz_22_)
+    case(_zz_26_)
       2'b00 : begin
         _zz_1_ = (4'b0001);
       end
@@ -3877,10 +3892,10 @@ module MR1Top (
     endcase
   end
 
-  assign wmask = (_zz_1_ <<< _zz_20_[1 : 0]);
-  assign _zz_11_ = 1'b1;
-  assign _zz_13_ = 1'b1;
-  assign _zz_14_ = (_zz_3_ ? reg_rd_data : cpu_ram_rd_data);
+  assign wmask = (_zz_1_ <<< _zz_24_[1 : 0]);
+  assign _zz_15_ = 1'b1;
+  assign _zz_17_ = 1'b1;
+  assign _zz_18_ = (_zz_3_ ? reg_rd_data : cpu_ram_rd_data);
   assign ram_cpuRamContent_0 = (32'b00000000000000000010000100110111);
   assign ram_cpuRamContent_1 = (32'b01000011100100000000000011101111);
   assign ram_cpuRamContent_2 = (32'b00000000000100000000000001110011);
@@ -3903,14 +3918,14 @@ module MR1Top (
   assign ram_cpuRamContent_19 = (32'b11111101000000010000000100010011);
   assign ram_cpuRamContent_20 = (32'b00000010100100010010001000100011);
   assign ram_cpuRamContent_21 = (32'b00000000000000000001010010110111);
-  assign ram_cpuRamContent_22 = (32'b11000111110001001000011110010011);
+  assign ram_cpuRamContent_22 = (32'b11000111100001001000011110010011);
   assign ram_cpuRamContent_23 = (32'b00010000000000000000011100010011);
   assign ram_cpuRamContent_24 = (32'b00000010000100010010011000100011);
   assign ram_cpuRamContent_25 = (32'b00000010100000010010010000100011);
   assign ram_cpuRamContent_26 = (32'b00000011001000010010000000100011);
   assign ram_cpuRamContent_27 = (32'b00000000111001111001001000100011);
-  assign ram_cpuRamContent_28 = (32'b11000111110001001000010100010011);
-  assign ram_cpuRamContent_29 = (32'b11000110000001001010111000100011);
+  assign ram_cpuRamContent_28 = (32'b11000111100001001000010100010011);
+  assign ram_cpuRamContent_29 = (32'b11000110000001001010110000100011);
   assign ram_cpuRamContent_30 = (32'b01001000000000000000000011101111);
   assign ram_cpuRamContent_31 = (32'b00000000000000000001011110110111);
   assign ram_cpuRamContent_32 = (32'b11000101010001111000011110010011);
@@ -3918,26 +3933,26 @@ module MR1Top (
   assign ram_cpuRamContent_34 = (32'b00000000010001111010010110000011);
   assign ram_cpuRamContent_35 = (32'b00000000100001111010011010000011);
   assign ram_cpuRamContent_36 = (32'b00000000110001111010011100000011);
-  assign ram_cpuRamContent_37 = (32'b00000001000001111010011110000011);
+  assign ram_cpuRamContent_37 = (32'b00000001000001111101011110000011);
   assign ram_cpuRamContent_38 = (32'b00000000110000010010011000100011);
   assign ram_cpuRamContent_39 = (32'b00000000101100010010100000100011);
-  assign ram_cpuRamContent_40 = (32'b00000000111100010010111000100011);
+  assign ram_cpuRamContent_40 = (32'b00000000111100010001111000100011);
   assign ram_cpuRamContent_41 = (32'b00000000110100010010101000100011);
   assign ram_cpuRamContent_42 = (32'b00000000111000010010110000100011);
   assign ram_cpuRamContent_43 = (32'b00001111111101100111011000010011);
   assign ram_cpuRamContent_44 = (32'b00001111111100000000011110010011);
   assign ram_cpuRamContent_45 = (32'b00000010111101100000101001100011);
-  assign ram_cpuRamContent_46 = (32'b00000000110100010000010000010011);
+  assign ram_cpuRamContent_46 = (32'b00000000110000010000010000010011);
   assign ram_cpuRamContent_47 = (32'b00001111111100000000100100010011);
-  assign ram_cpuRamContent_48 = (32'b00000000000001000100011110000011);
+  assign ram_cpuRamContent_48 = (32'b00000000000101000100011110000011);
   assign ram_cpuRamContent_49 = (32'b00000000000100000000011100010011);
   assign ram_cpuRamContent_50 = (32'b00000000101100010000011010010011);
   assign ram_cpuRamContent_51 = (32'b00001110110000000000010110010011);
-  assign ram_cpuRamContent_52 = (32'b11000111110001001000010100010011);
+  assign ram_cpuRamContent_52 = (32'b11000111100001001000010100010011);
   assign ram_cpuRamContent_53 = (32'b00000000001001000000010000010011);
   assign ram_cpuRamContent_54 = (32'b00000000111100010000010110100011);
   assign ram_cpuRamContent_55 = (32'b00011001100100000000000011101111);
-  assign ram_cpuRamContent_56 = (32'b11111111111101000100011000000011);
+  assign ram_cpuRamContent_56 = (32'b00000000000001000100011000000011);
   assign ram_cpuRamContent_57 = (32'b11111101001001100001111011100011);
   assign ram_cpuRamContent_58 = (32'b00000010110000010010000010000011);
   assign ram_cpuRamContent_59 = (32'b00000010100000010010010000000011);
@@ -3946,12 +3961,12 @@ module MR1Top (
   assign ram_cpuRamContent_62 = (32'b00000011000000010000000100010011);
   assign ram_cpuRamContent_63 = (32'b00000000000000001000000001100111);
   assign ram_cpuRamContent_64 = (32'b00000000000000000001011110110111);
-  assign ram_cpuRamContent_65 = (32'b11001011000001111010100000000011);
+  assign ram_cpuRamContent_65 = (32'b11001010110001111010100000000011);
   assign ram_cpuRamContent_66 = (32'b00000101000000000101011001100011);
   assign ram_cpuRamContent_67 = (32'b00000000000000000001011110110111);
-  assign ram_cpuRamContent_68 = (32'b11001011010001111010100010000011);
+  assign ram_cpuRamContent_68 = (32'b11001011000001111010100010000011);
   assign ram_cpuRamContent_69 = (32'b00000000000000000001011110110111);
-  assign ram_cpuRamContent_70 = (32'b11001011110001111010010100000011);
+  assign ram_cpuRamContent_70 = (32'b11001011100001111010010100000011);
   assign ram_cpuRamContent_71 = (32'b00000000000010001000011000110111);
   assign ram_cpuRamContent_72 = (32'b00000000001010001001001100010011);
   assign ram_cpuRamContent_73 = (32'b00000000001001010001010100010011);
@@ -3970,7 +3985,7 @@ module MR1Top (
   assign ram_cpuRamContent_86 = (32'b11111101000000010000000100010011);
   assign ram_cpuRamContent_87 = (32'b00000000000000000001011110110111);
   assign ram_cpuRamContent_88 = (32'b00000001010000010010110000100011);
-  assign ram_cpuRamContent_89 = (32'b11001011000001111010101000000011);
+  assign ram_cpuRamContent_89 = (32'b11001010110001111010101000000011);
   assign ram_cpuRamContent_90 = (32'b00000010000100010010011000100011);
   assign ram_cpuRamContent_91 = (32'b00000010100000010010010000100011);
   assign ram_cpuRamContent_92 = (32'b00000010100100010010001000100011);
@@ -3984,9 +3999,9 @@ module MR1Top (
   assign ram_cpuRamContent_100 = (32'b00000001101000010010000000100011);
   assign ram_cpuRamContent_101 = (32'b00001001010000000101011001100011);
   assign ram_cpuRamContent_102 = (32'b00000000000000000001011110110111);
-  assign ram_cpuRamContent_103 = (32'b11001011010001111010101010000011);
+  assign ram_cpuRamContent_103 = (32'b11001011000001111010101010000011);
   assign ram_cpuRamContent_104 = (32'b00000000000000000001011110110111);
-  assign ram_cpuRamContent_105 = (32'b11001011110001111010100110000011);
+  assign ram_cpuRamContent_105 = (32'b11001011100001111010100110000011);
   assign ram_cpuRamContent_106 = (32'b00000000000000100010101100110111);
   assign ram_cpuRamContent_107 = (32'b00000000000000000000100100010011);
   assign ram_cpuRamContent_108 = (32'b11111111111110100000110010010011);
@@ -4035,21 +4050,21 @@ module MR1Top (
   assign ram_cpuRamContent_151 = (32'b00000000000100010010011000100011);
   assign ram_cpuRamContent_152 = (32'b11101111100111111111000011101111);
   assign ram_cpuRamContent_153 = (32'b00000000000000000001011110110111);
-  assign ram_cpuRamContent_154 = (32'b11001011000001111010011110000011);
+  assign ram_cpuRamContent_154 = (32'b11001010110001111010011110000011);
   assign ram_cpuRamContent_155 = (32'b00000000110000010010000010000011);
   assign ram_cpuRamContent_156 = (32'b00000000000000000001011100110111);
   assign ram_cpuRamContent_157 = (32'b11111111111101111000011110010011);
-  assign ram_cpuRamContent_158 = (32'b11001010111101110010010000100011);
+  assign ram_cpuRamContent_158 = (32'b11001010111101110010001000100011);
   assign ram_cpuRamContent_159 = (32'b00000001000000010000000100010011);
   assign ram_cpuRamContent_160 = (32'b00000000000000001000000001100111);
   assign ram_cpuRamContent_161 = (32'b00000000000000000001011100110111);
-  assign ram_cpuRamContent_162 = (32'b11001010100001110010011110000011);
+  assign ram_cpuRamContent_162 = (32'b11001010010001110010011110000011);
   assign ram_cpuRamContent_163 = (32'b00000000000000000001011010110111);
-  assign ram_cpuRamContent_164 = (32'b11001011000001101010011010000011);
+  assign ram_cpuRamContent_164 = (32'b11001010110001101010011010000011);
   assign ram_cpuRamContent_165 = (32'b00000000000101111000011110010011);
   assign ram_cpuRamContent_166 = (32'b00000000000000000001011000110111);
-  assign ram_cpuRamContent_167 = (32'b11001010000001100010011000100011);
-  assign ram_cpuRamContent_168 = (32'b11001010111101110010010000100011);
+  assign ram_cpuRamContent_167 = (32'b11001010000001100010010000100011);
+  assign ram_cpuRamContent_168 = (32'b11001010111101110010001000100011);
   assign ram_cpuRamContent_169 = (32'b00000000110101111101010001100011);
   assign ram_cpuRamContent_170 = (32'b00000000000000001000000001100111);
   assign ram_cpuRamContent_171 = (32'b11111010110111111111000001101111);
@@ -4077,24 +4092,24 @@ module MR1Top (
   assign ram_cpuRamContent_193 = (32'b00000000000011001100110000000011);
   assign ram_cpuRamContent_194 = (32'b00000000000111001000110010010011);
   assign ram_cpuRamContent_195 = (32'b00000110000011000000000001100011);
-  assign ram_cpuRamContent_196 = (32'b11001010100010010010010000000011);
+  assign ram_cpuRamContent_196 = (32'b11001010010010010010010000000011);
   assign ram_cpuRamContent_197 = (32'b00001001001111000000100001100011);
-  assign ram_cpuRamContent_198 = (32'b11001011110010110010010110000011);
-  assign ram_cpuRamContent_199 = (32'b11001010110011010010010010000011);
+  assign ram_cpuRamContent_198 = (32'b11001011100010110010010110000011);
+  assign ram_cpuRamContent_199 = (32'b11001010100011010010010010000011);
   assign ram_cpuRamContent_200 = (32'b00000000000001000000010100010011);
   assign ram_cpuRamContent_201 = (32'b00001111010100000000000011101111);
   assign ram_cpuRamContent_202 = (32'b00000000100101010000010100110011);
   assign ram_cpuRamContent_203 = (32'b00000000001001010001010100010011);
   assign ram_cpuRamContent_204 = (32'b00000000101010101000010100110011);
-  assign ram_cpuRamContent_205 = (32'b11001011010010100010011110000011);
+  assign ram_cpuRamContent_205 = (32'b11001011000010100010011110000011);
   assign ram_cpuRamContent_206 = (32'b00000000000101001000010010010011);
   assign ram_cpuRamContent_207 = (32'b00000001100001010010000000100011);
-  assign ram_cpuRamContent_208 = (32'b11001010100111010010011000100011);
+  assign ram_cpuRamContent_208 = (32'b11001010100111010010010000100011);
   assign ram_cpuRamContent_209 = (32'b00000000000101000000010000010011);
   assign ram_cpuRamContent_210 = (32'b11111010111101001100111011100011);
-  assign ram_cpuRamContent_211 = (32'b11001011000010111010011110000011);
-  assign ram_cpuRamContent_212 = (32'b11001010000011010010011000100011);
-  assign ram_cpuRamContent_213 = (32'b11001010100010010010010000100011);
+  assign ram_cpuRamContent_211 = (32'b11001010110010111010011110000011);
+  assign ram_cpuRamContent_212 = (32'b11001010000011010010010000100011);
+  assign ram_cpuRamContent_213 = (32'b11001010100010010010001000100011);
   assign ram_cpuRamContent_214 = (32'b11111010111101000100011011100011);
   assign ram_cpuRamContent_215 = (32'b11101111110111111111000011101111);
   assign ram_cpuRamContent_216 = (32'b00000000000011001100110000000011);
@@ -4114,15 +4129,15 @@ module MR1Top (
   assign ram_cpuRamContent_230 = (32'b00000000000000010010110100000011);
   assign ram_cpuRamContent_231 = (32'b00000011000000010000000100010011);
   assign ram_cpuRamContent_232 = (32'b00000000000000001000000001100111);
-  assign ram_cpuRamContent_233 = (32'b11001011000010111010011110000011);
+  assign ram_cpuRamContent_233 = (32'b11001010110010111010011110000011);
   assign ram_cpuRamContent_234 = (32'b00000000000101000000010000010011);
-  assign ram_cpuRamContent_235 = (32'b11001010000011010010011000100011);
-  assign ram_cpuRamContent_236 = (32'b11001010100010010010010000100011);
+  assign ram_cpuRamContent_235 = (32'b11001010000011010010010000100011);
+  assign ram_cpuRamContent_236 = (32'b11001010100010010010001000100011);
   assign ram_cpuRamContent_237 = (32'b11110100111101000100100011100011);
   assign ram_cpuRamContent_238 = (32'b11101010000111111111000011101111);
   assign ram_cpuRamContent_239 = (32'b11111010010111111111000001101111);
   assign ram_cpuRamContent_240 = (32'b00000000000000000001011110110111);
-  assign ram_cpuRamContent_241 = (32'b11001001100001111101011110000011);
+  assign ram_cpuRamContent_241 = (32'b11001001010001111101011110000011);
   assign ram_cpuRamContent_242 = (32'b11111110000000010000000100010011);
   assign ram_cpuRamContent_243 = (32'b00000000000100010010111000100011);
   assign ram_cpuRamContent_244 = (32'b00000000000000010001000100100011);
@@ -4135,7 +4150,7 @@ module MR1Top (
   assign ram_cpuRamContent_251 = (32'b00000000000000010001011100100011);
   assign ram_cpuRamContent_252 = (32'b00000010000001011000011001100011);
   assign ram_cpuRamContent_253 = (32'b00000000000000000001011110110111);
-  assign ram_cpuRamContent_254 = (32'b11001000010001111000011110010011);
+  assign ram_cpuRamContent_254 = (32'b11001000000001111000011110010011);
   assign ram_cpuRamContent_255 = (32'b00000000010001010101011100010011);
   assign ram_cpuRamContent_256 = (32'b00000000111101010111010100010011);
   assign ram_cpuRamContent_257 = (32'b00000000111001111000011100110011);
@@ -4150,7 +4165,7 @@ module MR1Top (
   assign ram_cpuRamContent_266 = (32'b00000010000000010000000100010011);
   assign ram_cpuRamContent_267 = (32'b00000000000000001000000001100111);
   assign ram_cpuRamContent_268 = (32'b00000000000000000001011110110111);
-  assign ram_cpuRamContent_269 = (32'b11001001100001111101011110000011);
+  assign ram_cpuRamContent_269 = (32'b11001001010001111101011110000011);
   assign ram_cpuRamContent_270 = (32'b11111110000000010000000100010011);
   assign ram_cpuRamContent_271 = (32'b00000000000100010010111000100011);
   assign ram_cpuRamContent_272 = (32'b00000000000000010001000100100011);
@@ -4165,7 +4180,7 @@ module MR1Top (
   assign ram_cpuRamContent_281 = (32'b00000000000000000001011000110111);
   assign ram_cpuRamContent_282 = (32'b00000000000000010000011010010011);
   assign ram_cpuRamContent_283 = (32'b00000001110000000000011100010011);
-  assign ram_cpuRamContent_284 = (32'b11001000010001100000011000010011);
+  assign ram_cpuRamContent_284 = (32'b11001000000001100000011000010011);
   assign ram_cpuRamContent_285 = (32'b11111111110000000000010110010011);
   assign ram_cpuRamContent_286 = (32'b01000000111001010101011110110011);
   assign ram_cpuRamContent_287 = (32'b00000000111101111111011110010011);
@@ -4673,30 +4688,30 @@ module MR1Top (
   assign ram_cpuRamContent_789 = (32'b01000000000111010000000000011100);
   assign ram_cpuRamContent_790 = (32'b00001000001100111000000000011111);
   assign ram_cpuRamContent_791 = (32'b01100000001101100001011000110100);
-  assign ram_cpuRamContent_792 = (32'b00011001010010000001100001001000);
-  assign ram_cpuRamContent_793 = (32'b11111111111111111100000001001001);
-  assign ram_cpuRamContent_794 = (32'b00111010010000110100001101000111);
-  assign ram_cpuRamContent_795 = (32'b01001110010001110010100000100000);
-  assign ram_cpuRamContent_796 = (32'b00110111001000000010100101010101);
-  assign ram_cpuRamContent_797 = (32'b00110000001011100011001000101110);
+  assign ram_cpuRamContent_792 = (32'b11000000010010010001100001001000);
+  assign ram_cpuRamContent_793 = (32'b01000011010001111111111111111111);
+  assign ram_cpuRamContent_794 = (32'b00101000001000000011101001000011);
+  assign ram_cpuRamContent_795 = (32'b00101001010101010100111001000111);
+  assign ram_cpuRamContent_796 = (32'b00110010001011100011011100100000);
+  assign ram_cpuRamContent_797 = (32'b00000000000000000011000000101110);
   assign ram_cpuRamContent_798 = (32'b00000000000000000000000000000000);
   assign ram_cpuRamContent_799 = (32'b00000000000000000000000000000000);
-  assign ram_cpuRamContent_800 = (32'b00000000000000000000000000000000);
-  assign ram_cpuRamContent_801 = (32'b00110011001100100011000100110000);
-  assign ram_cpuRamContent_802 = (32'b00110111001101100011010100110100);
-  assign ram_cpuRamContent_803 = (32'b01100010011000010011100100111000);
-  assign ram_cpuRamContent_804 = (32'b01100110011001010110010001100011);
+  assign ram_cpuRamContent_800 = (32'b00110011001100100011000100110000);
+  assign ram_cpuRamContent_801 = (32'b00110111001101100011010100110100);
+  assign ram_cpuRamContent_802 = (32'b01100010011000010011100100111000);
+  assign ram_cpuRamContent_803 = (32'b01100110011001010110010001100011);
+  assign ram_cpuRamContent_804 = (32'b00000000000000000000000000000000);
   assign ram_cpuRamContent_805 = (32'b00000000000000000000000000000000);
   assign ram_cpuRamContent_806 = (32'b00000000000000000000000000000000);
   assign ram_cpuRamContent_807 = (32'b00000000000000000000000000000000);
   assign ram_cpuRamContent_808 = (32'b00000000000000000000000000000000);
   assign ram_cpuRamContent_809 = (32'b00000000000000000000000000000000);
   assign ram_cpuRamContent_810 = (32'b00000000000000000000000000000000);
-  assign ram_cpuRamContent_811 = (32'b00000000000000000000000000000000);
-  assign ram_cpuRamContent_812 = (32'b00000000000000000000000000001010);
-  assign ram_cpuRamContent_813 = (32'b00000000000000000000000000101000);
-  assign ram_cpuRamContent_814 = (32'b00000000000000000000000000011001);
-  assign ram_cpuRamContent_815 = (32'b00000000000000000000000001010000);
+  assign ram_cpuRamContent_811 = (32'b00000000000000000000000000001010);
+  assign ram_cpuRamContent_812 = (32'b00000000000000000000000000101000);
+  assign ram_cpuRamContent_813 = (32'b00000000000000000000000000011001);
+  assign ram_cpuRamContent_814 = (32'b00000000000000000000000001010000);
+  assign ram_cpuRamContent_815 = (32'b00000000000000000000000000000000);
   assign ram_cpuRamContent_816 = (32'b00000000000000000000000000000000);
   assign ram_cpuRamContent_817 = (32'b00000000000000000000000000000000);
   assign ram_cpuRamContent_818 = (32'b00000000000000000000000000000000);
@@ -5929,26 +5944,37 @@ module MR1Top (
   assign ram_cpuRamContent_2045 = (32'b00000000000000000000000000000000);
   assign ram_cpuRamContent_2046 = (32'b00000000000000000000000000000000);
   assign ram_cpuRamContent_2047 = (32'b00000000000000000000000000000000);
-  assign _zz_4_ = (_zz_18_ >>> 2);
-  assign _zz_12_ = _zz_15_;
-  assign _zz_5_ = (_zz_19_ && (! _zz_20_[19]));
-  assign _zz_6_ = (_zz_20_ >>> 2);
-  assign _zz_7_ = _zz_23_;
-  assign cpu_ram_rd_data = _zz_16_;
-  assign update_leds = ((_zz_19_ && _zz_21_) && (_zz_20_ == (32'b00000000000010000000000000000000)));
+  assign _zz_4_ = (_zz_22_ >>> 2);
+  assign _zz_16_ = _zz_19_;
+  assign _zz_5_ = (_zz_23_ && (! _zz_24_[19]));
+  assign _zz_6_ = (_zz_24_ >>> 2);
+  assign _zz_7_ = _zz_27_;
+  assign cpu_ram_rd_data = _zz_20_;
+  assign update_leds = ((_zz_23_ && _zz_25_) && (_zz_24_ == (32'b00000000000010000000000000000000)));
   assign io_led1 = _zz_8_;
   assign io_led2 = _zz_9_;
   assign io_led3 = _zz_10_;
-  assign button_addr = (_zz_20_ == (32'b00000000000010000000000000000100));
-  assign dvi_ctrl_addr = (_zz_20_ == (32'b00000000000010000000000000010000));
-  assign dvi_ctrl_set_addr = (_zz_20_ == (32'b00000000000010000000000000010100));
-  assign dvi_ctrl_clr_addr = (_zz_20_ == (32'b00000000000010000000000000011000));
-  assign dvi_ctrl_rd_addr = (_zz_20_ == (32'b00000000000010000000000000011100));
+  assign button_addr = (_zz_24_ == (32'b00000000000010000000000000000100));
+  assign dvi_ctrl_addr = (_zz_24_ == (32'b00000000000010000000000000010000));
+  assign dvi_ctrl_set_addr = (_zz_24_ == (32'b00000000000010000000000000010100));
+  assign dvi_ctrl_clr_addr = (_zz_24_ == (32'b00000000000010000000000000011000));
+  assign dvi_ctrl_rd_addr = (_zz_24_ == (32'b00000000000010000000000000011100));
+  assign update_dvi_ctrl = ((_zz_23_ && _zz_25_) && dvi_ctrl_addr);
+  assign update_dvi_ctrl_set = ((_zz_23_ && _zz_25_) && dvi_ctrl_set_addr);
+  assign update_dvi_ctrl_clr = ((_zz_23_ && _zz_25_) && dvi_ctrl_clr_addr);
   assign io_dvi_ctrl_scl_writeEnable = (dvi_ctrl_scl == 1'b0);
   assign io_dvi_ctrl_scl_write = dvi_ctrl_scl;
   assign io_dvi_ctrl_sda_writeEnable = (dvi_ctrl_sda == 1'b0);
   assign io_dvi_ctrl_sda_write = dvi_ctrl_sda;
-  assign reg_rd_data = (button_addr_regNext ? {(31'b0000000000000000000000000000000),button} : (dvi_ctrl_addr_regNext ? {{(30'b000000000000000000000000000000),dvi_ctrl_sda},dvi_ctrl_scl} : (dvi_ctrl_set_addr_regNext ? {{_zz_26_,_zz_27_},dvi_ctrl_scl} : (dvi_ctrl_clr_addr_regNext ? {_zz_28_,_zz_29_} : (dvi_ctrl_rd_addr_regNext ? _zz_30_ : _zz_31_)))));
+  assign test_pattern_nr_addr = (_zz_24_ == (32'b00000000000010000000000000100000));
+  assign test_pattern_const_color_addr = (_zz_24_ == (32'b00000000000010000000000000100100));
+  assign update_test_pattern_nr = ((_zz_23_ && _zz_25_) && test_pattern_nr_addr);
+  assign update_test_pattern_const_color = ((_zz_23_ && _zz_25_) && test_pattern_const_color_addr);
+  assign io_test_pattern_nr = _zz_11_;
+  assign io_test_pattern_const_color_r = _zz_12_;
+  assign io_test_pattern_const_color_g = _zz_13_;
+  assign io_test_pattern_const_color_b = _zz_14_;
+  assign reg_rd_data = (button_addr_regNext ? {(31'b0000000000000000000000000000000),button} : (dvi_ctrl_addr_regNext ? {{(30'b000000000000000000000000000000),dvi_ctrl_sda},dvi_ctrl_scl} : (dvi_ctrl_set_addr_regNext ? {{_zz_30_,_zz_31_},dvi_ctrl_scl} : (dvi_ctrl_clr_addr_regNext ? {_zz_32_,_zz_33_} : (dvi_ctrl_rd_addr_regNext ? _zz_34_ : _zz_35_)))));
   always @ (posedge clk25) begin
     if(!reset25_) begin
       instr_req_valid_regNext <= 1'b0;
@@ -5959,26 +5985,42 @@ module MR1Top (
       button <= 1'b0;
       dvi_ctrl_scl <= 1'b1;
       dvi_ctrl_sda <= 1'b1;
+      _zz_11_ <= (4'b0000);
+      _zz_12_ <= (8'b00000000);
+      _zz_13_ <= (8'b00000000);
+      _zz_14_ <= (8'b00000000);
     end else begin
-      instr_req_valid_regNext <= _zz_17_;
-      _zz_2_ <= (_zz_19_ && (! _zz_21_));
+      instr_req_valid_regNext <= _zz_21_;
+      _zz_2_ <= (_zz_23_ && (! _zz_25_));
       if(update_leds)begin
-        _zz_8_ <= _zz_23_[0];
+        _zz_8_ <= _zz_27_[0];
       end
       if(update_leds)begin
-        _zz_9_ <= _zz_23_[1];
+        _zz_9_ <= _zz_27_[1];
       end
       if(update_leds)begin
-        _zz_10_ <= _zz_23_[2];
+        _zz_10_ <= _zz_27_[2];
       end
       button <= (! io_switch_);
-      dvi_ctrl_scl <= (dvi_ctrl_addr ? _zz_23_[0] : ((dvi_ctrl_set_addr && _zz_23_[0]) ? 1'b1 : ((dvi_ctrl_clr_addr && _zz_23_[0]) ? 1'b0 : dvi_ctrl_scl)));
-      dvi_ctrl_sda <= (dvi_ctrl_addr ? _zz_23_[1] : ((dvi_ctrl_set_addr && _zz_23_[1]) ? 1'b1 : ((dvi_ctrl_clr_addr && _zz_23_[1]) ? 1'b0 : dvi_ctrl_sda)));
+      dvi_ctrl_scl <= (update_dvi_ctrl ? _zz_27_[0] : ((update_dvi_ctrl_set && _zz_27_[0]) ? 1'b1 : ((update_dvi_ctrl_clr && _zz_27_[0]) ? 1'b0 : dvi_ctrl_scl)));
+      dvi_ctrl_sda <= (update_dvi_ctrl ? _zz_27_[1] : ((update_dvi_ctrl_set && _zz_27_[1]) ? 1'b1 : ((update_dvi_ctrl_clr && _zz_27_[1]) ? 1'b0 : dvi_ctrl_sda)));
+      if(update_test_pattern_nr)begin
+        _zz_11_ <= _zz_27_[3 : 0];
+      end
+      if(update_test_pattern_const_color)begin
+        _zz_12_ <= _zz_27_[7 : 0];
+      end
+      if(update_test_pattern_const_color)begin
+        _zz_13_ <= _zz_27_[15 : 8];
+      end
+      if(update_test_pattern_const_color)begin
+        _zz_14_ <= _zz_27_[23 : 16];
+      end
     end
   end
 
   always @ (posedge clk25) begin
-    _zz_3_ <= _zz_20_[19];
+    _zz_3_ <= _zz_24_[19];
     button_addr_regNext <= button_addr;
     dvi_ctrl_addr_regNext <= dvi_ctrl_addr;
     dvi_ctrl_set_addr_regNext <= dvi_ctrl_set_addr;
@@ -6015,7 +6057,6 @@ module VideoTimingGen (
   wire [5:0] _zz_3_;
   wire [11:0] _zz_4_;
   wire [10:0] _zz_5_;
-  wire [11:0] _zz_6_;
   reg [11:0] col_cntr;
   reg [10:0] line_cntr;
   wire  last_col;
@@ -6023,19 +6064,16 @@ module VideoTimingGen (
   wire [7:0] h_blank;
   wire [5:0] v_blank;
   wire  pixel_active;
-  wire [11:0] active_col_cntr;
   assign _zz_1_ = {1'd0, line_cntr};
   assign _zz_2_ = (io_timings_h_fp + io_timings_h_sync);
   assign _zz_3_ = (io_timings_v_fp + io_timings_v_sync);
   assign _zz_4_ = {4'd0, h_blank};
   assign _zz_5_ = {5'd0, v_blank};
-  assign _zz_6_ = {4'd0, h_blank};
   assign last_col = (col_cntr == io_timings_h_total_m1);
   assign last_line = (_zz_1_ == io_timings_v_total_m1);
   assign h_blank = (_zz_2_ + io_timings_h_bp);
   assign v_blank = (_zz_3_ + io_timings_v_bp);
   assign pixel_active = ((_zz_4_ <= col_cntr) && (_zz_5_ <= line_cntr));
-  assign active_col_cntr = (col_cntr - _zz_6_);
   always @ (posedge clk25) begin
     if(!reset25_) begin
       col_cntr <= (12'b000000000000);
@@ -6059,9 +6097,211 @@ module VideoTimingGen (
     io_pixel_out_req <= pixel_active;
     io_pixel_out_eol <= (pixel_active ? last_col : 1'b0);
     io_pixel_out_eof <= (pixel_active ? (last_col && last_line) : 1'b0);
-    io_pixel_out_pixel_r <= (pixel_active ? active_col_cntr[7 : 0] : (8'b00000000));
-    io_pixel_out_pixel_g <= (pixel_active ? (8'b00000000) : (8'b00000000));
-    io_pixel_out_pixel_b <= (pixel_active ? (8'b00000000) : (8'b00000000));
+    io_pixel_out_pixel_r <= (8'b10000000);
+    io_pixel_out_pixel_g <= (8'b10000000);
+    io_pixel_out_pixel_b <= (8'b10000000);
+  end
+
+endmodule
+
+module VideoTestPattern (
+      input  [11:0] io_timings_h_active,
+      input  [7:0] io_timings_h_fp,
+      input  [7:0] io_timings_h_sync,
+      input  [7:0] io_timings_h_bp,
+      input   io_timings_h_sync_positive,
+      input  [11:0] io_timings_h_total_m1,
+      input  [10:0] io_timings_v_active,
+      input  [5:0] io_timings_v_fp,
+      input  [5:0] io_timings_v_sync,
+      input  [5:0] io_timings_v_bp,
+      input   io_timings_v_sync_positive,
+      input  [11:0] io_timings_v_total_m1,
+      input   io_pixel_in_vsync,
+      input   io_pixel_in_req,
+      input   io_pixel_in_eol,
+      input   io_pixel_in_eof,
+      input  [7:0] io_pixel_in_pixel_r,
+      input  [7:0] io_pixel_in_pixel_g,
+      input  [7:0] io_pixel_in_pixel_b,
+      output reg  io_pixel_out_vsync,
+      output reg  io_pixel_out_req,
+      output reg  io_pixel_out_eol,
+      output reg  io_pixel_out_eof,
+      output reg [7:0] io_pixel_out_pixel_r,
+      output reg [7:0] io_pixel_out_pixel_g,
+      output reg [7:0] io_pixel_out_pixel_b,
+      input  [3:0] io_pattern_nr,
+      input  [7:0] io_const_color_r,
+      input  [7:0] io_const_color_g,
+      input  [7:0] io_const_color_b,
+      input   clk25,
+      input   reset25_);
+  wire [13:0] _zz_1_;
+  wire [13:0] _zz_2_;
+  wire [13:0] _zz_3_;
+  wire [13:0] _zz_4_;
+  wire [14:0] _zz_5_;
+  wire [14:0] _zz_6_;
+  wire [12:0] _zz_7_;
+  wire [12:0] _zz_8_;
+  wire [12:0] _zz_9_;
+  wire [12:0] _zz_10_;
+  wire [13:0] _zz_11_;
+  wire [13:0] _zz_12_;
+  wire [7:0] _zz_13_;
+  wire [7:0] _zz_14_;
+  wire [7:0] _zz_15_;
+  wire [10:0] _zz_16_;
+  wire [11:0] _zz_17_;
+  reg [11:0] col_cntr;
+  reg [10:0] line_cntr;
+  wire [11:0] h_active_div4;
+  wire [10:0] v_active_div4;
+  wire  h1;
+  wire  h2;
+  wire  h3;
+  wire  h4;
+  wire  v1;
+  wire  v2;
+  wire  v3;
+  wire  v4;
+  assign _zz_1_ = {2'd0, col_cntr};
+  assign _zz_2_ = (h_active_div4 * (2'b10));
+  assign _zz_3_ = {2'd0, col_cntr};
+  assign _zz_4_ = (h_active_div4 * (2'b11));
+  assign _zz_5_ = {3'd0, col_cntr};
+  assign _zz_6_ = (h_active_div4 * (3'b100));
+  assign _zz_7_ = {2'd0, line_cntr};
+  assign _zz_8_ = (v_active_div4 * (2'b10));
+  assign _zz_9_ = {2'd0, line_cntr};
+  assign _zz_10_ = (v_active_div4 * (2'b11));
+  assign _zz_11_ = {3'd0, line_cntr};
+  assign _zz_12_ = (v_active_div4 * (3'b100));
+  assign _zz_13_ = (col_cntr[7 : 0] + line_cntr[7 : 0]);
+  assign _zz_14_ = (col_cntr[7 : 0] + line_cntr[7 : 0]);
+  assign _zz_15_ = (col_cntr[7 : 0] + line_cntr[7 : 0]);
+  assign _zz_16_ = (line_cntr <<< 3);
+  assign _zz_17_ = (col_cntr <<< 3);
+  assign h_active_div4 = (io_timings_h_active >>> 2);
+  assign v_active_div4 = (io_timings_v_active >>> 2);
+  assign h1 = (col_cntr < h_active_div4);
+  assign h2 = (_zz_1_ < _zz_2_);
+  assign h3 = (_zz_3_ < _zz_4_);
+  assign h4 = (_zz_5_ < _zz_6_);
+  assign v1 = (line_cntr < v_active_div4);
+  assign v2 = (_zz_7_ < _zz_8_);
+  assign v3 = (_zz_9_ < _zz_10_);
+  assign v4 = (_zz_11_ < _zz_12_);
+  always @ (posedge clk25) begin
+    if(!reset25_) begin
+      col_cntr <= (12'b000000000000);
+      line_cntr <= (11'b00000000000);
+    end else begin
+      if(io_pixel_in_vsync)begin
+        line_cntr <= (11'b00000000000);
+        col_cntr <= (12'b000000000000);
+      end else begin
+        if(io_pixel_in_req)begin
+          if(io_pixel_in_eof)begin
+            line_cntr <= (11'b00000000000);
+            col_cntr <= (12'b000000000000);
+          end else begin
+            if(io_pixel_in_eol)begin
+              line_cntr <= (line_cntr + (11'b00000000001));
+              col_cntr <= (12'b000000000000);
+            end else begin
+              col_cntr <= (col_cntr + (12'b000000000001));
+            end
+          end
+        end
+      end
+    end
+  end
+
+  always @ (posedge clk25) begin
+    io_pixel_out_vsync <= io_pixel_in_vsync;
+    io_pixel_out_req <= io_pixel_in_req;
+    io_pixel_out_eol <= io_pixel_in_eol;
+    io_pixel_out_eof <= io_pixel_in_eof;
+    io_pixel_out_pixel_r <= io_pixel_in_pixel_r;
+    io_pixel_out_pixel_g <= io_pixel_in_pixel_g;
+    io_pixel_out_pixel_b <= io_pixel_in_pixel_b;
+    case(io_pattern_nr)
+      4'b0000 : begin
+        io_pixel_out_pixel_r <= io_const_color_r;
+        io_pixel_out_pixel_g <= io_const_color_g;
+        io_pixel_out_pixel_b <= io_const_color_b;
+      end
+      4'b0001 : begin
+        io_pixel_out_pixel_r <= _zz_13_;
+        io_pixel_out_pixel_g <= (8'b00000000);
+        io_pixel_out_pixel_b <= (8'b00000000);
+      end
+      4'b0010 : begin
+        io_pixel_out_pixel_r <= _zz_14_;
+        io_pixel_out_pixel_g <= (8'b00000000);
+        io_pixel_out_pixel_b <= (8'b00000000);
+      end
+      4'b0011 : begin
+        io_pixel_out_pixel_r <= _zz_15_;
+        io_pixel_out_pixel_g <= (8'b00000000);
+        io_pixel_out_pixel_b <= (8'b00000000);
+      end
+      4'b0100 : begin
+        if(h1)begin
+          io_pixel_out_pixel_r <= (8'b11111111);
+          io_pixel_out_pixel_g <= (8'b00000000);
+          io_pixel_out_pixel_b <= (8'b00000000);
+        end else begin
+          if(h2)begin
+            io_pixel_out_pixel_r <= (8'b00000000);
+            io_pixel_out_pixel_g <= (8'b11111111);
+            io_pixel_out_pixel_b <= (8'b00000000);
+          end else begin
+            if(h3)begin
+              io_pixel_out_pixel_r <= (8'b00000000);
+              io_pixel_out_pixel_g <= (8'b00000000);
+              io_pixel_out_pixel_b <= (8'b11111111);
+            end else begin
+              io_pixel_out_pixel_r <= (8'b11111111);
+              io_pixel_out_pixel_g <= (8'b11111111);
+              io_pixel_out_pixel_b <= (8'b11111111);
+            end
+          end
+        end
+      end
+      4'b0101 : begin
+        if(v1)begin
+          io_pixel_out_pixel_r <= (8'b11111111);
+          io_pixel_out_pixel_g <= (8'b00000000);
+          io_pixel_out_pixel_b <= (8'b00000000);
+        end else begin
+          if(v2)begin
+            io_pixel_out_pixel_r <= (8'b00000000);
+            io_pixel_out_pixel_g <= (8'b11111111);
+            io_pixel_out_pixel_b <= (8'b00000000);
+          end else begin
+            if(v3)begin
+              io_pixel_out_pixel_r <= (8'b00000000);
+              io_pixel_out_pixel_g <= (8'b00000000);
+              io_pixel_out_pixel_b <= (8'b11111111);
+            end else begin
+              io_pixel_out_pixel_r <= (8'b11111111);
+              io_pixel_out_pixel_g <= (8'b11111111);
+              io_pixel_out_pixel_b <= (8'b11111111);
+            end
+          end
+        end
+      end
+      4'b0110 : begin
+        io_pixel_out_pixel_r <= {line_cntr[3 : 0],col_cntr[3 : 0]};
+        io_pixel_out_pixel_g <= _zz_16_[7 : 0];
+        io_pixel_out_pixel_b <= _zz_17_[7 : 0];
+      end
+      default : begin
+      end
+    endcase
   end
 
 endmodule
@@ -7202,36 +7442,51 @@ module PanoCore (
   wire  _zz_6_;
   wire  _zz_7_;
   wire  _zz_8_;
-  wire  _zz_9_;
-  wire  _zz_10_;
-  wire  _zz_11_;
-  wire  _zz_12_;
-  wire [7:0] _zz_13_;
-  wire [7:0] _zz_14_;
-  wire [7:0] _zz_15_;
+  wire [3:0] _zz_9_;
+  wire [7:0] _zz_10_;
+  wire [7:0] _zz_11_;
+  wire [7:0] _zz_12_;
+  wire  _zz_13_;
+  wire  _zz_14_;
+  wire  _zz_15_;
   wire  _zz_16_;
-  wire  _zz_17_;
-  wire  _zz_18_;
-  wire  _zz_19_;
-  wire [7:0] _zz_20_;
-  wire [7:0] _zz_21_;
-  wire [7:0] _zz_22_;
-  wire [11:0] _zz_23_;
-  wire [11:0] _zz_24_;
-  wire [11:0] _zz_25_;
-  wire [11:0] _zz_26_;
-  wire [11:0] _zz_27_;
-  wire [11:0] _zz_28_;
-  wire [11:0] _zz_29_;
-  wire [10:0] _zz_30_;
-  wire [10:0] _zz_31_;
-  wire [10:0] _zz_32_;
-  wire [10:0] _zz_33_;
-  wire [10:0] _zz_34_;
-  wire [10:0] _zz_35_;
-  wire [10:0] _zz_36_;
+  wire [7:0] _zz_17_;
+  wire [7:0] _zz_18_;
+  wire [7:0] _zz_19_;
+  wire  _zz_20_;
+  wire  _zz_21_;
+  wire  _zz_22_;
+  wire  _zz_23_;
+  wire [7:0] _zz_24_;
+  wire [7:0] _zz_25_;
+  wire [7:0] _zz_26_;
+  wire  _zz_27_;
+  wire  _zz_28_;
+  wire  _zz_29_;
+  wire  _zz_30_;
+  wire [7:0] _zz_31_;
+  wire [7:0] _zz_32_;
+  wire [7:0] _zz_33_;
+  wire [11:0] _zz_34_;
+  wire [11:0] _zz_35_;
+  wire [11:0] _zz_36_;
+  wire [11:0] _zz_37_;
+  wire [11:0] _zz_38_;
+  wire [11:0] _zz_39_;
+  wire [11:0] _zz_40_;
+  wire [10:0] _zz_41_;
+  wire [10:0] _zz_42_;
+  wire [10:0] _zz_43_;
+  wire [10:0] _zz_44_;
+  wire [10:0] _zz_45_;
+  wire [10:0] _zz_46_;
+  wire [10:0] _zz_47_;
   reg [23:0] leds_led_cntr;
   wire [23:0] _zz_1_;
+  wire [3:0] test_pattern_nr;
+  wire [7:0] const_color_r;
+  wire [7:0] const_color_g;
+  wire [7:0] const_color_b;
   wire [11:0] timings_h_active;
   wire [7:0] timings_h_fp;
   wire [7:0] timings_h_sync;
@@ -7251,20 +7506,27 @@ module PanoCore (
   wire [7:0] vi_gen_pixel_out_pixel_r;
   wire [7:0] vi_gen_pixel_out_pixel_g;
   wire [7:0] vi_gen_pixel_out_pixel_b;
-  assign _zz_23_ = (_zz_24_ - (12'b000000000001));
-  assign _zz_24_ = (_zz_25_ + _zz_29_);
-  assign _zz_25_ = (_zz_26_ + _zz_28_);
-  assign _zz_26_ = (timings_h_active + _zz_27_);
-  assign _zz_27_ = {4'd0, timings_h_fp};
-  assign _zz_28_ = {4'd0, timings_h_sync};
-  assign _zz_29_ = {4'd0, timings_h_bp};
-  assign _zz_30_ = (_zz_31_ - (11'b00000000001));
-  assign _zz_31_ = (_zz_32_ + _zz_36_);
-  assign _zz_32_ = (_zz_33_ + _zz_35_);
-  assign _zz_33_ = (timings_v_active + _zz_34_);
-  assign _zz_34_ = {5'd0, timings_v_fp};
-  assign _zz_35_ = {5'd0, timings_v_sync};
-  assign _zz_36_ = {5'd0, timings_v_bp};
+  wire  test_patt_pixel_out_vsync;
+  wire  test_patt_pixel_out_req;
+  wire  test_patt_pixel_out_eol;
+  wire  test_patt_pixel_out_eof;
+  wire [7:0] test_patt_pixel_out_pixel_r;
+  wire [7:0] test_patt_pixel_out_pixel_g;
+  wire [7:0] test_patt_pixel_out_pixel_b;
+  assign _zz_34_ = (_zz_35_ - (12'b000000000001));
+  assign _zz_35_ = (_zz_36_ + _zz_40_);
+  assign _zz_36_ = (_zz_37_ + _zz_39_);
+  assign _zz_37_ = (timings_h_active + _zz_38_);
+  assign _zz_38_ = {4'd0, timings_h_fp};
+  assign _zz_39_ = {4'd0, timings_h_sync};
+  assign _zz_40_ = {4'd0, timings_h_bp};
+  assign _zz_41_ = (_zz_42_ - (11'b00000000001));
+  assign _zz_42_ = (_zz_43_ + _zz_47_);
+  assign _zz_43_ = (_zz_44_ + _zz_46_);
+  assign _zz_44_ = (timings_v_active + _zz_45_);
+  assign _zz_45_ = {5'd0, timings_v_fp};
+  assign _zz_46_ = {5'd0, timings_v_sync};
+  assign _zz_47_ = {5'd0, timings_v_bp};
   MR1Top u_mr1_top ( 
     .io_led1(_zz_2_),
     .io_led2(_zz_3_),
@@ -7276,6 +7538,10 @@ module PanoCore (
     .io_dvi_ctrl_sda_read(io_dvi_ctrl_sda_read),
     .io_dvi_ctrl_sda_write(_zz_7_),
     .io_dvi_ctrl_sda_writeEnable(_zz_8_),
+    .io_test_pattern_nr(_zz_9_),
+    .io_test_pattern_const_color_r(_zz_10_),
+    .io_test_pattern_const_color_g(_zz_11_),
+    .io_test_pattern_const_color_b(_zz_12_),
     .clk25(clk25),
     .reset25_(reset25_) 
   );
@@ -7292,17 +7558,17 @@ module PanoCore (
     .io_timings_v_bp(timings_v_bp),
     .io_timings_v_sync_positive(timings_v_sync_positive),
     .io_timings_v_total_m1(timings_v_total_m1),
-    .io_pixel_out_vsync(_zz_9_),
-    .io_pixel_out_req(_zz_10_),
-    .io_pixel_out_eol(_zz_11_),
-    .io_pixel_out_eof(_zz_12_),
-    .io_pixel_out_pixel_r(_zz_13_),
-    .io_pixel_out_pixel_g(_zz_14_),
-    .io_pixel_out_pixel_b(_zz_15_),
+    .io_pixel_out_vsync(_zz_13_),
+    .io_pixel_out_req(_zz_14_),
+    .io_pixel_out_eol(_zz_15_),
+    .io_pixel_out_eof(_zz_16_),
+    .io_pixel_out_pixel_r(_zz_17_),
+    .io_pixel_out_pixel_g(_zz_18_),
+    .io_pixel_out_pixel_b(_zz_19_),
     .clk25(clk25),
     .reset25_(reset25_) 
   );
-  VideoOut u_vo ( 
+  VideoTestPattern u_test_patt ( 
     .io_timings_h_active(timings_h_active),
     .io_timings_h_fp(timings_h_fp),
     .io_timings_h_sync(timings_h_sync),
@@ -7322,13 +7588,47 @@ module PanoCore (
     .io_pixel_in_pixel_r(vi_gen_pixel_out_pixel_r),
     .io_pixel_in_pixel_g(vi_gen_pixel_out_pixel_g),
     .io_pixel_in_pixel_b(vi_gen_pixel_out_pixel_b),
-    .io_vga_out_vsync(_zz_16_),
-    .io_vga_out_hsync(_zz_17_),
-    .io_vga_out_blank_(_zz_18_),
-    .io_vga_out_de(_zz_19_),
-    .io_vga_out_r(_zz_20_),
-    .io_vga_out_g(_zz_21_),
-    .io_vga_out_b(_zz_22_),
+    .io_pixel_out_vsync(_zz_20_),
+    .io_pixel_out_req(_zz_21_),
+    .io_pixel_out_eol(_zz_22_),
+    .io_pixel_out_eof(_zz_23_),
+    .io_pixel_out_pixel_r(_zz_24_),
+    .io_pixel_out_pixel_g(_zz_25_),
+    .io_pixel_out_pixel_b(_zz_26_),
+    .io_pattern_nr(test_pattern_nr),
+    .io_const_color_r(const_color_r),
+    .io_const_color_g(const_color_g),
+    .io_const_color_b(const_color_b),
+    .clk25(clk25),
+    .reset25_(reset25_) 
+  );
+  VideoOut u_vo ( 
+    .io_timings_h_active(timings_h_active),
+    .io_timings_h_fp(timings_h_fp),
+    .io_timings_h_sync(timings_h_sync),
+    .io_timings_h_bp(timings_h_bp),
+    .io_timings_h_sync_positive(timings_h_sync_positive),
+    .io_timings_h_total_m1(timings_h_total_m1),
+    .io_timings_v_active(timings_v_active),
+    .io_timings_v_fp(timings_v_fp),
+    .io_timings_v_sync(timings_v_sync),
+    .io_timings_v_bp(timings_v_bp),
+    .io_timings_v_sync_positive(timings_v_sync_positive),
+    .io_timings_v_total_m1(timings_v_total_m1),
+    .io_pixel_in_vsync(test_patt_pixel_out_vsync),
+    .io_pixel_in_req(test_patt_pixel_out_req),
+    .io_pixel_in_eol(test_patt_pixel_out_eol),
+    .io_pixel_in_eof(test_patt_pixel_out_eof),
+    .io_pixel_in_pixel_r(test_patt_pixel_out_pixel_r),
+    .io_pixel_in_pixel_g(test_patt_pixel_out_pixel_g),
+    .io_pixel_in_pixel_b(test_patt_pixel_out_pixel_b),
+    .io_vga_out_vsync(_zz_27_),
+    .io_vga_out_hsync(_zz_28_),
+    .io_vga_out_blank_(_zz_29_),
+    .io_vga_out_de(_zz_30_),
+    .io_vga_out_r(_zz_31_),
+    .io_vga_out_g(_zz_32_),
+    .io_vga_out_b(_zz_33_),
     .clk25(clk25),
     .reset25_(reset25_) 
   );
@@ -7340,32 +7640,43 @@ module PanoCore (
   assign io_dvi_ctrl_scl_writeEnable = _zz_6_;
   assign io_dvi_ctrl_sda_write = _zz_7_;
   assign io_dvi_ctrl_sda_writeEnable = _zz_8_;
+  assign test_pattern_nr = _zz_9_;
+  assign const_color_r = _zz_10_;
+  assign const_color_g = _zz_11_;
+  assign const_color_b = _zz_12_;
   assign timings_h_active = (12'b001010000000);
   assign timings_h_fp = (8'b00010000);
   assign timings_h_sync = (8'b01100000);
   assign timings_h_bp = (8'b00110000);
   assign timings_h_sync_positive = 1'b0;
-  assign timings_h_total_m1 = _zz_23_;
+  assign timings_h_total_m1 = _zz_34_;
   assign timings_v_active = (11'b00111100000);
   assign timings_v_fp = (6'b001011);
   assign timings_v_sync = (6'b000010);
   assign timings_v_bp = (6'b011111);
   assign timings_v_sync_positive = 1'b0;
-  assign timings_v_total_m1 = {1'd0, _zz_30_};
-  assign vi_gen_pixel_out_vsync = _zz_9_;
-  assign vi_gen_pixel_out_req = _zz_10_;
-  assign vi_gen_pixel_out_eol = _zz_11_;
-  assign vi_gen_pixel_out_eof = _zz_12_;
-  assign vi_gen_pixel_out_pixel_r = _zz_13_;
-  assign vi_gen_pixel_out_pixel_g = _zz_14_;
-  assign vi_gen_pixel_out_pixel_b = _zz_15_;
-  assign io_vo_vsync = _zz_16_;
-  assign io_vo_hsync = _zz_17_;
-  assign io_vo_blank_ = _zz_18_;
-  assign io_vo_de = _zz_19_;
-  assign io_vo_r = _zz_20_;
-  assign io_vo_g = _zz_21_;
-  assign io_vo_b = _zz_22_;
+  assign timings_v_total_m1 = {1'd0, _zz_41_};
+  assign vi_gen_pixel_out_vsync = _zz_13_;
+  assign vi_gen_pixel_out_req = _zz_14_;
+  assign vi_gen_pixel_out_eol = _zz_15_;
+  assign vi_gen_pixel_out_eof = _zz_16_;
+  assign vi_gen_pixel_out_pixel_r = _zz_17_;
+  assign vi_gen_pixel_out_pixel_g = _zz_18_;
+  assign vi_gen_pixel_out_pixel_b = _zz_19_;
+  assign test_patt_pixel_out_vsync = _zz_20_;
+  assign test_patt_pixel_out_req = _zz_21_;
+  assign test_patt_pixel_out_eol = _zz_22_;
+  assign test_patt_pixel_out_eof = _zz_23_;
+  assign test_patt_pixel_out_pixel_r = _zz_24_;
+  assign test_patt_pixel_out_pixel_g = _zz_25_;
+  assign test_patt_pixel_out_pixel_b = _zz_26_;
+  assign io_vo_vsync = _zz_27_;
+  assign io_vo_hsync = _zz_28_;
+  assign io_vo_blank_ = _zz_29_;
+  assign io_vo_de = _zz_30_;
+  assign io_vo_r = _zz_31_;
+  assign io_vo_g = _zz_32_;
+  assign io_vo_b = _zz_33_;
   always @ (posedge clk25) begin
     if(!reset25_) begin
       leds_led_cntr <= (24'b000000000000000000000000);

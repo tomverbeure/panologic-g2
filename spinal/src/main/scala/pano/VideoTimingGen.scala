@@ -10,7 +10,6 @@ class VideoTimingGen extends Component {
         val pixel_out   = out(Reg(PixelStream()))
     }
 
-
     val col_cntr    = Reg(UInt(12 bits)) init(0)
     val line_cntr   = Reg(UInt(11 bits)) init(0)
 
@@ -41,9 +40,9 @@ class VideoTimingGen extends Component {
     io.pixel_out.eol    := pixel_active ? last_col                | False
     io.pixel_out.eof    := pixel_active ? (last_col && last_line) | False
 
-    io.pixel_out.pixel.r    := pixel_active ? (line_cntr(3 downto 0) @@ col_cntr(3 downto 0)) | 0
-    io.pixel_out.pixel.g    := pixel_active ? (line_cntr |<< 3)(7 downto 0)                   | 0
-    io.pixel_out.pixel.b    := pixel_active ? (col_cntr |<<3)(7 downto 0)                     | 0
+    io.pixel_out.pixel.r    := U(128, 8 bits)
+    io.pixel_out.pixel.g    := U(128, 8 bits)
+    io.pixel_out.pixel.b    := U(128, 8 bits)
 
 }
 

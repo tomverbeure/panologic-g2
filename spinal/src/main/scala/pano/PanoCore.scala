@@ -35,6 +35,9 @@ class PanoCore extends Component {
         io.led_green    := led_cntr.msb
     }
 
+    val test_pattern_nr = UInt(4 bits)
+    val const_color     = Pixel()
+
     val mr1Config = MR1Config()
     val u_mr1_top = new MR1Top(mr1Config)
     u_mr1_top.io.led1       <> io.led_red
@@ -42,6 +45,8 @@ class PanoCore extends Component {
     u_mr1_top.io.switch_    <> io.switch_
     u_mr1_top.io.dvi_ctrl_scl    <> io.dvi_ctrl_scl
     u_mr1_top.io.dvi_ctrl_sda    <> io.dvi_ctrl_sda
+    u_mr1_top.io.test_pattern_nr            <> test_pattern_nr
+    u_mr1_top.io.test_pattern_const_color   <> const_color
 
     val timings = VideoTimings()
     timings.h_active        := 640
@@ -64,9 +69,19 @@ class PanoCore extends Component {
     u_vi_gen.io.timings         <> timings
     u_vi_gen.io.pixel_out       <> vi_gen_pixel_out
 
+    val test_patt_pixel_out = PixelStream()
+
+    val u_test_patt = new VideoTestPattern()
+    u_test_patt.io.timings      <> timings
+    u_test_patt.io.pixel_in     <> vi_gen_pixel_out
+    u_test_patt.io.pixel_out    <> test_patt_pixel_out
+    u_test_patt.io.pattern_nr   <> test_pattern_nr
+    u_test_patt.io.const_color  <> const_color
+
     val u_vo = new VideoOut()
     u_vo.io.timings             <> timings
-    u_vo.io.pixel_in            <> vi_gen_pixel_out
+    u_vo.io.pixel_in            <> test_patt_pixel_out
+//    u_vo.io.pixel_in            <> vi_gen_pixel_out
     u_vo.io.vga_out             <> io.vo
 
 }

@@ -115,7 +115,13 @@ int main() {
     print("Code at github.com/tomverbeure/rt\n");
 #endif
 
-    while(1);
+    int pattern_nr = 0;
+
+    while(1){
+        wait(2000000);
+        pattern_nr = (pattern_nr + 1) % 7;
+        REG_WR(TEST_PATTERN_NR, pattern_nr);
+    }
 
     while(1){
         if (!button_pressed()){

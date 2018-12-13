@@ -1,10 +1,12 @@
 
-package mr1
+package pano
 
 import java.nio.file.{Files, Paths}
 import spinal.core._
 import spinal.lib._
 import spinal.lib.io._
+
+import mr1._
 
 class MR1Top(config: MR1Config) extends Component {
 
@@ -17,6 +19,9 @@ class MR1Top(config: MR1Config) extends Component {
 
         val dvi_ctrl_scl        = master(TriState(Bool))
         val dvi_ctrl_sda        = master(TriState(Bool))
+
+        val test_pattern_nr             = out(UInt(4 bits))
+        val test_pattern_const_color    = out(Pixel())
     }
 
     val mr1 = new MR1(config)
@@ -107,18 +112,22 @@ class MR1Top(config: MR1Config) extends Component {
     val dvi_ctrl_clr_addr = (mr1.io.data_req.addr === U"32'h00080018")
     val dvi_ctrl_rd_addr  = (mr1.io.data_req.addr === U"32'h0008001c")
 
+    val update_dvi_ctrl     = mr1.io.data_req.valid && mr1.io.data_req.wr && dvi_ctrl_addr
+    val update_dvi_ctrl_set = mr1.io.data_req.valid && mr1.io.data_req.wr && dvi_ctrl_set_addr
+    val update_dvi_ctrl_clr = mr1.io.data_req.valid && mr1.io.data_req.wr && dvi_ctrl_clr_addr
+
     val dvi_ctrl_scl = Reg(Bool) init(True)
     val dvi_ctrl_sda = Reg(Bool) init(True)
 
-    dvi_ctrl_scl :=  dvi_ctrl_addr                                  ? mr1.io.data_req.data(0) | 
-                    ((dvi_ctrl_set_addr && mr1.io.data_req.data(0)) ? True                    |
-                    ((dvi_ctrl_clr_addr && mr1.io.data_req.data(0)) ? False                   |
-                                                                      dvi_ctrl_scl))
+    dvi_ctrl_scl :=  update_dvi_ctrl                                  ? mr1.io.data_req.data(0) |
+                    ((update_dvi_ctrl_set && mr1.io.data_req.data(0)) ? True                    |
+                    ((update_dvi_ctrl_clr && mr1.io.data_req.data(0)) ? False                   |
+                                                                        dvi_ctrl_scl))
 
-    dvi_ctrl_sda :=  dvi_ctrl_addr                                  ? mr1.io.data_req.data(1) | 
-                    ((dvi_ctrl_set_addr && mr1.io.data_req.data(1)) ? True                    |
-                    ((dvi_ctrl_clr_addr && mr1.io.data_req.data(1)) ? False                   |
-                                                                      dvi_ctrl_sda))
+    dvi_ctrl_sda :=  update_dvi_ctrl                                  ? mr1.io.data_req.data(1) |
+                    ((update_dvi_ctrl_set && mr1.io.data_req.data(1)) ? True                    |
+                    ((update_dvi_ctrl_clr && mr1.io.data_req.data(1)) ? False                   |
+                                                                        dvi_ctrl_sda))
 
     io.dvi_ctrl_scl.writeEnable := (dvi_ctrl_scl === False)
     io.dvi_ctrl_scl.write       := dvi_ctrl_scl
@@ -126,12 +135,32 @@ class MR1Top(config: MR1Config) extends Component {
     io.dvi_ctrl_sda.writeEnable := (dvi_ctrl_sda === False)
     io.dvi_ctrl_sda.write       := dvi_ctrl_sda
 
+
+    //============================================================
+    // TEST PATTERN
+    //============================================================
+
+    val test_pattern_nr_addr          = (mr1.io.data_req.addr === U"32'h00080020")
+    val test_pattern_const_color_addr = (mr1.io.data_req.addr === U"32'h00080024")
+
+    val update_test_pattern_nr          = mr1.io.data_req.valid && mr1.io.data_req.wr && test_pattern_nr_addr
+    val update_test_pattern_const_color = mr1.io.data_req.valid && mr1.io.data_req.wr && test_pattern_const_color_addr
+
+    io.test_pattern_nr            := RegNextWhen(mr1.io.data_req.data(3 downto 0).asUInt, update_test_pattern_nr) init(0)
+
+    io.test_pattern_const_color.r := RegNextWhen(mr1.io.data_req.data( 7 downto  0).asUInt, update_test_pattern_const_color) init(0)
+    io.test_pattern_const_color.g := RegNextWhen(mr1.io.data_req.data(15 downto  8).asUInt, update_test_pattern_const_color) init(0)
+    io.test_pattern_const_color.b := RegNextWhen(mr1.io.data_req.data(23 downto 16).asUInt, update_test_pattern_const_color) init(0)
+
+    //============================================================
+    // READ DATA MUX
+    //============================================================
+
     reg_rd_data :=  (RegNext(button_addr)       ? (B(0, 31 bits) ## button) |
                     (RegNext(dvi_ctrl_addr)     ? (B(0, 30 bits) ## dvi_ctrl_sda ## dvi_ctrl_scl) |
                     (RegNext(dvi_ctrl_set_addr) ? (B(0, 30 bits) ## dvi_ctrl_sda ## dvi_ctrl_scl) |
                     (RegNext(dvi_ctrl_clr_addr) ? (B(0, 30 bits) ## dvi_ctrl_sda ## dvi_ctrl_scl) |
                     (RegNext(dvi_ctrl_rd_addr)  ? (B(0, 30 bits) ## io.dvi_ctrl_sda.read ## io.dvi_ctrl_scl.read) |
                                                    B(0, 32 bits))))))
-
 }
 
