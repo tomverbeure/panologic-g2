@@ -11,7 +11,7 @@ int cur_y = 0;
 int txt_buf_width         = 80;
 int txt_buf_height        = 25;
 
-int txt_buf_active_width  = 40;
+int txt_buf_active_width  = 50;
 int txt_buf_active_height = 10;
 
 void clear()

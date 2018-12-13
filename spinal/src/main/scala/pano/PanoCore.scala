@@ -78,10 +78,19 @@ class PanoCore extends Component {
     u_test_patt.io.pattern_nr   <> test_pattern_nr
     u_test_patt.io.const_color  <> const_color
 
+    val txt_gen_pixel_out = PixelStream()
+
+    val u_txt_gen = new VideoTxtGen()
+    u_txt_gen.io.pixel_in       <> test_patt_pixel_out
+    u_txt_gen.io.pixel_out      <> txt_gen_pixel_out
+
+    u_txt_gen.io.txt_buf_wr      <> u_mr1_top.io.txt_buf_wr
+    u_txt_gen.io.txt_buf_wr_addr <> u_mr1_top.io.txt_buf_wr_addr
+    u_txt_gen.io.txt_buf_wr_data <> u_mr1_top.io.txt_buf_wr_data
+
     val u_vo = new VideoOut()
     u_vo.io.timings             <> timings
-    u_vo.io.pixel_in            <> test_patt_pixel_out
-//    u_vo.io.pixel_in            <> vi_gen_pixel_out
+    u_vo.io.pixel_in            <> txt_gen_pixel_out
     u_vo.io.vga_out             <> io.vo
 
 }

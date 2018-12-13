@@ -104,22 +104,21 @@ int main() {
     }
 #endif
 
-#if 0
+#if 1
     clear();
-    print("Racing the Beam Ray Tracer\n");
-    print("--------------------------\n");
+    print("Pano Logic G2 Reverse Engineering\n");
+    print("---------------------------------\n");
     print("\n");
-    print("Real-time ray tracing without frame\n");
-    print("buffer on small Spartan-3E 1600 FPGA.\n");
+    print("Spartan-6 LX150 FPGA + DVI working\n");
     print("\n");
-    print("Code at github.com/tomverbeure/rt\n");
+    print("Code at github.com/tomverbeure/panologic-g2\n");
 #endif
 
     int pattern_nr = 0;
     int const_color_nr = 0;
 
     while(1){
-        wait(2000000);
+        wait(3000000);
         pattern_nr = (pattern_nr + 1) % 7;
         REG_WR(TEST_PATTERN_NR, pattern_nr);
 
