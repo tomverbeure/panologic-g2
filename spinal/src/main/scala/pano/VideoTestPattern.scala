@@ -68,15 +68,15 @@ class VideoTestPattern extends Component {
         }
         is(2){
             // Green gradient
-            io.pixel_out.pixel.r    := (col_cntr(7 downto 0) + line_cntr(7 downto 0)).resize(8)
-            io.pixel_out.pixel.g    := U(0, 8 bits)
+            io.pixel_out.pixel.r    := U(0, 8 bits)
+            io.pixel_out.pixel.g    := (col_cntr(7 downto 0) + line_cntr(7 downto 0)).resize(8)
             io.pixel_out.pixel.b    := U(0, 8 bits)
         }
         is(3){
             // Blue gradient
-            io.pixel_out.pixel.r    := (col_cntr(7 downto 0) + line_cntr(7 downto 0)).resize(8)
+            io.pixel_out.pixel.r    := U(0, 8 bits)
             io.pixel_out.pixel.g    := U(0, 8 bits)
-            io.pixel_out.pixel.b    := U(0, 8 bits)
+            io.pixel_out.pixel.b    := (col_cntr(7 downto 0) + line_cntr(7 downto 0)).resize(8)
         }
         is(4){
             // RGBW vertical bars

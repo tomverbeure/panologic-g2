@@ -117,7 +117,7 @@ class ChrontelPads(includeXClkN: Boolean = true) extends Component {
     val d_p = Bits(12 bits)
     val d_n = Bits(12 bits)
 
-    d_p := io.g(3 downto 0) ## io.g(7 downto 0)
+    d_p := io.g(3 downto 0) ## io.b(7 downto 0)
     d_n := io.r(7 downto 0) ## io.g(7 downto 4)
 
     for(i <- 0 until 12) yield new Area {
