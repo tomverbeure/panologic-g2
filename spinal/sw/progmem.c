@@ -116,11 +116,24 @@ int main() {
 #endif
 
     int pattern_nr = 0;
+    int const_color_nr = 0;
 
     while(1){
         wait(2000000);
         pattern_nr = (pattern_nr + 1) % 7;
         REG_WR(TEST_PATTERN_NR, pattern_nr);
+
+        if (pattern_nr == 0){
+            const_color_nr = (const_color_nr + 1)%5;
+
+            switch(const_color_nr){
+                case 0: REG_WR(TEST_PATTERN_CONST_COLOR, 0x000000); break;
+                case 1: REG_WR(TEST_PATTERN_CONST_COLOR, 0xffffff); break;
+                case 2: REG_WR(TEST_PATTERN_CONST_COLOR, 0x0000ff); break;
+                case 3: REG_WR(TEST_PATTERN_CONST_COLOR, 0x00ff00); break;
+                case 4: REG_WR(TEST_PATTERN_CONST_COLOR, 0xff0000); break;
+            }
+        }
     }
 
     while(1){
