@@ -25,7 +25,7 @@ Compared to the G1, the most important improvements of G2 are:
     by that Linux version. However, there is now an ISE 14.7 for Win10 version that not only supports Spartan-6,
     but it supports the larger devices such as the LX150/LX100 as well!
 
-* 256MByte of DDR2 SDRAM instead of 32MByte of LPDDR SDRAM.
+* 128MByte of DDR2 SDRAM instead of 32MByte of LPDDR SDRAM.
 
 * 128Mbit serial flash instead of 8Mbit.
 
@@ -83,7 +83,7 @@ Instructions on how to get the JTAG going are [here](https://tomverbeure.github.
 
 * 2x [Micron MT47H32M16NF-25E](https://www.micron.com/parts/dram/ddr2-sdram/mt47h32m16nf-25e?pc=%7B4064C2CD-AB47-4DB0-AB9A-A91579FD303A%7D) DDR2 SDRAM
 
-  That's right: there are 2 SDRAM chips on this board! Each one has 512Mbit in x16 configuration, good for 128MByte per DRAM and 256MByte total.
+  That's right: there are 2 SDRAM chips on this board! Each one has 512Mbit in x16 configuration, good for 64MByte per DRAM and 128MByte total.
 
   Theoretical peak BW is 3.2GByte/s, which is pretty decent.
   
