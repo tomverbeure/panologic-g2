@@ -1,5 +1,5 @@
 
-package pano
+package spartan6
 
 import spinal.core._
 

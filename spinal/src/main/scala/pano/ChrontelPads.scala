@@ -2,6 +2,7 @@
 package pano
 
 import spinal.core._
+import spartan6._
 
 case class ChrontelIntfc(includeXClkN: Boolean = true) extends Bundle
 {
