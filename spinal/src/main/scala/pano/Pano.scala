@@ -6,6 +6,8 @@ import spinal.core._
 import spinal.lib._
 import spinal.lib.io._
 
+import spartan6._
+
 class Pano extends Component {
 
     val io = new Bundle {
@@ -30,7 +32,7 @@ class Pano extends Component {
     //============================================================
     // Create osc_clk clock domain
     //============================================================
-    val resetCtrlClockDomain = ClockDomain(
+    val oscClkDomain = ClockDomain(
         clock = io.osc_clk,
         frequency = FixedFrequency(25 MHz),
         config = ClockDomainConfig(
@@ -41,7 +43,9 @@ class Pano extends Component {
     //============================================================
     // Create global reset clock domain
     //============================================================
-    val resetCtrl = new ClockingArea(resetCtrlClockDomain) {
+    val osc_reset_ = Bool
+
+    val osc_reset_gen = new ClockingArea(oscClkDomain) {
         val reset_unbuffered_ = True
 
         val reset_cntr = Reg(UInt(5 bits)) init(0)
@@ -50,16 +54,16 @@ class Pano extends Component {
             reset_unbuffered_ := False
         }
 
-        val osc_reset_ = RegNext(reset_unbuffered_)
+        osc_reset_ := RegNext(reset_unbuffered_)
     }
 
 
     val clk25    = Bool
     val reset25_ = Bool
     clk25       := io.osc_clk
-    reset25_    := resetCtrl.osc_reset_
+    reset25_    := osc_reset_
 
-    val clkMainClockDomain = ClockDomain(
+    val clkMainDomain = ClockDomain(
         clock = clk25,
         reset = reset25_,
         config = ClockDomainConfig(
@@ -68,7 +72,60 @@ class Pano extends Component {
         )
     )
 
-    val core = new ClockingArea(clkMainClockDomain) {
+    //============================================================
+    // vo_clk and vo clock domain
+    //============================================================
+
+    val vo_clk      = Bool
+    val vo_reset_   = Bool
+
+    val u_vo_clk_gen = new DCM_CLKGEN(
+            clkfx_divide    = 25,
+            clkfx_multiply  = 148,
+            clkin_period    = "40.0"
+        )
+    u_vo_clk_gen.io.CLKIN       <> io.osc_clk
+    u_vo_clk_gen.io.CLKFX       <> vo_clk
+    u_vo_clk_gen.io.RST         <> False
+    u_vo_clk_gen.io.FREEZEDCM   <> False
+    u_vo_clk_gen.io.PROGCLK     <> False
+    u_vo_clk_gen.io.PROGDATA    <> False
+    u_vo_clk_gen.io.PROGEN      <> False
+
+    val voClkRawDomain = ClockDomain(
+        clock = vo_clk,
+        frequency = FixedFrequency(148.5 MHz),
+        config = ClockDomainConfig(
+                    resetKind = BOOT
+        )
+    )
+
+    val vo_reset_gen = new ClockingArea(voClkRawDomain) {
+        val reset_unbuffered_ = True
+
+        val reset_cntr = Reg(UInt(5 bits)) init(0)
+        when(reset_cntr =/= U(reset_cntr.range -> true)){
+            reset_cntr := reset_cntr + 1
+            reset_unbuffered_ := False
+        }
+
+        vo_reset_ := RegNext(reset_unbuffered_)
+    }
+
+    val voClkDomain = ClockDomain(
+            clock = vo_clk,
+            reset = vo_reset_,
+            config = ClockDomainConfig(
+                resetKind = SYNC,
+                resetActiveLevel = LOW
+            )
+        )
+
+    //============================================================
+    // Core logic
+    //============================================================
+
+    val core = new ClockingArea(clkMainDomain) {
 
         val vo = VgaData()
 
@@ -102,8 +159,7 @@ class Pano extends Component {
         // Core logic
         //============================================================
 
-
-        val u_pano_core = new PanoCore()
+        val u_pano_core = new PanoCore(voClkDomain)
 
         u_pano_core.io.led_red      <> io.led_red
         u_pano_core.io.led_green    <> io.led_green
