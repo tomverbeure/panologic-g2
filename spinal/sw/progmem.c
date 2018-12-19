@@ -71,7 +71,7 @@ void dvi_ctrl_init()
         byte reg_nr  = chrontel_registers[i][0];
         byte reg_val = chrontel_registers[i][1];
 
-//        i2c_write_regs(&dvi_ctrl_i2c_ctx, 0x75<<1, reg_nr, &reg_val, 1);
+        i2c_write_regs(&dvi_ctrl_i2c_ctx, 0x75<<1, reg_nr, &reg_val, 1);
         i2c_write_regs(&dvi_ctrl_i2c_ctx, 0x76<<1, reg_nr, &reg_val, 1);
 
         ++i;
