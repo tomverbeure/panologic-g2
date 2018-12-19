@@ -52,19 +52,36 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
     val vo_area = new ClockingArea(voClkDomain) {
 
         val timings = VideoTimings()
-        timings.h_active        := 640
-        timings.h_fp            := 16
-        timings.h_sync          := 96
-        timings.h_bp            := 48
-        timings.h_sync_positive := False
-        timings.h_total_m1      := (timings.h_active + timings.h_fp + timings.h_sync + timings.h_bp -1).resize(timings.h_total_m1.getWidth)
+        if (false){
+            timings.h_active        := 640
+            timings.h_fp            := 16
+            timings.h_sync          := 96
+            timings.h_bp            := 48
+            timings.h_sync_positive := False
+            timings.h_total_m1      := (timings.h_active + timings.h_fp + timings.h_sync + timings.h_bp -1).resize(timings.h_total_m1.getWidth)
 
-        timings.v_active        := 480
-        timings.v_fp            := 11
-        timings.v_sync          := 2
-        timings.v_bp            := 31
-        timings.v_sync_positive := False
-        timings.v_total_m1      := (timings.v_active + timings.v_fp + timings.v_sync + timings.v_bp -1).resize(timings.v_total_m1.getWidth)
+            timings.v_active        := 480
+            timings.v_fp            := 11
+            timings.v_sync          := 2
+            timings.v_bp            := 31
+            timings.v_sync_positive := False
+            timings.v_total_m1      := (timings.v_active + timings.v_fp + timings.v_sync + timings.v_bp -1).resize(timings.v_total_m1.getWidth)
+        }
+        else{
+            timings.h_active        := 1920
+            timings.h_fp            := 88
+            timings.h_sync          := 44
+            timings.h_bp            := 148
+            timings.h_sync_positive := True
+            timings.h_total_m1      := (timings.h_active + timings.h_fp + timings.h_sync + timings.h_bp -1).resize(timings.h_total_m1.getWidth)
+
+            timings.v_active        := 1080
+            timings.v_fp            := 4
+            timings.v_sync          := 5
+            timings.v_bp            := 36
+            timings.v_sync_positive := True
+            timings.v_total_m1      := (timings.v_active + timings.v_fp + timings.v_sync + timings.v_bp -1).resize(timings.v_total_m1.getWidth)
+        }
 
         val vi_gen_pixel_out = PixelStream()
 
