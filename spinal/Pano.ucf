@@ -4,18 +4,25 @@ CONFIG VCCAUX = "2.5";
 
 # 25 MHz System Clock
 NET "osc_clk"               LOC = Y13 | IOSTANDARD = LVCMOS33;
-TIMESPEC TS_CLK = PERIOD "osc_clk" 25 MHz HIGH 50%;
+
+TIMESPEC TS_OSC_CLK = PERIOD "osc_clk" 25 MHz HIGH 50%;
 NET "osc_clk" TNM_NET = osc_clk;
+
+TIMESPEC TS_OSC_CLK = PERIOD "_zz_Pano_16_" 150 MHz HIGH 50%;
+NET "_zz_Pano_16_" TNM_NET = _zz_Pano_16_;
 
 # Reset Signals
 #NET "SYSRST_N" LOC = AB14 | IOSTANDARD = LVCMOS33;
 #NET "RESET_OUT_N" LOC = AA6 | IOSTANDARD = LVCMOS33;
+
 # Power Management
 #NET "SLEEP_REQ" LOC = C13 | IOSTANDARD = LVCMOS33;
 #NET "POWER_SLEEP" LOC = C10 | IOSTANDARD = LVCMOS33;
+
 # USB Clock Generation
 #NET "USB_RST_N" LOC = W11 | IOSTANDARD = LVCMOS33;
 #NET "USB_CLK" LOC = W12 | IOSTANDARD = LVCMOS33;
+
 # Pano Button LED Output, Active High
 NET "led_red"               LOC = E12 | IOSTANDARD = LVCMOS33;
 NET "led_blue"              LOC = H13 | IOSTANDARD = LVCMOS33;
@@ -29,47 +36,46 @@ NET "dvi_spc"               LOC = E8 | IOSTANDARD = LVCMOS33;
 NET "dvi_spd"               LOC = D9 | IOSTANDARD = LVCMOS33;
 
 # Chrontel 1 (DVI)
-NET "dvi_reset_"            LOC = C15 | IOSTANDARD = LVCMOS33 | SLEW = FAST;
-NET "dvi_xclk_p"            LOC = E14 | IOSTANDARD = LVCMOS33 | SLEW = FAST;
-NET "dvi_xclk_n"            LOC = F15 | IOSTANDARD = LVCMOS33 | SLEW = FAST;
-NET "dvi_v"                 LOC = C16 | IOSTANDARD = LVCMOS33 | SLEW = FAST;
-NET "dvi_h"                 LOC = F12 | IOSTANDARD = LVCMOS33 | SLEW = FAST;
-NET "dvi_de"                LOC = F14 | IOSTANDARD = LVCMOS33 | SLEW = FAST;
-NET "dvi_d[0]"              LOC = D17 | IOSTANDARD = LVCMOS33 | SLEW = FAST;
-NET "dvi_d[1]"              LOC = A14 | IOSTANDARD = LVCMOS33 | SLEW = FAST;
-NET "dvi_d[2]"              LOC = A15 | IOSTANDARD = LVCMOS33 | SLEW = FAST;
-NET "dvi_d[3]"              LOC = A16 | IOSTANDARD = LVCMOS33 | SLEW = FAST;
-NET "dvi_d[4]"              LOC = A17 | IOSTANDARD = LVCMOS33 | SLEW = FAST;
-NET "dvi_d[5]"              LOC = A18 | IOSTANDARD = LVCMOS33 | SLEW = FAST;
-NET "dvi_d[6]"              LOC = D14 | IOSTANDARD = LVCMOS33 | SLEW = FAST;
-NET "dvi_d[7]"              LOC = B14 | IOSTANDARD = LVCMOS33 | SLEW = FAST;
-NET "dvi_d[8]"              LOC = B16 | IOSTANDARD = LVCMOS33 | SLEW = FAST;
-NET "dvi_d[9]"              LOC = B18 | IOSTANDARD = LVCMOS33 | SLEW = FAST;
-NET "dvi_d[10]"             LOC = E16 | IOSTANDARD = LVCMOS33 | SLEW = FAST;
-NET "dvi_d[11]"             LOC = D15 | IOSTANDARD = LVCMOS33 | SLEW = FAST;
+NET "dvi_reset_"            LOC = C15 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24;
+NET "dvi_xclk_p"            LOC = E14 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24;
+NET "dvi_xclk_n"            LOC = F15 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24;
+NET "dvi_v"                 LOC = C16 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24;
+NET "dvi_h"                 LOC = F12 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24;
+NET "dvi_de"                LOC = F14 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24;
+NET "dvi_d[0]"              LOC = D17 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24;
+NET "dvi_d[1]"              LOC = A14 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24;
+NET "dvi_d[2]"              LOC = A15 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24;
+NET "dvi_d[3]"              LOC = A16 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24;
+NET "dvi_d[4]"              LOC = A17 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24;
+NET "dvi_d[5]"              LOC = A18 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24;
+NET "dvi_d[6]"              LOC = D14 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24;
+NET "dvi_d[7]"              LOC = B14 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24;
+NET "dvi_d[8]"              LOC = B16 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24;
+NET "dvi_d[9]"              LOC = B18 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24;
+NET "dvi_d[10]"             LOC = E16 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24;
+NET "dvi_d[11]"             LOC = D15 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24;
 
 #NET "dvi0_ddc_scl"          LOC = C14 | IOSTANDARD = LVCMOS33;
 #NET "dvi0_ddc_sda"          LOC = C17 | IOSTANDARD = LVCMOS33;
 #NET "dvi0_hpint"            LOC = D13 | IOSTANDARD = LVCMOS33; # Hot-plug detect interrupt input, active low
-
 # Chrontel 2 (micro-HDMI)
-NET "hdmi_reset_"           LOC = W18  | IOSTANDARD = LVCMOS33 | SLEW = FAST; # Reset output, active low
-NET "hdmi_xclk_p"           LOC = T15  | IOSTANDARD = LVCMOS33 | SLEW = FAST; # Clock output
-NET "hdmi_v"                LOC = T16  | IOSTANDARD = LVCMOS33 | SLEW = FAST; # V-sync output
-NET "hdmi_h"                LOC = AB15 | IOSTANDARD = LVCMOS33 | SLEW = FAST; # H-sync output
-NET "hdmi_de"               LOC = AB16 | IOSTANDARD = LVCMOS33 | SLEW = FAST; # Data enable output
-NET "hdmi_d[0]"             LOC = T18  | IOSTANDARD = LVCMOS33 | SLEW = FAST;
-NET "hdmi_d[1]"             LOC = U16  | IOSTANDARD = LVCMOS33 | SLEW = FAST;
-NET "hdmi_d[2]"             LOC = V17  | IOSTANDARD = LVCMOS33 | SLEW = FAST;
-NET "hdmi_d[3]"             LOC = V19  | IOSTANDARD = LVCMOS33 | SLEW = FAST;
-NET "hdmi_d[4]"             LOC = V18  | IOSTANDARD = LVCMOS33 | SLEW = FAST;
-NET "hdmi_d[5]"             LOC = W17  | IOSTANDARD = LVCMOS33 | SLEW = FAST;
-NET "hdmi_d[6]"             LOC = Y17  | IOSTANDARD = LVCMOS33 | SLEW = FAST;
-NET "hdmi_d[7]"             LOC = Y15  | IOSTANDARD = LVCMOS33 | SLEW = FAST;
-NET "hdmi_d[8]"             LOC = Y18  | IOSTANDARD = LVCMOS33 | SLEW = FAST;
-NET "hdmi_d[9]"             LOC = Y19  | IOSTANDARD = LVCMOS33 | SLEW = FAST;
-NET "hdmi_d[10]"            LOC = AB21 | IOSTANDARD = LVCMOS33 | SLEW = FAST;
-NET "hdmi_d[11]"            LOC = T17  | IOSTANDARD = LVCMOS33 | SLEW = FAST;
+NET "hdmi_reset_"           LOC = W18  | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24; # Reset output, active low
+NET "hdmi_xclk_p"           LOC = T15  | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24; # Clock output
+NET "hdmi_v"                LOC = T16  | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24; # V-sync output
+NET "hdmi_h"                LOC = AB15 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24; # H-sync output
+NET "hdmi_de"               LOC = AB16 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24; # Data enable output
+NET "hdmi_d[0]"             LOC = T18  | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24;
+NET "hdmi_d[1]"             LOC = U16  | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24;
+NET "hdmi_d[2]"             LOC = V17  | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24;
+NET "hdmi_d[3]"             LOC = V19  | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24;
+NET "hdmi_d[4]"             LOC = V18  | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24;
+NET "hdmi_d[5]"             LOC = W17  | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24;
+NET "hdmi_d[6]"             LOC = Y17  | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24;
+NET "hdmi_d[7]"             LOC = Y15  | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24;
+NET "hdmi_d[8]"             LOC = Y18  | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24;
+NET "hdmi_d[9]"             LOC = Y19  | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24;
+NET "hdmi_d[10]"            LOC = AB21 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24;
+NET "hdmi_d[11]"            LOC = T17  | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 24;
 
 #NET "DDC2_SCK" LOC = AA21 | IOSTANDARD = LVCMOS33; # Display data channel clock
 #NET "DDC2_SDA" LOC = AB19 | IOSTANDARD = LVCMOS33; # Display data channel data
@@ -219,9 +225,8 @@ NET "hdmi_d[11]"            LOC = T17  | IOSTANDARD = LVCMOS33 | SLEW = FAST;
 #NET "DDR2B_LDQS_N" LOC = L1 | IOSTANDARD = LVCMOS18;
 #NET "DDR2B_UDQS_P" LOC = T2 | IOSTANDARD = LVCMOS18;
 #NET "DDR2B_UDQS_N" LOC = T1 | IOSTANDARD = LVCMOS18;
+
 INST "core_u_pano_core/u_mr1_top/Mram_ram_cpu_ram_symbol0" LOC = RAMB16_X3Y86;
 INST "core_u_pano_core/u_mr1_top/Mram_ram_cpu_ram_symbol1" LOC = RAMB16_X3Y84;
 INST "core_u_pano_core/u_mr1_top/Mram_ram_cpu_ram_symbol2" LOC = RAMB16_X3Y82;
 INST "core_u_pano_core/u_mr1_top/Mram_ram_cpu_ram_symbol3" LOC = RAMB16_X3Y80;
-#Created by Constraints Editor (xc6slx150-fgg484-2) - 2018/12/19
-TIMESPEC TS_ = FROM "osc_clk" TO "_zz_16_" TIG;
