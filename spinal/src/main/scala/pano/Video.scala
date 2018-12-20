@@ -5,17 +5,17 @@ import spinal.core._
 
 case class VideoTimings() extends Bundle {
     val h_active            = UInt(12 bits)
-    val h_fp                = UInt(8 bits)
-    val h_sync              = UInt(8 bits)
-    val h_bp                = UInt(8 bits)
+    val h_fp                = UInt(9 bits)
+    val h_sync              = UInt(9 bits)
+    val h_bp                = UInt(9 bits)
     val h_sync_positive     = Bool
 
     val h_total_m1          = UInt(12 bits)
 
     val v_active            = UInt(11 bits)
-    val v_fp                = UInt(6 bits)
-    val v_sync              = UInt(6 bits)
-    val v_bp                = UInt(6 bits)
+    val v_fp                = UInt(9 bits)
+    val v_sync              = UInt(9 bits)
+    val v_bp                = UInt(9 bits)
     val v_sync_positive     = Bool
 
     val v_total_m1          = UInt(12 bits)

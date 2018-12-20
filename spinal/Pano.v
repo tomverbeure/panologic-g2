@@ -1,7 +1,16 @@
-// Generator : SpinalHDL v1.2.0    git head : cf3b44dbd881428e70669e5b623479c23b2d0ddd
-// Date      : 18/12/2018, 21:53:21
+// Generator : SpinalHDL v1.2.2    git head : 3159d9865a8de00378e0b0405c338a97c2f5a601
+// Date      : 19/12/2018, 22:28:26
 // Component : Pano
 
+
+`define InstrFormat_defaultEncoding_type [6:0]
+`define InstrFormat_defaultEncoding_R 7'b0000001
+`define InstrFormat_defaultEncoding_I 7'b0000010
+`define InstrFormat_defaultEncoding_S 7'b0000100
+`define InstrFormat_defaultEncoding_B 7'b0001000
+`define InstrFormat_defaultEncoding_U 7'b0010000
+`define InstrFormat_defaultEncoding_J 7'b0100000
+`define InstrFormat_defaultEncoding_Shamt 7'b1000000
 
 `define InstrType_defaultEncoding_type [12:0]
 `define InstrType_defaultEncoding_Undef 13'b0000000000001
@@ -17,15 +26,6 @@
 `define InstrType_defaultEncoding_E 13'b0010000000000
 `define InstrType_defaultEncoding_CSR 13'b0100000000000
 `define InstrType_defaultEncoding_MULDIV 13'b1000000000000
-
-`define InstrFormat_defaultEncoding_type [6:0]
-`define InstrFormat_defaultEncoding_R 7'b0000001
-`define InstrFormat_defaultEncoding_I 7'b0000010
-`define InstrFormat_defaultEncoding_S 7'b0000100
-`define InstrFormat_defaultEncoding_B 7'b0001000
-`define InstrFormat_defaultEncoding_U 7'b0010000
-`define InstrFormat_defaultEncoding_J 7'b0100000
-`define InstrFormat_defaultEncoding_Shamt 7'b1000000
 
 `define Op1Kind_binary_sequential_type [1:0]
 `define Op1Kind_binary_sequential_Rs1 2'b00
@@ -70,19 +70,19 @@ module Fetch (
       input   io_r2rd_stall,
       input   clk25,
       input   reset25_);
-  wire  _zz_1_;
-  wire  _zz_2_;
-  wire  _zz_3_;
-  wire  _zz_4_;
-  wire  _zz_5_;
-  wire  _zz_6_;
-  wire  _zz_7_;
-  wire [4:0] _zz_8_;
-  wire  _zz_9_;
-  wire  _zz_10_;
-  wire  _zz_11_;
-  wire  _zz_12_;
-  wire [4:0] _zz_13_;
+  wire  _zz_Fetch_1_;
+  wire  _zz_Fetch_2_;
+  wire  _zz_Fetch_3_;
+  wire  _zz_Fetch_4_;
+  wire  _zz_Fetch_5_;
+  wire  _zz_Fetch_6_;
+  wire  _zz_Fetch_7_;
+  wire [4:0] _zz_Fetch_8_;
+  wire  _zz_Fetch_9_;
+  wire  _zz_Fetch_10_;
+  wire  _zz_Fetch_11_;
+  wire  _zz_Fetch_12_;
+  wire [4:0] _zz_Fetch_13_;
   wire  fetch_halt;
   wire [6:0] opcode;
   wire  down_stall;
@@ -108,19 +108,19 @@ module Fetch (
   wire [4:0] rf_rs1_addr;
   wire [4:0] rf_rs2_addr;
   wire  rf_raw_stall;
-  assign _zz_1_ = ((! fetch_halt) && (! down_stall));
-  assign _zz_2_ = (down_stall || raw_stall);
-  assign _zz_3_ = (! (down_stall || raw_stall));
-  assign _zz_4_ = (rf_rs1_addr == io_d_rd_update_rd_waddr);
-  assign _zz_5_ = (io_d_rd_update_rd_waddr != (5'b00000));
-  assign _zz_6_ = (rf_rs1_addr == io_e_rd_update_rd_waddr);
-  assign _zz_7_ = (io_e_rd_update_rd_waddr != (5'b00000));
-  assign _zz_8_ = (5'b00000);
-  assign _zz_9_ = (rf_rs2_addr == io_d_rd_update_rd_waddr);
-  assign _zz_10_ = (io_d_rd_update_rd_waddr != (5'b00000));
-  assign _zz_11_ = (rf_rs2_addr == io_e_rd_update_rd_waddr);
-  assign _zz_12_ = (io_e_rd_update_rd_waddr != (5'b00000));
-  assign _zz_13_ = (5'b00000);
+  assign _zz_Fetch_1_ = ((! fetch_halt) && (! down_stall));
+  assign _zz_Fetch_2_ = (down_stall || raw_stall);
+  assign _zz_Fetch_3_ = (! (down_stall || raw_stall));
+  assign _zz_Fetch_4_ = (rf_rs1_addr == io_d_rd_update_rd_waddr);
+  assign _zz_Fetch_5_ = (io_d_rd_update_rd_waddr != (5'b00000));
+  assign _zz_Fetch_6_ = (rf_rs1_addr == io_e_rd_update_rd_waddr);
+  assign _zz_Fetch_7_ = (io_e_rd_update_rd_waddr != (5'b00000));
+  assign _zz_Fetch_8_ = (5'b00000);
+  assign _zz_Fetch_9_ = (rf_rs2_addr == io_d_rd_update_rd_waddr);
+  assign _zz_Fetch_10_ = (io_d_rd_update_rd_waddr != (5'b00000));
+  assign _zz_Fetch_11_ = (rf_rs2_addr == io_e_rd_update_rd_waddr);
+  assign _zz_Fetch_12_ = (io_e_rd_update_rd_waddr != (5'b00000));
+  assign _zz_Fetch_13_ = (5'b00000);
   assign fetch_halt = 1'b0;
   assign opcode = instr[6 : 0];
   assign down_stall = (io_d2f_stall || io_r2rd_stall);
@@ -131,22 +131,23 @@ module Fetch (
     pc_capture_instr = 1'b0;
     io_instr_req_valid = 1'b0;
     io_instr_req_addr = pc_real_pc;
-    case(pc_cur_state)
-      `PcState_defaultEncoding_Idle : begin
-        if(_zz_1_)begin
+    (* parallel_case *)
+    case(1) // synthesis parallel_case
+      (((pc_cur_state) & `PcState_defaultEncoding_Idle) == `PcState_defaultEncoding_Idle) : begin
+        if(_zz_Fetch_1_)begin
           io_instr_req_valid = 1'b1;
           io_instr_req_addr = pc_real_pc;
         end
       end
-      `PcState_defaultEncoding_WaitReqReady : begin
+      (((pc_cur_state) & `PcState_defaultEncoding_WaitReqReady) == `PcState_defaultEncoding_WaitReqReady) : begin
         io_instr_req_valid = 1'b1;
         io_instr_req_addr = pc_real_pc;
       end
-      `PcState_defaultEncoding_WaitRsp : begin
+      (((pc_cur_state) & `PcState_defaultEncoding_WaitRsp) == `PcState_defaultEncoding_WaitRsp) : begin
         if(io_instr_rsp_valid)begin
           pc_capture_instr = 1'b1;
           io_instr_req_addr = pc_real_pc_incr;
-          if(! _zz_2_) begin
+          if(! _zz_Fetch_2_) begin
             if(instr_is_jump)begin
               pc_send_instr = 1'b1;
             end else begin
@@ -156,8 +157,8 @@ module Fetch (
           end
         end
       end
-      `PcState_defaultEncoding_WaitStallDone : begin
-        if(_zz_3_)begin
+      (((pc_cur_state) & `PcState_defaultEncoding_WaitStallDone) == `PcState_defaultEncoding_WaitStallDone) : begin
+        if(_zz_Fetch_3_)begin
           pc_send_instr = 1'b1;
           if(! instr_is_jump_r) begin
             io_instr_req_valid = 1'b1;
@@ -198,7 +199,7 @@ module Fetch (
   assign rf_rs2_valid = 1'b1;
   assign rf_rs1_addr = instr_final[19 : 15];
   assign rf_rs2_addr = instr_final[24 : 20];
-  assign rf_raw_stall = ((rf_rs1_valid && (((io_d_rd_update_rd_waddr_valid && (_zz_4_ && _zz_5_)) || (io_e_rd_update_rd_waddr_valid && (_zz_6_ && _zz_7_))) || (io_w_rd_update_rd_waddr_valid && ((rf_rs1_addr == io_w_rd_update_rd_waddr) && (io_w_rd_update_rd_waddr != _zz_8_))))) || (rf_rs2_valid && (((io_d_rd_update_rd_waddr_valid && (_zz_9_ && _zz_10_)) || (io_e_rd_update_rd_waddr_valid && (_zz_11_ && _zz_12_))) || (io_w_rd_update_rd_waddr_valid && ((rf_rs2_addr == io_w_rd_update_rd_waddr) && (io_w_rd_update_rd_waddr != _zz_13_))))));
+  assign rf_raw_stall = ((rf_rs1_valid && (((io_d_rd_update_rd_waddr_valid && (_zz_Fetch_4_ && _zz_Fetch_5_)) || (io_e_rd_update_rd_waddr_valid && (_zz_Fetch_6_ && _zz_Fetch_7_))) || (io_w_rd_update_rd_waddr_valid && ((rf_rs1_addr == io_w_rd_update_rd_waddr) && (io_w_rd_update_rd_waddr != _zz_Fetch_8_))))) || (rf_rs2_valid && (((io_d_rd_update_rd_waddr_valid && (_zz_Fetch_9_ && _zz_Fetch_10_)) || (io_e_rd_update_rd_waddr_valid && (_zz_Fetch_11_ && _zz_Fetch_12_))) || (io_w_rd_update_rd_waddr_valid && ((rf_rs2_addr == io_w_rd_update_rd_waddr) && (io_w_rd_update_rd_waddr != _zz_Fetch_13_))))));
   assign io_rd2r_rs1_rd = (rf_rs1_valid && (! (down_stall || rf_raw_stall)));
   assign io_rd2r_rs2_rd = (rf_rs2_valid && (! (down_stall || rf_raw_stall)));
   assign io_rd2r_rs1_rd_addr = (rf_rs1_valid ? rf_rs1_addr : (5'b00000));
@@ -215,9 +216,10 @@ module Fetch (
       pc_r <= (32'b00000000000000000000000000000000);
       instr_is_jump_regNextWhen <= 1'b0;
     end else begin
-      case(pc_cur_state)
-        `PcState_defaultEncoding_Idle : begin
-          if(_zz_1_)begin
+      (* parallel_case *)
+      case(1) // synthesis parallel_case
+        (((pc_cur_state) & `PcState_defaultEncoding_Idle) == `PcState_defaultEncoding_Idle) : begin
+          if(_zz_Fetch_1_)begin
             if(io_instr_req_ready)begin
               pc_cur_state <= `PcState_defaultEncoding_WaitRsp;
             end else begin
@@ -225,15 +227,15 @@ module Fetch (
             end
           end
         end
-        `PcState_defaultEncoding_WaitReqReady : begin
+        (((pc_cur_state) & `PcState_defaultEncoding_WaitReqReady) == `PcState_defaultEncoding_WaitReqReady) : begin
           if(io_instr_req_ready)begin
             pc_cur_state <= `PcState_defaultEncoding_WaitRsp;
           end
         end
-        `PcState_defaultEncoding_WaitRsp : begin
+        (((pc_cur_state) & `PcState_defaultEncoding_WaitRsp) == `PcState_defaultEncoding_WaitRsp) : begin
           if(io_instr_rsp_valid)begin
             pc_real_pc <= pc_real_pc_incr;
-            if(_zz_2_)begin
+            if(_zz_Fetch_2_)begin
               pc_cur_state <= `PcState_defaultEncoding_WaitStallDone;
             end else begin
               if(instr_is_jump)begin
@@ -248,8 +250,8 @@ module Fetch (
             end
           end
         end
-        `PcState_defaultEncoding_WaitStallDone : begin
-          if(_zz_3_)begin
+        (((pc_cur_state) & `PcState_defaultEncoding_WaitStallDone) == `PcState_defaultEncoding_WaitStallDone) : begin
+          if(_zz_Fetch_3_)begin
             if(instr_is_jump_r)begin
               pc_cur_state <= `PcState_defaultEncoding_WaitJumpDone;
             end else begin
@@ -321,27 +323,27 @@ module Decode (
       input  [31:0] io_e2d_pc_jump,
       input   clk25,
       input   reset25_);
-  wire  _zz_13_;
-  wire [9:0] _zz_14_;
-  wire [31:0] _zz_15_;
-  wire [32:0] _zz_16_;
-  wire [31:0] _zz_17_;
-  wire [32:0] _zz_18_;
-  wire [31:0] _zz_19_;
-  wire [32:0] _zz_20_;
-  wire [31:0] _zz_21_;
-  wire [32:0] _zz_22_;
-  wire [31:0] _zz_23_;
-  wire [31:0] _zz_24_;
-  wire [32:0] _zz_25_;
-  wire [32:0] _zz_26_;
-  wire [32:0] _zz_27_;
-  wire [32:0] _zz_28_;
-  wire [9:0] _zz_29_;
-  wire [9:0] _zz_30_;
-  wire [20:0] _zz_31_;
-  wire [20:0] _zz_32_;
-  wire [20:0] _zz_33_;
+  wire  _zz_Decode_13_;
+  wire [9:0] _zz_Decode_14_;
+  wire [31:0] _zz_Decode_15_;
+  wire [32:0] _zz_Decode_16_;
+  wire [31:0] _zz_Decode_17_;
+  wire [32:0] _zz_Decode_18_;
+  wire [31:0] _zz_Decode_19_;
+  wire [32:0] _zz_Decode_20_;
+  wire [31:0] _zz_Decode_21_;
+  wire [32:0] _zz_Decode_22_;
+  wire [31:0] _zz_Decode_23_;
+  wire [31:0] _zz_Decode_24_;
+  wire [32:0] _zz_Decode_25_;
+  wire [32:0] _zz_Decode_26_;
+  wire [32:0] _zz_Decode_27_;
+  wire [32:0] _zz_Decode_28_;
+  wire [9:0] _zz_Decode_29_;
+  wire [9:0] _zz_Decode_30_;
+  wire [20:0] _zz_Decode_31_;
+  wire [20:0] _zz_Decode_32_;
+  wire [20:0] _zz_Decode_33_;
   reg  d2f_stall_d;
   reg  f2d_valid_d;
   wire  decode_start;
@@ -358,19 +360,19 @@ module Decode (
   reg  sub;
   reg  unsigned_1_;
   reg `Op1Kind_binary_sequential_type decode_op1_kind;
-  wire  _zz_1_;
-  reg [19:0] _zz_2_;
+  wire  _zz_Decode_1_;
+  reg [19:0] _zz_Decode_2_;
   wire [31:0] i_imm;
-  wire  _zz_3_;
-  reg [19:0] _zz_4_;
+  wire  _zz_Decode_3_;
+  reg [19:0] _zz_Decode_4_;
   wire [31:0] s_imm;
-  wire  _zz_5_;
-  reg [19:0] _zz_6_;
+  wire  _zz_Decode_5_;
+  reg [19:0] _zz_Decode_6_;
   wire [31:0] b_imm;
-  wire  _zz_7_;
-  reg [10:0] _zz_8_;
+  wire  _zz_Decode_7_;
+  reg [10:0] _zz_Decode_8_;
   wire [31:0] j_imm;
-  wire [11:0] _zz_9_;
+  wire [11:0] _zz_Decode_9_;
   wire [31:0] u_imm;
   wire  trap;
   wire  rs1_valid;
@@ -380,12 +382,12 @@ module Decode (
   wire [32:0] rs1_33;
   wire [32:0] rs2_33;
   wire [32:0] op1_33;
-  reg [32:0] _zz_10_;
+  reg [32:0] _zz_Decode_10_;
   wire [32:0] op2_33;
-  reg [32:0] _zz_11_;
+  reg [32:0] _zz_Decode_11_;
   wire [8:0] op1_op2_lsb;
   wire [31:0] rs2_imm;
-  reg [31:0] _zz_12_;
+  reg [31:0] _zz_Decode_12_;
   wire  d2e_nxt_valid;
   wire [31:0] d2e_nxt_pc;
   wire [31:0] d2e_nxt_instr;
@@ -396,27 +398,27 @@ module Decode (
   wire [31:0] d2e_nxt_rs2_imm;
   wire  d2e_nxt_rd_valid;
   wire [4:0] d2e_nxt_rd_addr;
-  assign _zz_13_ = (io_f2d_valid && (! io_e2d_stall));
-  assign _zz_14_ = {decode_funct7,decode_funct3};
-  assign _zz_15_ = io_r2rr_rs1_data;
-  assign _zz_16_ = {1'd0, _zz_15_};
-  assign _zz_17_ = io_r2rr_rs1_data;
-  assign _zz_18_ = {{1{_zz_17_[31]}}, _zz_17_};
-  assign _zz_19_ = io_r2rr_rs2_data;
-  assign _zz_20_ = {1'd0, _zz_19_};
-  assign _zz_21_ = io_r2rr_rs2_data;
-  assign _zz_22_ = {{1{_zz_21_[31]}}, _zz_21_};
-  assign _zz_23_ = io_f2d_pc;
-  assign _zz_24_ = i_imm;
-  assign _zz_25_ = {1'd0, _zz_24_};
-  assign _zz_26_ = {{1{i_imm[31]}}, i_imm};
-  assign _zz_27_ = {{1{s_imm[31]}}, s_imm};
-  assign _zz_28_ = {{1{u_imm[31]}}, u_imm};
-  assign _zz_29_ = _zz_30_;
-  assign _zz_30_ = ({{1'b0,op1_33[7 : 0]},sub} + {{1'b0,op2_33[7 : 0]},sub});
-  assign _zz_31_ = i_imm[20 : 0];
-  assign _zz_32_ = b_imm[20 : 0];
-  assign _zz_33_ = j_imm[20 : 0];
+  assign _zz_Decode_13_ = (io_f2d_valid && (! io_e2d_stall));
+  assign _zz_Decode_14_ = {decode_funct7,decode_funct3};
+  assign _zz_Decode_15_ = io_r2rr_rs1_data;
+  assign _zz_Decode_16_ = {1'd0, _zz_Decode_15_};
+  assign _zz_Decode_17_ = io_r2rr_rs1_data;
+  assign _zz_Decode_18_ = {{1{_zz_Decode_17_[31]}}, _zz_Decode_17_};
+  assign _zz_Decode_19_ = io_r2rr_rs2_data;
+  assign _zz_Decode_20_ = {1'd0, _zz_Decode_19_};
+  assign _zz_Decode_21_ = io_r2rr_rs2_data;
+  assign _zz_Decode_22_ = {{1{_zz_Decode_21_[31]}}, _zz_Decode_21_};
+  assign _zz_Decode_23_ = io_f2d_pc;
+  assign _zz_Decode_24_ = i_imm;
+  assign _zz_Decode_25_ = {1'd0, _zz_Decode_24_};
+  assign _zz_Decode_26_ = {{1{i_imm[31]}}, i_imm};
+  assign _zz_Decode_27_ = {{1{s_imm[31]}}, s_imm};
+  assign _zz_Decode_28_ = {{1{u_imm[31]}}, u_imm};
+  assign _zz_Decode_29_ = _zz_Decode_30_;
+  assign _zz_Decode_30_ = ({{1'b0,op1_33[7 : 0]},sub} + {{1'b0,op2_33[7 : 0]},sub});
+  assign _zz_Decode_31_ = i_imm[20 : 0];
+  assign _zz_Decode_32_ = b_imm[20 : 0];
+  assign _zz_Decode_33_ = j_imm[20 : 0];
   assign decode_start = (io_f2d_valid && (! d2f_stall_d));
   assign decode_end = (io_f2d_valid && (! io_d2f_stall));
   assign decode_go_idle = ((! io_f2d_valid) && f2d_valid_d);
@@ -506,7 +508,7 @@ module Decode (
       end
       7'b0110011 : begin
         decode_iformat = `InstrFormat_defaultEncoding_R;
-        case(_zz_14_)
+        case(_zz_Decode_14_)
           10'b0000000000, 10'b0100000000 : begin
             decode_itype = `InstrType_defaultEncoding_ALU_ADD;
             sub = decode_funct7[5];
@@ -543,99 +545,99 @@ module Decode (
     endcase
   end
 
-  assign _zz_1_ = instr[31];
+  assign _zz_Decode_1_ = instr[31];
   always @ (*) begin
-    _zz_2_[19] = _zz_1_;
-    _zz_2_[18] = _zz_1_;
-    _zz_2_[17] = _zz_1_;
-    _zz_2_[16] = _zz_1_;
-    _zz_2_[15] = _zz_1_;
-    _zz_2_[14] = _zz_1_;
-    _zz_2_[13] = _zz_1_;
-    _zz_2_[12] = _zz_1_;
-    _zz_2_[11] = _zz_1_;
-    _zz_2_[10] = _zz_1_;
-    _zz_2_[9] = _zz_1_;
-    _zz_2_[8] = _zz_1_;
-    _zz_2_[7] = _zz_1_;
-    _zz_2_[6] = _zz_1_;
-    _zz_2_[5] = _zz_1_;
-    _zz_2_[4] = _zz_1_;
-    _zz_2_[3] = _zz_1_;
-    _zz_2_[2] = _zz_1_;
-    _zz_2_[1] = _zz_1_;
-    _zz_2_[0] = _zz_1_;
+    _zz_Decode_2_[19] = _zz_Decode_1_;
+    _zz_Decode_2_[18] = _zz_Decode_1_;
+    _zz_Decode_2_[17] = _zz_Decode_1_;
+    _zz_Decode_2_[16] = _zz_Decode_1_;
+    _zz_Decode_2_[15] = _zz_Decode_1_;
+    _zz_Decode_2_[14] = _zz_Decode_1_;
+    _zz_Decode_2_[13] = _zz_Decode_1_;
+    _zz_Decode_2_[12] = _zz_Decode_1_;
+    _zz_Decode_2_[11] = _zz_Decode_1_;
+    _zz_Decode_2_[10] = _zz_Decode_1_;
+    _zz_Decode_2_[9] = _zz_Decode_1_;
+    _zz_Decode_2_[8] = _zz_Decode_1_;
+    _zz_Decode_2_[7] = _zz_Decode_1_;
+    _zz_Decode_2_[6] = _zz_Decode_1_;
+    _zz_Decode_2_[5] = _zz_Decode_1_;
+    _zz_Decode_2_[4] = _zz_Decode_1_;
+    _zz_Decode_2_[3] = _zz_Decode_1_;
+    _zz_Decode_2_[2] = _zz_Decode_1_;
+    _zz_Decode_2_[1] = _zz_Decode_1_;
+    _zz_Decode_2_[0] = _zz_Decode_1_;
   end
 
-  assign i_imm = {_zz_2_,instr[31 : 20]};
-  assign _zz_3_ = instr[31];
+  assign i_imm = {_zz_Decode_2_,instr[31 : 20]};
+  assign _zz_Decode_3_ = instr[31];
   always @ (*) begin
-    _zz_4_[19] = _zz_3_;
-    _zz_4_[18] = _zz_3_;
-    _zz_4_[17] = _zz_3_;
-    _zz_4_[16] = _zz_3_;
-    _zz_4_[15] = _zz_3_;
-    _zz_4_[14] = _zz_3_;
-    _zz_4_[13] = _zz_3_;
-    _zz_4_[12] = _zz_3_;
-    _zz_4_[11] = _zz_3_;
-    _zz_4_[10] = _zz_3_;
-    _zz_4_[9] = _zz_3_;
-    _zz_4_[8] = _zz_3_;
-    _zz_4_[7] = _zz_3_;
-    _zz_4_[6] = _zz_3_;
-    _zz_4_[5] = _zz_3_;
-    _zz_4_[4] = _zz_3_;
-    _zz_4_[3] = _zz_3_;
-    _zz_4_[2] = _zz_3_;
-    _zz_4_[1] = _zz_3_;
-    _zz_4_[0] = _zz_3_;
+    _zz_Decode_4_[19] = _zz_Decode_3_;
+    _zz_Decode_4_[18] = _zz_Decode_3_;
+    _zz_Decode_4_[17] = _zz_Decode_3_;
+    _zz_Decode_4_[16] = _zz_Decode_3_;
+    _zz_Decode_4_[15] = _zz_Decode_3_;
+    _zz_Decode_4_[14] = _zz_Decode_3_;
+    _zz_Decode_4_[13] = _zz_Decode_3_;
+    _zz_Decode_4_[12] = _zz_Decode_3_;
+    _zz_Decode_4_[11] = _zz_Decode_3_;
+    _zz_Decode_4_[10] = _zz_Decode_3_;
+    _zz_Decode_4_[9] = _zz_Decode_3_;
+    _zz_Decode_4_[8] = _zz_Decode_3_;
+    _zz_Decode_4_[7] = _zz_Decode_3_;
+    _zz_Decode_4_[6] = _zz_Decode_3_;
+    _zz_Decode_4_[5] = _zz_Decode_3_;
+    _zz_Decode_4_[4] = _zz_Decode_3_;
+    _zz_Decode_4_[3] = _zz_Decode_3_;
+    _zz_Decode_4_[2] = _zz_Decode_3_;
+    _zz_Decode_4_[1] = _zz_Decode_3_;
+    _zz_Decode_4_[0] = _zz_Decode_3_;
   end
 
-  assign s_imm = {{_zz_4_,instr[31 : 25]},instr[11 : 7]};
-  assign _zz_5_ = instr[31];
+  assign s_imm = {{_zz_Decode_4_,instr[31 : 25]},instr[11 : 7]};
+  assign _zz_Decode_5_ = instr[31];
   always @ (*) begin
-    _zz_6_[19] = _zz_5_;
-    _zz_6_[18] = _zz_5_;
-    _zz_6_[17] = _zz_5_;
-    _zz_6_[16] = _zz_5_;
-    _zz_6_[15] = _zz_5_;
-    _zz_6_[14] = _zz_5_;
-    _zz_6_[13] = _zz_5_;
-    _zz_6_[12] = _zz_5_;
-    _zz_6_[11] = _zz_5_;
-    _zz_6_[10] = _zz_5_;
-    _zz_6_[9] = _zz_5_;
-    _zz_6_[8] = _zz_5_;
-    _zz_6_[7] = _zz_5_;
-    _zz_6_[6] = _zz_5_;
-    _zz_6_[5] = _zz_5_;
-    _zz_6_[4] = _zz_5_;
-    _zz_6_[3] = _zz_5_;
-    _zz_6_[2] = _zz_5_;
-    _zz_6_[1] = _zz_5_;
-    _zz_6_[0] = _zz_5_;
+    _zz_Decode_6_[19] = _zz_Decode_5_;
+    _zz_Decode_6_[18] = _zz_Decode_5_;
+    _zz_Decode_6_[17] = _zz_Decode_5_;
+    _zz_Decode_6_[16] = _zz_Decode_5_;
+    _zz_Decode_6_[15] = _zz_Decode_5_;
+    _zz_Decode_6_[14] = _zz_Decode_5_;
+    _zz_Decode_6_[13] = _zz_Decode_5_;
+    _zz_Decode_6_[12] = _zz_Decode_5_;
+    _zz_Decode_6_[11] = _zz_Decode_5_;
+    _zz_Decode_6_[10] = _zz_Decode_5_;
+    _zz_Decode_6_[9] = _zz_Decode_5_;
+    _zz_Decode_6_[8] = _zz_Decode_5_;
+    _zz_Decode_6_[7] = _zz_Decode_5_;
+    _zz_Decode_6_[6] = _zz_Decode_5_;
+    _zz_Decode_6_[5] = _zz_Decode_5_;
+    _zz_Decode_6_[4] = _zz_Decode_5_;
+    _zz_Decode_6_[3] = _zz_Decode_5_;
+    _zz_Decode_6_[2] = _zz_Decode_5_;
+    _zz_Decode_6_[1] = _zz_Decode_5_;
+    _zz_Decode_6_[0] = _zz_Decode_5_;
   end
 
-  assign b_imm = {{{{_zz_6_,instr[7]},instr[30 : 25]},instr[11 : 8]},(1'b0)};
-  assign _zz_7_ = instr[31];
+  assign b_imm = {{{{_zz_Decode_6_,instr[7]},instr[30 : 25]},instr[11 : 8]},(1'b0)};
+  assign _zz_Decode_7_ = instr[31];
   always @ (*) begin
-    _zz_8_[10] = _zz_7_;
-    _zz_8_[9] = _zz_7_;
-    _zz_8_[8] = _zz_7_;
-    _zz_8_[7] = _zz_7_;
-    _zz_8_[6] = _zz_7_;
-    _zz_8_[5] = _zz_7_;
-    _zz_8_[4] = _zz_7_;
-    _zz_8_[3] = _zz_7_;
-    _zz_8_[2] = _zz_7_;
-    _zz_8_[1] = _zz_7_;
-    _zz_8_[0] = _zz_7_;
+    _zz_Decode_8_[10] = _zz_Decode_7_;
+    _zz_Decode_8_[9] = _zz_Decode_7_;
+    _zz_Decode_8_[8] = _zz_Decode_7_;
+    _zz_Decode_8_[7] = _zz_Decode_7_;
+    _zz_Decode_8_[6] = _zz_Decode_7_;
+    _zz_Decode_8_[5] = _zz_Decode_7_;
+    _zz_Decode_8_[4] = _zz_Decode_7_;
+    _zz_Decode_8_[3] = _zz_Decode_7_;
+    _zz_Decode_8_[2] = _zz_Decode_7_;
+    _zz_Decode_8_[1] = _zz_Decode_7_;
+    _zz_Decode_8_[0] = _zz_Decode_7_;
   end
 
-  assign j_imm = {{{{{_zz_8_,instr[31]},instr[19 : 12]},instr[20]},instr[30 : 21]},(1'b0)};
-  assign _zz_9_[11 : 0] = (12'b000000000000);
-  assign u_imm = {instr[31 : 12],_zz_9_};
+  assign j_imm = {{{{{_zz_Decode_8_,instr[31]},instr[19 : 12]},instr[20]},instr[30 : 21]},(1'b0)};
+  assign _zz_Decode_9_[11 : 0] = (12'b000000000000);
+  assign u_imm = {instr[31 : 12],_zz_Decode_9_};
   assign io_d2f_pc_jump_valid = io_e2d_pc_jump_valid;
   assign io_d2f_pc_jump = io_e2d_pc_jump;
   assign trap = ((decode_itype & `InstrType_defaultEncoding_Undef) != 13'b0000000000000);
@@ -643,66 +645,68 @@ module Decode (
   assign rs2_valid = (((((decode_iformat & `InstrFormat_defaultEncoding_R) != 7'b0000000) || ((decode_iformat & `InstrFormat_defaultEncoding_S) != 7'b0000000)) || ((decode_iformat & `InstrFormat_defaultEncoding_B) != 7'b0000000)) && (! trap));
   assign rd_valid = ((((((decode_iformat & `InstrFormat_defaultEncoding_R) != 7'b0000000) || ((decode_iformat & `InstrFormat_defaultEncoding_I) != 7'b0000000)) || ((decode_iformat & `InstrFormat_defaultEncoding_U) != 7'b0000000)) || ((decode_iformat & `InstrFormat_defaultEncoding_J) != 7'b0000000)) || ((decode_iformat & `InstrFormat_defaultEncoding_Shamt) != 7'b0000000));
   assign rd_addr_final = (rd_valid ? decode_rd_addr : (5'b00000));
-  assign rs1_33 = (unsigned_1_ ? _zz_16_ : _zz_18_);
-  assign rs2_33 = (unsigned_1_ ? _zz_20_ : _zz_22_);
+  assign rs1_33 = (unsigned_1_ ? _zz_Decode_16_ : _zz_Decode_18_);
+  assign rs2_33 = (unsigned_1_ ? _zz_Decode_20_ : _zz_Decode_22_);
   always @ (*) begin
     case(decode_op1_kind)
       `Op1Kind_binary_sequential_Rs1 : begin
-        _zz_10_ = rs1_33;
+        _zz_Decode_10_ = rs1_33;
       end
       `Op1Kind_binary_sequential_Zero : begin
-        _zz_10_ = (33'b000000000000000000000000000000000);
+        _zz_Decode_10_ = (33'b000000000000000000000000000000000);
       end
       default : begin
-        _zz_10_ = {1'd0, _zz_23_};
+        _zz_Decode_10_ = {1'd0, _zz_Decode_23_};
       end
     endcase
   end
 
-  assign op1_33 = _zz_10_;
+  assign op1_33 = _zz_Decode_10_;
   always @ (*) begin
-    case(decode_iformat)
-      `InstrFormat_defaultEncoding_R : begin
-        _zz_11_ = rs2_33;
+    (* parallel_case *)
+    case(1) // synthesis parallel_case
+      (((decode_iformat) & `InstrFormat_defaultEncoding_R) == `InstrFormat_defaultEncoding_R) : begin
+        _zz_Decode_11_ = rs2_33;
       end
-      `InstrFormat_defaultEncoding_I : begin
-        _zz_11_ = (unsigned_1_ ? _zz_25_ : _zz_26_);
+      (((decode_iformat) & `InstrFormat_defaultEncoding_I) == `InstrFormat_defaultEncoding_I) : begin
+        _zz_Decode_11_ = (unsigned_1_ ? _zz_Decode_25_ : _zz_Decode_26_);
       end
-      `InstrFormat_defaultEncoding_S : begin
-        _zz_11_ = _zz_27_;
+      (((decode_iformat) & `InstrFormat_defaultEncoding_S) == `InstrFormat_defaultEncoding_S) : begin
+        _zz_Decode_11_ = _zz_Decode_27_;
       end
-      `InstrFormat_defaultEncoding_U : begin
-        _zz_11_ = _zz_28_;
+      (((decode_iformat) & `InstrFormat_defaultEncoding_U) == `InstrFormat_defaultEncoding_U) : begin
+        _zz_Decode_11_ = _zz_Decode_28_;
       end
-      `InstrFormat_defaultEncoding_Shamt : begin
-        _zz_11_ = {rs2_33[32 : 5],instr[24 : 20]};
+      (((decode_iformat) & `InstrFormat_defaultEncoding_Shamt) == `InstrFormat_defaultEncoding_Shamt) : begin
+        _zz_Decode_11_ = {rs2_33[32 : 5],instr[24 : 20]};
       end
       default : begin
-        _zz_11_ = rs2_33;
+        _zz_Decode_11_ = rs2_33;
       end
     endcase
   end
 
-  assign op2_33 = (_zz_11_ ^ (sub ? (33'b111111111111111111111111111111111) : (33'b000000000000000000000000000000000)));
-  assign op1_op2_lsb = _zz_29_[9 : 1];
+  assign op2_33 = (_zz_Decode_11_ ^ (sub ? (33'b111111111111111111111111111111111) : (33'b000000000000000000000000000000000)));
+  assign op1_op2_lsb = _zz_Decode_29_[9 : 1];
   always @ (*) begin
-    case(decode_iformat)
-      `InstrFormat_defaultEncoding_I : begin
-        _zz_12_ = {io_r2rr_rs2_data[31 : 21],_zz_31_};
+    (* parallel_case *)
+    case(1) // synthesis parallel_case
+      (((decode_iformat) & `InstrFormat_defaultEncoding_I) == `InstrFormat_defaultEncoding_I) : begin
+        _zz_Decode_12_ = {io_r2rr_rs2_data[31 : 21],_zz_Decode_31_};
       end
-      `InstrFormat_defaultEncoding_B : begin
-        _zz_12_ = {io_r2rr_rs2_data[31 : 21],_zz_32_};
+      (((decode_iformat) & `InstrFormat_defaultEncoding_B) == `InstrFormat_defaultEncoding_B) : begin
+        _zz_Decode_12_ = {io_r2rr_rs2_data[31 : 21],_zz_Decode_32_};
       end
-      `InstrFormat_defaultEncoding_J : begin
-        _zz_12_ = {io_r2rr_rs2_data[31 : 21],_zz_33_};
+      (((decode_iformat) & `InstrFormat_defaultEncoding_J) == `InstrFormat_defaultEncoding_J) : begin
+        _zz_Decode_12_ = {io_r2rr_rs2_data[31 : 21],_zz_Decode_33_};
       end
       default : begin
-        _zz_12_ = io_r2rr_rs2_data;
+        _zz_Decode_12_ = io_r2rr_rs2_data;
       end
     endcase
   end
 
-  assign rs2_imm = _zz_12_;
+  assign rs2_imm = _zz_Decode_12_;
   assign io_d2f_stall = io_e2d_stall;
   assign io_rd_update_rd_waddr_valid = (decode_end && rd_valid);
   assign io_rd_update_rd_waddr = rd_addr_final;
@@ -726,7 +730,7 @@ module Decode (
     end else begin
       d2f_stall_d <= io_d2f_stall;
       f2d_valid_d <= io_f2d_valid;
-      if(_zz_13_)begin
+      if(_zz_Decode_13_)begin
         io_d2e_valid <= d2e_nxt_valid;
       end else begin
         if(((! io_e2d_stall) && io_d2e_valid))begin
@@ -737,7 +741,7 @@ module Decode (
   end
 
   always @ (posedge clk25) begin
-    if(_zz_13_)begin
+    if(_zz_Decode_13_)begin
       io_d2e_pc <= d2e_nxt_pc;
       io_d2e_instr <= d2e_nxt_instr;
       io_d2e_itype <= d2e_nxt_itype;
@@ -787,31 +791,30 @@ module Execute (
       output [31:0] io_data_req_data,
       input   clk25,
       input   reset25_);
-  wire  _zz_8_;
-  wire [32:0] _zz_9_;
-  wire [32:0] _zz_10_;
-  wire [25:0] _zz_11_;
-  wire [25:0] _zz_12_;
-  wire [25:0] _zz_13_;
-  wire [24:0] _zz_14_;
-  wire [25:0] _zz_15_;
-  wire [24:0] _zz_16_;
-  wire [7:0] _zz_17_;
-  wire [0:0] _zz_18_;
-  wire [31:0] _zz_19_;
-  wire [31:0] _zz_20_;
-  wire [31:0] _zz_21_;
-  wire [4:0] _zz_22_;
-  wire [32:0] _zz_23_;
-  wire [32:0] _zz_24_;
-  wire [32:0] _zz_25_;
-  wire [32:0] _zz_26_;
-  wire [32:0] _zz_27_;
-  wire [32:0] _zz_28_;
-  wire [31:0] _zz_29_;
-  wire [31:0] _zz_30_;
-  wire [0:0] _zz_31_;
-  wire [31:0] _zz_32_;
+  wire [32:0] _zz_Execute_8_;
+  wire [32:0] _zz_Execute_9_;
+  wire [25:0] _zz_Execute_10_;
+  wire [25:0] _zz_Execute_11_;
+  wire [25:0] _zz_Execute_12_;
+  wire [24:0] _zz_Execute_13_;
+  wire [25:0] _zz_Execute_14_;
+  wire [24:0] _zz_Execute_15_;
+  wire [7:0] _zz_Execute_16_;
+  wire [0:0] _zz_Execute_17_;
+  wire [31:0] _zz_Execute_18_;
+  wire [31:0] _zz_Execute_19_;
+  wire [31:0] _zz_Execute_20_;
+  wire [4:0] _zz_Execute_21_;
+  wire [32:0] _zz_Execute_22_;
+  wire [32:0] _zz_Execute_23_;
+  wire [32:0] _zz_Execute_24_;
+  wire [32:0] _zz_Execute_25_;
+  wire [32:0] _zz_Execute_26_;
+  wire [32:0] _zz_Execute_27_;
+  wire [31:0] _zz_Execute_28_;
+  wire [31:0] _zz_Execute_29_;
+  wire [0:0] _zz_Execute_30_;
+  wire [31:0] _zz_Execute_31_;
   reg  e2d_stall_d;
   wire  exe_start;
   wire  exe_end;
@@ -844,18 +847,18 @@ module Execute (
   wire [31:0] jump_pc_plus4;
   reg  jump_rd_wr;
   wire [31:0] jump_rd_wdata;
-  wire  _zz_1_;
-  wire  _zz_2_;
-  reg  _zz_3_;
+  wire  _zz_Execute_1_;
+  wire  _zz_Execute_2_;
+  reg  _zz_Execute_3_;
   wire  lsu_lsu_stall;
   wire  lsu_rd_wr;
   wire [1:0] lsu_size;
   wire [31:0] lsu_lsu_addr;
-  reg [31:0] _zz_4_;
+  reg [31:0] _zz_Execute_4_;
   wire  rd_wr;
-  reg [31:0] _zz_5_;
-  reg [31:0] _zz_6_;
-  reg [31:0] _zz_7_;
+  reg [31:0] _zz_Execute_5_;
+  reg [31:0] _zz_Execute_6_;
+  reg [31:0] _zz_Execute_7_;
   wire [31:0] rd_wdata;
   wire  e2w_nxt_valid;
   wire  e2w_nxt_ld_active;
@@ -865,31 +868,30 @@ module Execute (
   wire  e2w_nxt_rd_wr;
   wire [4:0] e2w_nxt_rd_waddr;
   wire [31:0] e2w_nxt_rd_wdata;
-  assign _zz_8_ = (io_d2e_valid && (! io_e2d_stall));
-  assign _zz_9_ = io_d2e_op1_33;
-  assign _zz_10_ = io_d2e_op2_33;
-  assign _zz_11_ = _zz_12_;
-  assign _zz_12_ = ($signed(_zz_13_) + $signed(_zz_15_));
-  assign _zz_13_ = {_zz_14_,alu_op_cin};
-  assign _zz_14_ = op1_33[32 : 8];
-  assign _zz_15_ = {_zz_16_,alu_op_cin};
-  assign _zz_16_ = op2_33[32 : 8];
-  assign _zz_17_ = op1_op2_lsb[7 : 0];
-  assign _zz_18_ = alu_alu_add_33[32];
-  assign _zz_19_ = (op1 ^ op2);
-  assign _zz_20_ = (op1 | op2);
-  assign _zz_21_ = (op1 & op2);
-  assign _zz_22_ = op2[4 : 0];
-  assign _zz_23_ = {op1[31],op1};
-  assign _zz_24_ = {(1'b0),op1};
-  assign _zz_25_ = _zz_26_;
-  assign _zz_26_ = (shift_shleft ? _zz_27_ : _zz_28_);
-  assign _zz_27_ = ($signed(shift_op1_33) <<< shift_shamt);
-  assign _zz_28_ = ($signed(shift_op1_33) >>> shift_shamt);
-  assign _zz_29_ = ($signed(jump_pc_op1) + $signed(_zz_30_));
-  assign _zz_30_ = {{11{imm[20]}}, imm};
-  assign _zz_31_ = jump_clr_lsb;
-  assign _zz_32_ = {31'd0, _zz_31_};
+  assign _zz_Execute_8_ = io_d2e_op1_33;
+  assign _zz_Execute_9_ = io_d2e_op2_33;
+  assign _zz_Execute_10_ = _zz_Execute_11_;
+  assign _zz_Execute_11_ = ($signed(_zz_Execute_12_) + $signed(_zz_Execute_14_));
+  assign _zz_Execute_12_ = {_zz_Execute_13_,alu_op_cin};
+  assign _zz_Execute_13_ = op1_33[32 : 8];
+  assign _zz_Execute_14_ = {_zz_Execute_15_,alu_op_cin};
+  assign _zz_Execute_15_ = op2_33[32 : 8];
+  assign _zz_Execute_16_ = op1_op2_lsb[7 : 0];
+  assign _zz_Execute_17_ = alu_alu_add_33[32];
+  assign _zz_Execute_18_ = (op1 ^ op2);
+  assign _zz_Execute_19_ = (op1 | op2);
+  assign _zz_Execute_20_ = (op1 & op2);
+  assign _zz_Execute_21_ = op2[4 : 0];
+  assign _zz_Execute_22_ = {op1[31],op1};
+  assign _zz_Execute_23_ = {(1'b0),op1};
+  assign _zz_Execute_24_ = _zz_Execute_25_;
+  assign _zz_Execute_25_ = (shift_shleft ? _zz_Execute_26_ : _zz_Execute_27_);
+  assign _zz_Execute_26_ = ($signed(shift_op1_33) <<< shift_shamt);
+  assign _zz_Execute_27_ = ($signed(shift_op1_33) >>> shift_shamt);
+  assign _zz_Execute_28_ = ($signed(jump_pc_op1) + $signed(_zz_Execute_29_));
+  assign _zz_Execute_29_ = {{11{imm[20]}}, imm};
+  assign _zz_Execute_30_ = jump_clr_lsb;
+  assign _zz_Execute_31_ = {31'd0, _zz_Execute_30_};
   assign exe_start = (io_d2e_valid && (! e2d_stall_d));
   assign exe_end = ((io_d2e_valid && (! io_e2d_stall)) && (! io_w2e_stall));
   assign itype = io_d2e_itype;
@@ -898,18 +900,19 @@ module Execute (
   assign op1_33 = io_d2e_op1_33;
   assign op2_33 = io_d2e_op2_33;
   assign op1_op2_lsb = io_d2e_op1_op2_lsb;
-  assign op1 = _zz_9_[31 : 0];
-  assign op2 = _zz_10_[31 : 0];
+  assign op1 = _zz_Execute_8_[31 : 0];
+  assign op2 = _zz_Execute_9_[31 : 0];
   assign imm = rs2[20 : 0];
   always @ (*) begin
     alu_rd_wr = 1'b0;
     alu_rd_wdata = alu_rd_wdata_alu_add;
-    case(itype)
-      `InstrType_defaultEncoding_ALU_ADD : begin
+    (* parallel_case *)
+    case(1) // synthesis parallel_case
+      (((itype) & `InstrType_defaultEncoding_ALU_ADD) == `InstrType_defaultEncoding_ALU_ADD) : begin
         alu_rd_wr = 1'b1;
         alu_rd_wdata = alu_rd_wdata_alu_add;
       end
-      `InstrType_defaultEncoding_ALU : begin
+      (((itype) & `InstrType_defaultEncoding_ALU) == `InstrType_defaultEncoding_ALU) : begin
         case(funct3)
           3'b010, 3'b011 : begin
             alu_rd_wr = 1'b1;
@@ -917,21 +920,21 @@ module Execute (
           end
           3'b100 : begin
             alu_rd_wr = 1'b1;
-            alu_rd_wdata = _zz_19_;
+            alu_rd_wdata = _zz_Execute_18_;
           end
           3'b110 : begin
             alu_rd_wr = 1'b1;
-            alu_rd_wdata = _zz_20_;
+            alu_rd_wdata = _zz_Execute_19_;
           end
           3'b111 : begin
             alu_rd_wr = 1'b1;
-            alu_rd_wdata = _zz_21_;
+            alu_rd_wdata = _zz_Execute_20_;
           end
           default : begin
           end
         endcase
       end
-      `InstrType_defaultEncoding_MULDIV : begin
+      (((itype) & `InstrType_defaultEncoding_MULDIV) == `InstrType_defaultEncoding_MULDIV) : begin
       end
       default : begin
       end
@@ -939,31 +942,32 @@ module Execute (
   end
 
   assign alu_op_cin = op1_op2_lsb[8];
-  assign alu_alu_add_33 = {_zz_11_[25 : 1],_zz_17_};
+  assign alu_alu_add_33 = {_zz_Execute_10_[25 : 1],_zz_Execute_16_};
   assign alu_rd_wdata_alu_add = alu_alu_add_33[31 : 0];
-  assign alu_rd_wdata_alu_lt = {31'd0, _zz_18_};
+  assign alu_rd_wdata_alu_lt = {31'd0, _zz_Execute_17_};
   assign shift_rd_wr = ((itype & `InstrType_defaultEncoding_SHIFT) != 13'b0000000000000);
-  assign shift_shamt = _zz_22_;
+  assign shift_shamt = _zz_Execute_21_;
   assign shift_shleft = (! funct3[2]);
-  assign shift_op1_33 = (instr[30] ? _zz_23_ : _zz_24_);
-  assign shift_rd_wdata = _zz_25_[31 : 0];
+  assign shift_op1_33 = (instr[30] ? _zz_Execute_22_ : _zz_Execute_23_);
+  assign shift_rd_wdata = _zz_Execute_24_[31 : 0];
   always @ (*) begin
     jump_take_jump = 1'b0;
     jump_pc_jump_valid = 1'b0;
     jump_clr_lsb = 1'b0;
     jump_pc_op1 = jump_pc;
     jump_rd_wr = 1'b0;
-    case(itype)
-      `InstrType_defaultEncoding_B : begin
+    (* parallel_case *)
+    case(1) // synthesis parallel_case
+      (((itype) & `InstrType_defaultEncoding_B) == `InstrType_defaultEncoding_B) : begin
         jump_pc_jump_valid = 1'b1;
-        jump_take_jump = _zz_3_;
+        jump_take_jump = _zz_Execute_3_;
       end
-      `InstrType_defaultEncoding_JAL : begin
+      (((itype) & `InstrType_defaultEncoding_JAL) == `InstrType_defaultEncoding_JAL) : begin
         jump_pc_jump_valid = 1'b1;
         jump_take_jump = 1'b1;
         jump_rd_wr = 1'b1;
       end
-      `InstrType_defaultEncoding_JALR : begin
+      (((itype) & `InstrType_defaultEncoding_JALR) == `InstrType_defaultEncoding_JALR) : begin
         jump_pc_jump_valid = 1'b1;
         jump_pc_op1 = op1;
         jump_take_jump = 1'b1;
@@ -978,29 +982,29 @@ module Execute (
   assign jump_pc = io_d2e_pc;
   assign jump_pc_plus4 = (jump_pc + (32'b00000000000000000000000000000100));
   assign jump_rd_wdata = jump_pc_plus4;
-  assign _zz_1_ = ($signed(op1) == $signed(op2));
-  assign _zz_2_ = alu_rd_wdata_alu_lt[0];
+  assign _zz_Execute_1_ = ($signed(op1) == $signed(op2));
+  assign _zz_Execute_2_ = alu_rd_wdata_alu_lt[0];
   always @ (*) begin
-    _zz_3_ = 1'b0;
+    _zz_Execute_3_ = 1'b0;
     case(funct3)
       3'b000 : begin
-        _zz_3_ = _zz_1_;
+        _zz_Execute_3_ = _zz_Execute_1_;
       end
       3'b001 : begin
-        _zz_3_ = (! _zz_1_);
+        _zz_Execute_3_ = (! _zz_Execute_1_);
       end
       3'b100, 3'b110 : begin
-        _zz_3_ = _zz_2_;
+        _zz_Execute_3_ = _zz_Execute_2_;
       end
       3'b101, 3'b111 : begin
-        _zz_3_ = (! _zz_2_);
+        _zz_Execute_3_ = (! _zz_Execute_2_);
       end
       default : begin
       end
     endcase
   end
 
-  assign jump_pc_jump = ((jump_take_jump ? _zz_29_ : jump_pc_plus4) & (~ _zz_32_));
+  assign jump_pc_jump = ((jump_take_jump ? _zz_Execute_28_ : jump_pc_plus4) & (~ _zz_Execute_31_));
   assign lsu_rd_wr = 1'b0;
   assign lsu_size = funct3[1 : 0];
   assign lsu_lsu_addr = alu_rd_wdata_alu_add;
@@ -1011,126 +1015,126 @@ module Execute (
   always @ (*) begin
     case(lsu_size)
       2'b00 : begin
-        _zz_4_ = {{{rs2[7 : 0],rs2[7 : 0]},rs2[7 : 0]},rs2[7 : 0]};
+        _zz_Execute_4_ = {{{rs2[7 : 0],rs2[7 : 0]},rs2[7 : 0]},rs2[7 : 0]};
       end
       2'b01 : begin
-        _zz_4_ = {rs2[15 : 0],rs2[15 : 0]};
+        _zz_Execute_4_ = {rs2[15 : 0],rs2[15 : 0]};
       end
       default : begin
-        _zz_4_ = rs2;
+        _zz_Execute_4_ = rs2;
       end
     endcase
   end
 
-  assign io_data_req_data = _zz_4_;
+  assign io_data_req_data = _zz_Execute_4_;
   assign lsu_lsu_stall = (io_data_req_valid && (! io_data_req_ready));
   assign rd_wr = ((io_d2e_valid && ((alu_rd_wr || jump_rd_wr) || shift_rd_wr)) && (rd_addr != (5'b00000)));
   always @ (*) begin
-    _zz_5_[0] = alu_rd_wr;
-    _zz_5_[1] = alu_rd_wr;
-    _zz_5_[2] = alu_rd_wr;
-    _zz_5_[3] = alu_rd_wr;
-    _zz_5_[4] = alu_rd_wr;
-    _zz_5_[5] = alu_rd_wr;
-    _zz_5_[6] = alu_rd_wr;
-    _zz_5_[7] = alu_rd_wr;
-    _zz_5_[8] = alu_rd_wr;
-    _zz_5_[9] = alu_rd_wr;
-    _zz_5_[10] = alu_rd_wr;
-    _zz_5_[11] = alu_rd_wr;
-    _zz_5_[12] = alu_rd_wr;
-    _zz_5_[13] = alu_rd_wr;
-    _zz_5_[14] = alu_rd_wr;
-    _zz_5_[15] = alu_rd_wr;
-    _zz_5_[16] = alu_rd_wr;
-    _zz_5_[17] = alu_rd_wr;
-    _zz_5_[18] = alu_rd_wr;
-    _zz_5_[19] = alu_rd_wr;
-    _zz_5_[20] = alu_rd_wr;
-    _zz_5_[21] = alu_rd_wr;
-    _zz_5_[22] = alu_rd_wr;
-    _zz_5_[23] = alu_rd_wr;
-    _zz_5_[24] = alu_rd_wr;
-    _zz_5_[25] = alu_rd_wr;
-    _zz_5_[26] = alu_rd_wr;
-    _zz_5_[27] = alu_rd_wr;
-    _zz_5_[28] = alu_rd_wr;
-    _zz_5_[29] = alu_rd_wr;
-    _zz_5_[30] = alu_rd_wr;
-    _zz_5_[31] = alu_rd_wr;
+    _zz_Execute_5_[0] = alu_rd_wr;
+    _zz_Execute_5_[1] = alu_rd_wr;
+    _zz_Execute_5_[2] = alu_rd_wr;
+    _zz_Execute_5_[3] = alu_rd_wr;
+    _zz_Execute_5_[4] = alu_rd_wr;
+    _zz_Execute_5_[5] = alu_rd_wr;
+    _zz_Execute_5_[6] = alu_rd_wr;
+    _zz_Execute_5_[7] = alu_rd_wr;
+    _zz_Execute_5_[8] = alu_rd_wr;
+    _zz_Execute_5_[9] = alu_rd_wr;
+    _zz_Execute_5_[10] = alu_rd_wr;
+    _zz_Execute_5_[11] = alu_rd_wr;
+    _zz_Execute_5_[12] = alu_rd_wr;
+    _zz_Execute_5_[13] = alu_rd_wr;
+    _zz_Execute_5_[14] = alu_rd_wr;
+    _zz_Execute_5_[15] = alu_rd_wr;
+    _zz_Execute_5_[16] = alu_rd_wr;
+    _zz_Execute_5_[17] = alu_rd_wr;
+    _zz_Execute_5_[18] = alu_rd_wr;
+    _zz_Execute_5_[19] = alu_rd_wr;
+    _zz_Execute_5_[20] = alu_rd_wr;
+    _zz_Execute_5_[21] = alu_rd_wr;
+    _zz_Execute_5_[22] = alu_rd_wr;
+    _zz_Execute_5_[23] = alu_rd_wr;
+    _zz_Execute_5_[24] = alu_rd_wr;
+    _zz_Execute_5_[25] = alu_rd_wr;
+    _zz_Execute_5_[26] = alu_rd_wr;
+    _zz_Execute_5_[27] = alu_rd_wr;
+    _zz_Execute_5_[28] = alu_rd_wr;
+    _zz_Execute_5_[29] = alu_rd_wr;
+    _zz_Execute_5_[30] = alu_rd_wr;
+    _zz_Execute_5_[31] = alu_rd_wr;
   end
 
   always @ (*) begin
-    _zz_6_[0] = jump_rd_wr;
-    _zz_6_[1] = jump_rd_wr;
-    _zz_6_[2] = jump_rd_wr;
-    _zz_6_[3] = jump_rd_wr;
-    _zz_6_[4] = jump_rd_wr;
-    _zz_6_[5] = jump_rd_wr;
-    _zz_6_[6] = jump_rd_wr;
-    _zz_6_[7] = jump_rd_wr;
-    _zz_6_[8] = jump_rd_wr;
-    _zz_6_[9] = jump_rd_wr;
-    _zz_6_[10] = jump_rd_wr;
-    _zz_6_[11] = jump_rd_wr;
-    _zz_6_[12] = jump_rd_wr;
-    _zz_6_[13] = jump_rd_wr;
-    _zz_6_[14] = jump_rd_wr;
-    _zz_6_[15] = jump_rd_wr;
-    _zz_6_[16] = jump_rd_wr;
-    _zz_6_[17] = jump_rd_wr;
-    _zz_6_[18] = jump_rd_wr;
-    _zz_6_[19] = jump_rd_wr;
-    _zz_6_[20] = jump_rd_wr;
-    _zz_6_[21] = jump_rd_wr;
-    _zz_6_[22] = jump_rd_wr;
-    _zz_6_[23] = jump_rd_wr;
-    _zz_6_[24] = jump_rd_wr;
-    _zz_6_[25] = jump_rd_wr;
-    _zz_6_[26] = jump_rd_wr;
-    _zz_6_[27] = jump_rd_wr;
-    _zz_6_[28] = jump_rd_wr;
-    _zz_6_[29] = jump_rd_wr;
-    _zz_6_[30] = jump_rd_wr;
-    _zz_6_[31] = jump_rd_wr;
+    _zz_Execute_6_[0] = jump_rd_wr;
+    _zz_Execute_6_[1] = jump_rd_wr;
+    _zz_Execute_6_[2] = jump_rd_wr;
+    _zz_Execute_6_[3] = jump_rd_wr;
+    _zz_Execute_6_[4] = jump_rd_wr;
+    _zz_Execute_6_[5] = jump_rd_wr;
+    _zz_Execute_6_[6] = jump_rd_wr;
+    _zz_Execute_6_[7] = jump_rd_wr;
+    _zz_Execute_6_[8] = jump_rd_wr;
+    _zz_Execute_6_[9] = jump_rd_wr;
+    _zz_Execute_6_[10] = jump_rd_wr;
+    _zz_Execute_6_[11] = jump_rd_wr;
+    _zz_Execute_6_[12] = jump_rd_wr;
+    _zz_Execute_6_[13] = jump_rd_wr;
+    _zz_Execute_6_[14] = jump_rd_wr;
+    _zz_Execute_6_[15] = jump_rd_wr;
+    _zz_Execute_6_[16] = jump_rd_wr;
+    _zz_Execute_6_[17] = jump_rd_wr;
+    _zz_Execute_6_[18] = jump_rd_wr;
+    _zz_Execute_6_[19] = jump_rd_wr;
+    _zz_Execute_6_[20] = jump_rd_wr;
+    _zz_Execute_6_[21] = jump_rd_wr;
+    _zz_Execute_6_[22] = jump_rd_wr;
+    _zz_Execute_6_[23] = jump_rd_wr;
+    _zz_Execute_6_[24] = jump_rd_wr;
+    _zz_Execute_6_[25] = jump_rd_wr;
+    _zz_Execute_6_[26] = jump_rd_wr;
+    _zz_Execute_6_[27] = jump_rd_wr;
+    _zz_Execute_6_[28] = jump_rd_wr;
+    _zz_Execute_6_[29] = jump_rd_wr;
+    _zz_Execute_6_[30] = jump_rd_wr;
+    _zz_Execute_6_[31] = jump_rd_wr;
   end
 
   always @ (*) begin
-    _zz_7_[0] = shift_rd_wr;
-    _zz_7_[1] = shift_rd_wr;
-    _zz_7_[2] = shift_rd_wr;
-    _zz_7_[3] = shift_rd_wr;
-    _zz_7_[4] = shift_rd_wr;
-    _zz_7_[5] = shift_rd_wr;
-    _zz_7_[6] = shift_rd_wr;
-    _zz_7_[7] = shift_rd_wr;
-    _zz_7_[8] = shift_rd_wr;
-    _zz_7_[9] = shift_rd_wr;
-    _zz_7_[10] = shift_rd_wr;
-    _zz_7_[11] = shift_rd_wr;
-    _zz_7_[12] = shift_rd_wr;
-    _zz_7_[13] = shift_rd_wr;
-    _zz_7_[14] = shift_rd_wr;
-    _zz_7_[15] = shift_rd_wr;
-    _zz_7_[16] = shift_rd_wr;
-    _zz_7_[17] = shift_rd_wr;
-    _zz_7_[18] = shift_rd_wr;
-    _zz_7_[19] = shift_rd_wr;
-    _zz_7_[20] = shift_rd_wr;
-    _zz_7_[21] = shift_rd_wr;
-    _zz_7_[22] = shift_rd_wr;
-    _zz_7_[23] = shift_rd_wr;
-    _zz_7_[24] = shift_rd_wr;
-    _zz_7_[25] = shift_rd_wr;
-    _zz_7_[26] = shift_rd_wr;
-    _zz_7_[27] = shift_rd_wr;
-    _zz_7_[28] = shift_rd_wr;
-    _zz_7_[29] = shift_rd_wr;
-    _zz_7_[30] = shift_rd_wr;
-    _zz_7_[31] = shift_rd_wr;
+    _zz_Execute_7_[0] = shift_rd_wr;
+    _zz_Execute_7_[1] = shift_rd_wr;
+    _zz_Execute_7_[2] = shift_rd_wr;
+    _zz_Execute_7_[3] = shift_rd_wr;
+    _zz_Execute_7_[4] = shift_rd_wr;
+    _zz_Execute_7_[5] = shift_rd_wr;
+    _zz_Execute_7_[6] = shift_rd_wr;
+    _zz_Execute_7_[7] = shift_rd_wr;
+    _zz_Execute_7_[8] = shift_rd_wr;
+    _zz_Execute_7_[9] = shift_rd_wr;
+    _zz_Execute_7_[10] = shift_rd_wr;
+    _zz_Execute_7_[11] = shift_rd_wr;
+    _zz_Execute_7_[12] = shift_rd_wr;
+    _zz_Execute_7_[13] = shift_rd_wr;
+    _zz_Execute_7_[14] = shift_rd_wr;
+    _zz_Execute_7_[15] = shift_rd_wr;
+    _zz_Execute_7_[16] = shift_rd_wr;
+    _zz_Execute_7_[17] = shift_rd_wr;
+    _zz_Execute_7_[18] = shift_rd_wr;
+    _zz_Execute_7_[19] = shift_rd_wr;
+    _zz_Execute_7_[20] = shift_rd_wr;
+    _zz_Execute_7_[21] = shift_rd_wr;
+    _zz_Execute_7_[22] = shift_rd_wr;
+    _zz_Execute_7_[23] = shift_rd_wr;
+    _zz_Execute_7_[24] = shift_rd_wr;
+    _zz_Execute_7_[25] = shift_rd_wr;
+    _zz_Execute_7_[26] = shift_rd_wr;
+    _zz_Execute_7_[27] = shift_rd_wr;
+    _zz_Execute_7_[28] = shift_rd_wr;
+    _zz_Execute_7_[29] = shift_rd_wr;
+    _zz_Execute_7_[30] = shift_rd_wr;
+    _zz_Execute_7_[31] = shift_rd_wr;
   end
 
-  assign rd_wdata = (((_zz_5_ & alu_rd_wdata) | (_zz_6_ & jump_rd_wdata)) | (_zz_7_ & shift_rd_wdata));
+  assign rd_wdata = (((_zz_Execute_5_ & alu_rd_wdata) | (_zz_Execute_6_ & jump_rd_wdata)) | (_zz_Execute_7_ & shift_rd_wdata));
   assign io_e2d_stall = (lsu_lsu_stall || io_w2e_stall);
   assign io_e2d_pc_jump_valid = (io_d2e_valid && jump_pc_jump_valid);
   assign io_e2d_pc_jump = jump_pc_jump;
@@ -1152,7 +1156,7 @@ module Execute (
       e2d_stall_d <= 1'b0;
     end else begin
       e2d_stall_d <= io_e2d_stall;
-      if(_zz_8_)begin
+      if((io_d2e_valid && (! io_e2d_stall)))begin
         io_e2w_valid <= e2w_nxt_valid;
       end else begin
         if(((! io_w2e_stall) && io_e2w_valid))begin
@@ -1163,7 +1167,7 @@ module Execute (
   end
 
   always @ (posedge clk25) begin
-    if(_zz_8_)begin
+    if((io_d2e_valid && (! io_e2d_stall)))begin
       io_e2w_ld_active <= e2w_nxt_ld_active;
       io_e2w_ld_addr_lsb <= e2w_nxt_ld_addr_lsb;
       io_e2w_ld_data_size <= e2w_nxt_ld_data_size;
@@ -1189,8 +1193,8 @@ module RegFile (
       input  [31:0] io_w2r_rd_wr_data,
       input   clk25,
       input   reset25_);
-  reg [31:0] _zz_1_;
-  reg [31:0] _zz_2_;
+  reg [31:0] _zz_RegFile_1_;
+  reg [31:0] _zz_RegFile_2_;
   wire [4:0] reg_init_cntr;
   reg  reg_init_initR;
   wire  rd_wr;
@@ -1205,18 +1209,18 @@ module RegFile (
 
   always @ (posedge clk25) begin
     if(io_rd2r_rs1_rd) begin
-      _zz_1_ <= mem[io_rd2r_rs1_rd_addr];
+      _zz_RegFile_1_ <= mem[io_rd2r_rs1_rd_addr];
     end
   end
 
   always @ (posedge clk25) begin
     if(io_rd2r_rs2_rd) begin
-      _zz_2_ <= mem[io_rd2r_rs2_rd_addr];
+      _zz_RegFile_2_ <= mem[io_rd2r_rs2_rd_addr];
     end
   end
 
-  assign io_r2rr_rs1_data = _zz_1_;
-  assign io_r2rr_rs2_data = _zz_2_;
+  assign io_r2rr_rs1_data = _zz_RegFile_1_;
+  assign io_r2rr_rs2_data = _zz_RegFile_2_;
   assign reg_init_cntr = (5'b00000);
   assign io_r2rd_stall = reg_init_initR;
   assign rd_wr = (reg_init_initR ? 1'b1 : io_w2r_rd_wr);
@@ -1272,15 +1276,15 @@ module Writeback (
       input  [31:0] io_e2w_rvfi_mem_wdata,
       input   clk25,
       input   reset25_);
-  wire [5:0] _zz_4_;
-  wire [7:0] _zz_5_;
-  wire [31:0] _zz_6_;
-  wire [7:0] _zz_7_;
-  wire [31:0] _zz_8_;
-  wire [15:0] _zz_9_;
-  wire [31:0] _zz_10_;
-  wire [15:0] _zz_11_;
-  wire [31:0] _zz_12_;
+  wire [5:0] _zz_Writeback_4_;
+  wire [7:0] _zz_Writeback_5_;
+  wire [31:0] _zz_Writeback_6_;
+  wire [7:0] _zz_Writeback_7_;
+  wire [31:0] _zz_Writeback_8_;
+  wire [15:0] _zz_Writeback_9_;
+  wire [31:0] _zz_Writeback_10_;
+  wire [15:0] _zz_Writeback_11_;
+  wire [31:0] _zz_Writeback_12_;
   reg  w2e_stall_d;
   wire  wb_start;
   wire  wb_end;
@@ -1288,116 +1292,116 @@ module Writeback (
   reg [31:0] ld_data_rsp_data;
   wire [31:0] ld_rsp_data_shift_adj;
   wire [31:0] ld_rd_wdata;
-  reg [31:0] _zz_1_;
+  reg [31:0] _zz_Writeback_1_;
   wire  ld_ld_stall;
   wire  ld_rd_wr;
   wire  rd_wr;
   wire [4:0] rd_waddr;
-  reg [31:0] _zz_2_;
-  reg [31:0] _zz_3_;
+  reg [31:0] _zz_Writeback_2_;
+  reg [31:0] _zz_Writeback_3_;
   wire [31:0] rd_wdata;
-  assign _zz_4_ = (io_e2w_ld_addr_lsb[1 : 0] * (4'b1000));
-  assign _zz_5_ = ld_rsp_data_shift_adj[7 : 0];
-  assign _zz_6_ = {{24{_zz_5_[7]}}, _zz_5_};
-  assign _zz_7_ = ld_rsp_data_shift_adj[7 : 0];
-  assign _zz_8_ = {24'd0, _zz_7_};
-  assign _zz_9_ = ld_rsp_data_shift_adj[15 : 0];
-  assign _zz_10_ = {{16{_zz_9_[15]}}, _zz_9_};
-  assign _zz_11_ = ld_rsp_data_shift_adj[15 : 0];
-  assign _zz_12_ = {16'd0, _zz_11_};
+  assign _zz_Writeback_4_ = (io_e2w_ld_addr_lsb[1 : 0] * (4'b1000));
+  assign _zz_Writeback_5_ = ld_rsp_data_shift_adj[7 : 0];
+  assign _zz_Writeback_6_ = {{24{_zz_Writeback_5_[7]}}, _zz_Writeback_5_};
+  assign _zz_Writeback_7_ = ld_rsp_data_shift_adj[7 : 0];
+  assign _zz_Writeback_8_ = {24'd0, _zz_Writeback_7_};
+  assign _zz_Writeback_9_ = ld_rsp_data_shift_adj[15 : 0];
+  assign _zz_Writeback_10_ = {{16{_zz_Writeback_9_[15]}}, _zz_Writeback_9_};
+  assign _zz_Writeback_11_ = ld_rsp_data_shift_adj[15 : 0];
+  assign _zz_Writeback_12_ = {16'd0, _zz_Writeback_11_};
   assign wb_start = (io_e2w_valid && (! w2e_stall_d));
   assign wb_end = (io_e2w_valid && (! io_w2e_stall));
-  assign ld_rsp_data_shift_adj = (ld_data_rsp_data >>> _zz_4_);
+  assign ld_rsp_data_shift_adj = (ld_data_rsp_data >>> _zz_Writeback_4_);
   always @ (*) begin
     case(io_e2w_ld_data_size)
       2'b00 : begin
-        _zz_1_ = (io_e2w_ld_data_signed ? _zz_6_ : _zz_8_);
+        _zz_Writeback_1_ = (io_e2w_ld_data_signed ? _zz_Writeback_6_ : _zz_Writeback_8_);
       end
       2'b01 : begin
-        _zz_1_ = (io_e2w_ld_data_signed ? _zz_10_ : _zz_12_);
+        _zz_Writeback_1_ = (io_e2w_ld_data_signed ? _zz_Writeback_10_ : _zz_Writeback_12_);
       end
       default : begin
-        _zz_1_ = ld_rsp_data_shift_adj;
+        _zz_Writeback_1_ = ld_rsp_data_shift_adj;
       end
     endcase
   end
 
-  assign ld_rd_wdata = _zz_1_;
+  assign ld_rd_wdata = _zz_Writeback_1_;
   assign ld_ld_stall = ((io_e2w_valid && io_e2w_ld_active) && (! ld_data_rsp_valid));
   assign ld_rd_wr = ((io_e2w_valid && io_e2w_ld_active) && (! ld_ld_stall));
   assign rd_wr = ((io_e2w_valid && (io_e2w_rd_wr || ld_rd_wr)) && (io_e2w_rd_waddr != (5'b00000)));
   assign rd_waddr = (rd_wr ? io_e2w_rd_waddr : (5'b00000));
   always @ (*) begin
-    _zz_2_[0] = io_e2w_rd_wr;
-    _zz_2_[1] = io_e2w_rd_wr;
-    _zz_2_[2] = io_e2w_rd_wr;
-    _zz_2_[3] = io_e2w_rd_wr;
-    _zz_2_[4] = io_e2w_rd_wr;
-    _zz_2_[5] = io_e2w_rd_wr;
-    _zz_2_[6] = io_e2w_rd_wr;
-    _zz_2_[7] = io_e2w_rd_wr;
-    _zz_2_[8] = io_e2w_rd_wr;
-    _zz_2_[9] = io_e2w_rd_wr;
-    _zz_2_[10] = io_e2w_rd_wr;
-    _zz_2_[11] = io_e2w_rd_wr;
-    _zz_2_[12] = io_e2w_rd_wr;
-    _zz_2_[13] = io_e2w_rd_wr;
-    _zz_2_[14] = io_e2w_rd_wr;
-    _zz_2_[15] = io_e2w_rd_wr;
-    _zz_2_[16] = io_e2w_rd_wr;
-    _zz_2_[17] = io_e2w_rd_wr;
-    _zz_2_[18] = io_e2w_rd_wr;
-    _zz_2_[19] = io_e2w_rd_wr;
-    _zz_2_[20] = io_e2w_rd_wr;
-    _zz_2_[21] = io_e2w_rd_wr;
-    _zz_2_[22] = io_e2w_rd_wr;
-    _zz_2_[23] = io_e2w_rd_wr;
-    _zz_2_[24] = io_e2w_rd_wr;
-    _zz_2_[25] = io_e2w_rd_wr;
-    _zz_2_[26] = io_e2w_rd_wr;
-    _zz_2_[27] = io_e2w_rd_wr;
-    _zz_2_[28] = io_e2w_rd_wr;
-    _zz_2_[29] = io_e2w_rd_wr;
-    _zz_2_[30] = io_e2w_rd_wr;
-    _zz_2_[31] = io_e2w_rd_wr;
+    _zz_Writeback_2_[0] = io_e2w_rd_wr;
+    _zz_Writeback_2_[1] = io_e2w_rd_wr;
+    _zz_Writeback_2_[2] = io_e2w_rd_wr;
+    _zz_Writeback_2_[3] = io_e2w_rd_wr;
+    _zz_Writeback_2_[4] = io_e2w_rd_wr;
+    _zz_Writeback_2_[5] = io_e2w_rd_wr;
+    _zz_Writeback_2_[6] = io_e2w_rd_wr;
+    _zz_Writeback_2_[7] = io_e2w_rd_wr;
+    _zz_Writeback_2_[8] = io_e2w_rd_wr;
+    _zz_Writeback_2_[9] = io_e2w_rd_wr;
+    _zz_Writeback_2_[10] = io_e2w_rd_wr;
+    _zz_Writeback_2_[11] = io_e2w_rd_wr;
+    _zz_Writeback_2_[12] = io_e2w_rd_wr;
+    _zz_Writeback_2_[13] = io_e2w_rd_wr;
+    _zz_Writeback_2_[14] = io_e2w_rd_wr;
+    _zz_Writeback_2_[15] = io_e2w_rd_wr;
+    _zz_Writeback_2_[16] = io_e2w_rd_wr;
+    _zz_Writeback_2_[17] = io_e2w_rd_wr;
+    _zz_Writeback_2_[18] = io_e2w_rd_wr;
+    _zz_Writeback_2_[19] = io_e2w_rd_wr;
+    _zz_Writeback_2_[20] = io_e2w_rd_wr;
+    _zz_Writeback_2_[21] = io_e2w_rd_wr;
+    _zz_Writeback_2_[22] = io_e2w_rd_wr;
+    _zz_Writeback_2_[23] = io_e2w_rd_wr;
+    _zz_Writeback_2_[24] = io_e2w_rd_wr;
+    _zz_Writeback_2_[25] = io_e2w_rd_wr;
+    _zz_Writeback_2_[26] = io_e2w_rd_wr;
+    _zz_Writeback_2_[27] = io_e2w_rd_wr;
+    _zz_Writeback_2_[28] = io_e2w_rd_wr;
+    _zz_Writeback_2_[29] = io_e2w_rd_wr;
+    _zz_Writeback_2_[30] = io_e2w_rd_wr;
+    _zz_Writeback_2_[31] = io_e2w_rd_wr;
   end
 
   always @ (*) begin
-    _zz_3_[0] = ld_rd_wr;
-    _zz_3_[1] = ld_rd_wr;
-    _zz_3_[2] = ld_rd_wr;
-    _zz_3_[3] = ld_rd_wr;
-    _zz_3_[4] = ld_rd_wr;
-    _zz_3_[5] = ld_rd_wr;
-    _zz_3_[6] = ld_rd_wr;
-    _zz_3_[7] = ld_rd_wr;
-    _zz_3_[8] = ld_rd_wr;
-    _zz_3_[9] = ld_rd_wr;
-    _zz_3_[10] = ld_rd_wr;
-    _zz_3_[11] = ld_rd_wr;
-    _zz_3_[12] = ld_rd_wr;
-    _zz_3_[13] = ld_rd_wr;
-    _zz_3_[14] = ld_rd_wr;
-    _zz_3_[15] = ld_rd_wr;
-    _zz_3_[16] = ld_rd_wr;
-    _zz_3_[17] = ld_rd_wr;
-    _zz_3_[18] = ld_rd_wr;
-    _zz_3_[19] = ld_rd_wr;
-    _zz_3_[20] = ld_rd_wr;
-    _zz_3_[21] = ld_rd_wr;
-    _zz_3_[22] = ld_rd_wr;
-    _zz_3_[23] = ld_rd_wr;
-    _zz_3_[24] = ld_rd_wr;
-    _zz_3_[25] = ld_rd_wr;
-    _zz_3_[26] = ld_rd_wr;
-    _zz_3_[27] = ld_rd_wr;
-    _zz_3_[28] = ld_rd_wr;
-    _zz_3_[29] = ld_rd_wr;
-    _zz_3_[30] = ld_rd_wr;
-    _zz_3_[31] = ld_rd_wr;
+    _zz_Writeback_3_[0] = ld_rd_wr;
+    _zz_Writeback_3_[1] = ld_rd_wr;
+    _zz_Writeback_3_[2] = ld_rd_wr;
+    _zz_Writeback_3_[3] = ld_rd_wr;
+    _zz_Writeback_3_[4] = ld_rd_wr;
+    _zz_Writeback_3_[5] = ld_rd_wr;
+    _zz_Writeback_3_[6] = ld_rd_wr;
+    _zz_Writeback_3_[7] = ld_rd_wr;
+    _zz_Writeback_3_[8] = ld_rd_wr;
+    _zz_Writeback_3_[9] = ld_rd_wr;
+    _zz_Writeback_3_[10] = ld_rd_wr;
+    _zz_Writeback_3_[11] = ld_rd_wr;
+    _zz_Writeback_3_[12] = ld_rd_wr;
+    _zz_Writeback_3_[13] = ld_rd_wr;
+    _zz_Writeback_3_[14] = ld_rd_wr;
+    _zz_Writeback_3_[15] = ld_rd_wr;
+    _zz_Writeback_3_[16] = ld_rd_wr;
+    _zz_Writeback_3_[17] = ld_rd_wr;
+    _zz_Writeback_3_[18] = ld_rd_wr;
+    _zz_Writeback_3_[19] = ld_rd_wr;
+    _zz_Writeback_3_[20] = ld_rd_wr;
+    _zz_Writeback_3_[21] = ld_rd_wr;
+    _zz_Writeback_3_[22] = ld_rd_wr;
+    _zz_Writeback_3_[23] = ld_rd_wr;
+    _zz_Writeback_3_[24] = ld_rd_wr;
+    _zz_Writeback_3_[25] = ld_rd_wr;
+    _zz_Writeback_3_[26] = ld_rd_wr;
+    _zz_Writeback_3_[27] = ld_rd_wr;
+    _zz_Writeback_3_[28] = ld_rd_wr;
+    _zz_Writeback_3_[29] = ld_rd_wr;
+    _zz_Writeback_3_[30] = ld_rd_wr;
+    _zz_Writeback_3_[31] = ld_rd_wr;
   end
 
-  assign rd_wdata = ((_zz_2_ & io_e2w_rd_wdata) | (_zz_3_ & ld_rd_wdata));
+  assign rd_wdata = ((_zz_Writeback_2_ & io_e2w_rd_wdata) | (_zz_Writeback_3_ & ld_rd_wdata));
   assign io_w2e_stall = ld_ld_stall;
   assign io_w2r_rd_wr = rd_wr;
   assign io_w2r_rd_wr_addr = rd_waddr;
@@ -1437,241 +1441,241 @@ module MR1 (
       input  [31:0] data_rsp_data,
       input   clk25,
       input   reset25_);
-  wire  _zz_1_;
-  wire [63:0] _zz_2_;
-  wire [31:0] _zz_3_;
-  wire  _zz_4_;
-  wire  _zz_5_;
-  wire  _zz_6_;
-  wire [4:0] _zz_7_;
-  wire [4:0] _zz_8_;
-  wire [31:0] _zz_9_;
-  wire [31:0] _zz_10_;
-  wire [4:0] _zz_11_;
-  wire [31:0] _zz_12_;
-  wire [31:0] _zz_13_;
-  wire [31:0] _zz_14_;
-  wire [31:0] _zz_15_;
-  wire [3:0] _zz_16_;
-  wire [3:0] _zz_17_;
-  wire [31:0] _zz_18_;
-  wire [31:0] _zz_19_;
-  wire  _zz_20_;
-  wire [31:0] _zz_21_;
-  wire  _zz_22_;
-  wire [31:0] _zz_23_;
-  wire [31:0] _zz_24_;
-  wire  _zz_25_;
-  wire [4:0] _zz_26_;
-  wire  _zz_27_;
-  wire [4:0] _zz_28_;
-  wire  _zz_29_;
-  wire  _zz_30_;
-  wire [31:0] _zz_31_;
-  wire  _zz_32_;
-  wire [4:0] _zz_33_;
-  wire  _zz_34_;
-  wire [31:0] _zz_35_;
-  wire  _zz_36_;
-  wire [31:0] _zz_37_;
-  wire [31:0] _zz_38_;
-  wire `InstrType_defaultEncoding_type _zz_39_;
-  wire [32:0] _zz_40_;
-  wire [32:0] _zz_41_;
-  wire [8:0] _zz_42_;
-  wire [31:0] _zz_43_;
-  wire  _zz_44_;
-  wire [4:0] _zz_45_;
-  wire  _zz_46_;
-  wire  _zz_47_;
-  wire [31:0] _zz_48_;
-  wire  _zz_49_;
-  wire [4:0] _zz_50_;
-  wire  _zz_51_;
-  wire [31:0] _zz_52_;
-  wire  _zz_53_;
-  wire  _zz_54_;
-  wire [1:0] _zz_55_;
-  wire [1:0] _zz_56_;
-  wire  _zz_57_;
-  wire  _zz_58_;
-  wire [4:0] _zz_59_;
-  wire [31:0] _zz_60_;
-  wire  _zz_61_;
-  wire [31:0] _zz_62_;
-  wire  _zz_63_;
-  wire [1:0] _zz_64_;
-  wire [31:0] _zz_65_;
-  wire  _zz_66_;
-  wire [31:0] _zz_67_;
-  wire [31:0] _zz_68_;
-  wire  _zz_69_;
-  wire  _zz_70_;
-  wire [4:0] _zz_71_;
-  wire  _zz_72_;
-  wire [31:0] _zz_73_;
-  wire  _zz_74_;
-  wire [4:0] _zz_75_;
-  wire [31:0] _zz_76_;
+  wire  _zz_MR1_1_;
+  wire [63:0] _zz_MR1_2_;
+  wire [31:0] _zz_MR1_3_;
+  wire  _zz_MR1_4_;
+  wire  _zz_MR1_5_;
+  wire  _zz_MR1_6_;
+  wire [4:0] _zz_MR1_7_;
+  wire [4:0] _zz_MR1_8_;
+  wire [31:0] _zz_MR1_9_;
+  wire [31:0] _zz_MR1_10_;
+  wire [4:0] _zz_MR1_11_;
+  wire [31:0] _zz_MR1_12_;
+  wire [31:0] _zz_MR1_13_;
+  wire [31:0] _zz_MR1_14_;
+  wire [31:0] _zz_MR1_15_;
+  wire [3:0] _zz_MR1_16_;
+  wire [3:0] _zz_MR1_17_;
+  wire [31:0] _zz_MR1_18_;
+  wire [31:0] _zz_MR1_19_;
+  wire  _zz_MR1_20_;
+  wire [31:0] _zz_MR1_21_;
+  wire  _zz_MR1_22_;
+  wire [31:0] _zz_MR1_23_;
+  wire [31:0] _zz_MR1_24_;
+  wire  _zz_MR1_25_;
+  wire [4:0] _zz_MR1_26_;
+  wire  _zz_MR1_27_;
+  wire [4:0] _zz_MR1_28_;
+  wire  _zz_MR1_29_;
+  wire  _zz_MR1_30_;
+  wire [31:0] _zz_MR1_31_;
+  wire  _zz_MR1_32_;
+  wire [4:0] _zz_MR1_33_;
+  wire  _zz_MR1_34_;
+  wire [31:0] _zz_MR1_35_;
+  wire  _zz_MR1_36_;
+  wire [31:0] _zz_MR1_37_;
+  wire [31:0] _zz_MR1_38_;
+  wire `InstrType_defaultEncoding_type _zz_MR1_39_;
+  wire [32:0] _zz_MR1_40_;
+  wire [32:0] _zz_MR1_41_;
+  wire [8:0] _zz_MR1_42_;
+  wire [31:0] _zz_MR1_43_;
+  wire  _zz_MR1_44_;
+  wire [4:0] _zz_MR1_45_;
+  wire  _zz_MR1_46_;
+  wire  _zz_MR1_47_;
+  wire [31:0] _zz_MR1_48_;
+  wire  _zz_MR1_49_;
+  wire [4:0] _zz_MR1_50_;
+  wire  _zz_MR1_51_;
+  wire [31:0] _zz_MR1_52_;
+  wire  _zz_MR1_53_;
+  wire  _zz_MR1_54_;
+  wire [1:0] _zz_MR1_55_;
+  wire [1:0] _zz_MR1_56_;
+  wire  _zz_MR1_57_;
+  wire  _zz_MR1_58_;
+  wire [4:0] _zz_MR1_59_;
+  wire [31:0] _zz_MR1_60_;
+  wire  _zz_MR1_61_;
+  wire [31:0] _zz_MR1_62_;
+  wire  _zz_MR1_63_;
+  wire [1:0] _zz_MR1_64_;
+  wire [31:0] _zz_MR1_65_;
+  wire  _zz_MR1_66_;
+  wire [31:0] _zz_MR1_67_;
+  wire [31:0] _zz_MR1_68_;
+  wire  _zz_MR1_69_;
+  wire  _zz_MR1_70_;
+  wire [4:0] _zz_MR1_71_;
+  wire  _zz_MR1_72_;
+  wire [31:0] _zz_MR1_73_;
+  wire  _zz_MR1_74_;
+  wire [4:0] _zz_MR1_75_;
+  wire [31:0] _zz_MR1_76_;
   Fetch fetch_1_ ( 
-    .io_instr_req_valid(_zz_20_),
+    .io_instr_req_valid(_zz_MR1_20_),
     .io_instr_req_ready(instr_req_ready),
-    .io_instr_req_addr(_zz_21_),
+    .io_instr_req_addr(_zz_MR1_21_),
     .io_instr_rsp_valid(instr_rsp_valid),
     .instr(instr_rsp_data),
-    .io_f2d_valid(_zz_22_),
-    .io_f2d_pc(_zz_23_),
-    .io_f2d_instr(_zz_24_),
-    .io_d2f_stall(_zz_29_),
-    .io_d2f_pc_jump_valid(_zz_30_),
-    .io_d2f_pc_jump(_zz_31_),
-    .io_d_rd_update_rd_waddr_valid(_zz_32_),
-    .io_d_rd_update_rd_waddr(_zz_33_),
-    .io_d_rd_update_rd_wdata_valid(_zz_34_),
-    .io_d_rd_update_rd_wdata(_zz_35_),
-    .io_e_rd_update_rd_waddr_valid(_zz_49_),
-    .io_e_rd_update_rd_waddr(_zz_50_),
-    .io_e_rd_update_rd_wdata_valid(_zz_51_),
-    .io_e_rd_update_rd_wdata(_zz_52_),
-    .io_w_rd_update_rd_waddr_valid(_zz_70_),
-    .io_w_rd_update_rd_waddr(_zz_71_),
-    .io_w_rd_update_rd_wdata_valid(_zz_72_),
-    .io_w_rd_update_rd_wdata(_zz_73_),
-    .io_rd2r_rs1_rd(_zz_25_),
-    .io_rd2r_rs1_rd_addr(_zz_26_),
-    .io_rd2r_rs2_rd(_zz_27_),
-    .io_rd2r_rs2_rd_addr(_zz_28_),
-    .io_r2rd_stall(_zz_66_),
+    .io_f2d_valid(_zz_MR1_22_),
+    .io_f2d_pc(_zz_MR1_23_),
+    .io_f2d_instr(_zz_MR1_24_),
+    .io_d2f_stall(_zz_MR1_29_),
+    .io_d2f_pc_jump_valid(_zz_MR1_30_),
+    .io_d2f_pc_jump(_zz_MR1_31_),
+    .io_d_rd_update_rd_waddr_valid(_zz_MR1_32_),
+    .io_d_rd_update_rd_waddr(_zz_MR1_33_),
+    .io_d_rd_update_rd_wdata_valid(_zz_MR1_34_),
+    .io_d_rd_update_rd_wdata(_zz_MR1_35_),
+    .io_e_rd_update_rd_waddr_valid(_zz_MR1_49_),
+    .io_e_rd_update_rd_waddr(_zz_MR1_50_),
+    .io_e_rd_update_rd_wdata_valid(_zz_MR1_51_),
+    .io_e_rd_update_rd_wdata(_zz_MR1_52_),
+    .io_w_rd_update_rd_waddr_valid(_zz_MR1_70_),
+    .io_w_rd_update_rd_waddr(_zz_MR1_71_),
+    .io_w_rd_update_rd_wdata_valid(_zz_MR1_72_),
+    .io_w_rd_update_rd_wdata(_zz_MR1_73_),
+    .io_rd2r_rs1_rd(_zz_MR1_25_),
+    .io_rd2r_rs1_rd_addr(_zz_MR1_26_),
+    .io_rd2r_rs2_rd(_zz_MR1_27_),
+    .io_rd2r_rs2_rd_addr(_zz_MR1_28_),
+    .io_r2rd_stall(_zz_MR1_66_),
     .clk25(clk25),
     .reset25_(reset25_) 
   );
   Decode decode_1_ ( 
-    .io_f2d_valid(_zz_22_),
-    .io_f2d_pc(_zz_23_),
-    .instr(_zz_24_),
-    .io_d2f_stall(_zz_29_),
-    .io_d2f_pc_jump_valid(_zz_30_),
-    .io_d2f_pc_jump(_zz_31_),
-    .io_rd_update_rd_waddr_valid(_zz_32_),
-    .io_rd_update_rd_waddr(_zz_33_),
-    .io_rd_update_rd_wdata_valid(_zz_34_),
-    .io_rd_update_rd_wdata(_zz_35_),
-    .io_r2rr_rs1_data(_zz_67_),
-    .io_r2rr_rs2_data(_zz_68_),
-    .io_d2e_valid(_zz_36_),
-    .io_d2e_pc(_zz_37_),
-    .io_d2e_instr(_zz_38_),
-    .io_d2e_itype(_zz_39_),
-    .io_d2e_op1_33(_zz_40_),
-    .io_d2e_op2_33(_zz_41_),
-    .io_d2e_op1_op2_lsb(_zz_42_),
-    .io_d2e_rs2_imm(_zz_43_),
-    .io_d2e_rd_valid(_zz_44_),
-    .io_d2e_rd_addr(_zz_45_),
-    .io_e2d_stall(_zz_46_),
-    .io_e2d_pc_jump_valid(_zz_47_),
-    .io_e2d_pc_jump(_zz_48_),
+    .io_f2d_valid(_zz_MR1_22_),
+    .io_f2d_pc(_zz_MR1_23_),
+    .instr(_zz_MR1_24_),
+    .io_d2f_stall(_zz_MR1_29_),
+    .io_d2f_pc_jump_valid(_zz_MR1_30_),
+    .io_d2f_pc_jump(_zz_MR1_31_),
+    .io_rd_update_rd_waddr_valid(_zz_MR1_32_),
+    .io_rd_update_rd_waddr(_zz_MR1_33_),
+    .io_rd_update_rd_wdata_valid(_zz_MR1_34_),
+    .io_rd_update_rd_wdata(_zz_MR1_35_),
+    .io_r2rr_rs1_data(_zz_MR1_67_),
+    .io_r2rr_rs2_data(_zz_MR1_68_),
+    .io_d2e_valid(_zz_MR1_36_),
+    .io_d2e_pc(_zz_MR1_37_),
+    .io_d2e_instr(_zz_MR1_38_),
+    .io_d2e_itype(_zz_MR1_39_),
+    .io_d2e_op1_33(_zz_MR1_40_),
+    .io_d2e_op2_33(_zz_MR1_41_),
+    .io_d2e_op1_op2_lsb(_zz_MR1_42_),
+    .io_d2e_rs2_imm(_zz_MR1_43_),
+    .io_d2e_rd_valid(_zz_MR1_44_),
+    .io_d2e_rd_addr(_zz_MR1_45_),
+    .io_e2d_stall(_zz_MR1_46_),
+    .io_e2d_pc_jump_valid(_zz_MR1_47_),
+    .io_e2d_pc_jump(_zz_MR1_48_),
     .clk25(clk25),
     .reset25_(reset25_) 
   );
   Execute execute_1_ ( 
-    .io_d2e_valid(_zz_36_),
-    .io_d2e_pc(_zz_37_),
-    .io_d2e_instr(_zz_38_),
-    .io_d2e_itype(_zz_39_),
-    .io_d2e_op1_33(_zz_40_),
-    .io_d2e_op2_33(_zz_41_),
-    .io_d2e_op1_op2_lsb(_zz_42_),
-    .rs2(_zz_43_),
-    .io_d2e_rd_valid(_zz_44_),
-    .rd_addr(_zz_45_),
-    .io_e2d_stall(_zz_46_),
-    .io_e2d_pc_jump_valid(_zz_47_),
-    .io_e2d_pc_jump(_zz_48_),
-    .io_rd_update_rd_waddr_valid(_zz_49_),
-    .io_rd_update_rd_waddr(_zz_50_),
-    .io_rd_update_rd_wdata_valid(_zz_51_),
-    .io_rd_update_rd_wdata(_zz_52_),
-    .io_e2w_valid(_zz_53_),
-    .io_e2w_ld_active(_zz_54_),
-    .io_e2w_ld_addr_lsb(_zz_55_),
-    .io_e2w_ld_data_size(_zz_56_),
-    .io_e2w_ld_data_signed(_zz_57_),
-    .io_e2w_rd_wr(_zz_58_),
-    .io_e2w_rd_waddr(_zz_59_),
-    .io_e2w_rd_wdata(_zz_60_),
-    .io_w2e_stall(_zz_69_),
-    .io_data_req_valid(_zz_61_),
+    .io_d2e_valid(_zz_MR1_36_),
+    .io_d2e_pc(_zz_MR1_37_),
+    .io_d2e_instr(_zz_MR1_38_),
+    .io_d2e_itype(_zz_MR1_39_),
+    .io_d2e_op1_33(_zz_MR1_40_),
+    .io_d2e_op2_33(_zz_MR1_41_),
+    .io_d2e_op1_op2_lsb(_zz_MR1_42_),
+    .rs2(_zz_MR1_43_),
+    .io_d2e_rd_valid(_zz_MR1_44_),
+    .rd_addr(_zz_MR1_45_),
+    .io_e2d_stall(_zz_MR1_46_),
+    .io_e2d_pc_jump_valid(_zz_MR1_47_),
+    .io_e2d_pc_jump(_zz_MR1_48_),
+    .io_rd_update_rd_waddr_valid(_zz_MR1_49_),
+    .io_rd_update_rd_waddr(_zz_MR1_50_),
+    .io_rd_update_rd_wdata_valid(_zz_MR1_51_),
+    .io_rd_update_rd_wdata(_zz_MR1_52_),
+    .io_e2w_valid(_zz_MR1_53_),
+    .io_e2w_ld_active(_zz_MR1_54_),
+    .io_e2w_ld_addr_lsb(_zz_MR1_55_),
+    .io_e2w_ld_data_size(_zz_MR1_56_),
+    .io_e2w_ld_data_signed(_zz_MR1_57_),
+    .io_e2w_rd_wr(_zz_MR1_58_),
+    .io_e2w_rd_waddr(_zz_MR1_59_),
+    .io_e2w_rd_wdata(_zz_MR1_60_),
+    .io_w2e_stall(_zz_MR1_69_),
+    .io_data_req_valid(_zz_MR1_61_),
     .io_data_req_ready(data_req_ready),
-    .io_data_req_addr(_zz_62_),
-    .io_data_req_wr(_zz_63_),
-    .io_data_req_size(_zz_64_),
-    .io_data_req_data(_zz_65_),
+    .io_data_req_addr(_zz_MR1_62_),
+    .io_data_req_wr(_zz_MR1_63_),
+    .io_data_req_size(_zz_MR1_64_),
+    .io_data_req_data(_zz_MR1_65_),
     .clk25(clk25),
     .reset25_(reset25_) 
   );
   RegFile reg_file ( 
-    .io_rd2r_rs1_rd(_zz_25_),
-    .io_rd2r_rs1_rd_addr(_zz_26_),
-    .io_rd2r_rs2_rd(_zz_27_),
-    .io_rd2r_rs2_rd_addr(_zz_28_),
-    .io_r2rd_stall(_zz_66_),
-    .io_r2rr_rs1_data(_zz_67_),
-    .io_r2rr_rs2_data(_zz_68_),
-    .io_w2r_rd_wr(_zz_74_),
-    .io_w2r_rd_wr_addr(_zz_75_),
-    .io_w2r_rd_wr_data(_zz_76_),
+    .io_rd2r_rs1_rd(_zz_MR1_25_),
+    .io_rd2r_rs1_rd_addr(_zz_MR1_26_),
+    .io_rd2r_rs2_rd(_zz_MR1_27_),
+    .io_rd2r_rs2_rd_addr(_zz_MR1_28_),
+    .io_r2rd_stall(_zz_MR1_66_),
+    .io_r2rr_rs1_data(_zz_MR1_67_),
+    .io_r2rr_rs2_data(_zz_MR1_68_),
+    .io_w2r_rd_wr(_zz_MR1_74_),
+    .io_w2r_rd_wr_addr(_zz_MR1_75_),
+    .io_w2r_rd_wr_data(_zz_MR1_76_),
     .clk25(clk25),
     .reset25_(reset25_) 
   );
   Writeback wb ( 
-    .io_e2w_valid(_zz_53_),
-    .io_e2w_ld_active(_zz_54_),
-    .io_e2w_ld_addr_lsb(_zz_55_),
-    .io_e2w_ld_data_size(_zz_56_),
-    .io_e2w_ld_data_signed(_zz_57_),
-    .io_e2w_rd_wr(_zz_58_),
-    .io_e2w_rd_waddr(_zz_59_),
-    .io_e2w_rd_wdata(_zz_60_),
-    .io_w2e_stall(_zz_69_),
-    .io_rd_update_rd_waddr_valid(_zz_70_),
-    .io_rd_update_rd_waddr(_zz_71_),
-    .io_rd_update_rd_wdata_valid(_zz_72_),
-    .io_rd_update_rd_wdata(_zz_73_),
-    .io_w2r_rd_wr(_zz_74_),
-    .io_w2r_rd_wr_addr(_zz_75_),
-    .io_w2r_rd_wr_data(_zz_76_),
+    .io_e2w_valid(_zz_MR1_53_),
+    .io_e2w_ld_active(_zz_MR1_54_),
+    .io_e2w_ld_addr_lsb(_zz_MR1_55_),
+    .io_e2w_ld_data_size(_zz_MR1_56_),
+    .io_e2w_ld_data_signed(_zz_MR1_57_),
+    .io_e2w_rd_wr(_zz_MR1_58_),
+    .io_e2w_rd_waddr(_zz_MR1_59_),
+    .io_e2w_rd_wdata(_zz_MR1_60_),
+    .io_w2e_stall(_zz_MR1_69_),
+    .io_rd_update_rd_waddr_valid(_zz_MR1_70_),
+    .io_rd_update_rd_waddr(_zz_MR1_71_),
+    .io_rd_update_rd_wdata_valid(_zz_MR1_72_),
+    .io_rd_update_rd_wdata(_zz_MR1_73_),
+    .io_w2r_rd_wr(_zz_MR1_74_),
+    .io_w2r_rd_wr_addr(_zz_MR1_75_),
+    .io_w2r_rd_wr_data(_zz_MR1_76_),
     .io_data_rsp_valid(data_rsp_valid),
     .io_data_rsp_data(data_rsp_data),
-    .io_e2w_rvfi_valid(_zz_1_),
-    .io_e2w_rvfi_order(_zz_2_),
-    .io_e2w_rvfi_insn(_zz_3_),
-    .io_e2w_rvfi_trap(_zz_4_),
-    .io_e2w_rvfi_halt(_zz_5_),
-    .io_e2w_rvfi_intr(_zz_6_),
-    .io_e2w_rvfi_rs1_addr(_zz_7_),
-    .io_e2w_rvfi_rs2_addr(_zz_8_),
-    .io_e2w_rvfi_rs1_rdata(_zz_9_),
-    .io_e2w_rvfi_rs2_rdata(_zz_10_),
-    .io_e2w_rvfi_rd_addr(_zz_11_),
-    .io_e2w_rvfi_rd_wdata(_zz_12_),
-    .io_e2w_rvfi_pc_rdata(_zz_13_),
-    .io_e2w_rvfi_pc_wdata(_zz_14_),
-    .io_e2w_rvfi_mem_addr(_zz_15_),
-    .io_e2w_rvfi_mem_rmask(_zz_16_),
-    .io_e2w_rvfi_mem_wmask(_zz_17_),
-    .io_e2w_rvfi_mem_rdata(_zz_18_),
-    .io_e2w_rvfi_mem_wdata(_zz_19_),
+    .io_e2w_rvfi_valid(_zz_MR1_1_),
+    .io_e2w_rvfi_order(_zz_MR1_2_),
+    .io_e2w_rvfi_insn(_zz_MR1_3_),
+    .io_e2w_rvfi_trap(_zz_MR1_4_),
+    .io_e2w_rvfi_halt(_zz_MR1_5_),
+    .io_e2w_rvfi_intr(_zz_MR1_6_),
+    .io_e2w_rvfi_rs1_addr(_zz_MR1_7_),
+    .io_e2w_rvfi_rs2_addr(_zz_MR1_8_),
+    .io_e2w_rvfi_rs1_rdata(_zz_MR1_9_),
+    .io_e2w_rvfi_rs2_rdata(_zz_MR1_10_),
+    .io_e2w_rvfi_rd_addr(_zz_MR1_11_),
+    .io_e2w_rvfi_rd_wdata(_zz_MR1_12_),
+    .io_e2w_rvfi_pc_rdata(_zz_MR1_13_),
+    .io_e2w_rvfi_pc_wdata(_zz_MR1_14_),
+    .io_e2w_rvfi_mem_addr(_zz_MR1_15_),
+    .io_e2w_rvfi_mem_rmask(_zz_MR1_16_),
+    .io_e2w_rvfi_mem_wmask(_zz_MR1_17_),
+    .io_e2w_rvfi_mem_rdata(_zz_MR1_18_),
+    .io_e2w_rvfi_mem_wdata(_zz_MR1_19_),
     .clk25(clk25),
     .reset25_(reset25_) 
   );
-  assign instr_req_valid = _zz_20_;
-  assign instr_req_addr = _zz_21_;
-  assign data_req_valid = _zz_61_;
-  assign data_req_addr = _zz_62_;
-  assign data_req_wr = _zz_63_;
-  assign data_req_size = _zz_64_;
-  assign data_req_data = _zz_65_;
+  assign instr_req_valid = _zz_MR1_20_;
+  assign instr_req_addr = _zz_MR1_21_;
+  assign data_req_valid = _zz_MR1_61_;
+  assign data_req_addr = _zz_MR1_62_;
+  assign data_req_wr = _zz_MR1_63_;
+  assign data_req_size = _zz_MR1_64_;
+  assign data_req_data = _zz_MR1_65_;
 endmodule
 
 module MR1Top (
@@ -1694,35 +1698,35 @@ module MR1Top (
       output [7:0] io_txt_buf_wr_data,
       input   clk25,
       input   reset25_);
-  wire  _zz_15_;
-  wire [31:0] _zz_16_;
-  wire  _zz_17_;
-  wire [31:0] _zz_18_;
-  reg [31:0] _zz_19_;
-  reg [31:0] _zz_20_;
-  wire  _zz_21_;
-  wire [31:0] _zz_22_;
-  wire  _zz_23_;
-  wire [31:0] _zz_24_;
-  wire  _zz_25_;
-  wire [1:0] _zz_26_;
-  wire [31:0] _zz_27_;
-  wire [10:0] _zz_28_;
-  wire [10:0] _zz_29_;
-  wire [31:0] _zz_30_;
-  wire [29:0] _zz_31_;
-  wire [0:0] _zz_32_;
-  wire [30:0] _zz_33_;
-  wire [0:0] _zz_34_;
-  wire [31:0] _zz_35_;
-  wire [31:0] _zz_36_;
-  reg [3:0] _zz_1_;
+  wire  _zz_MR1Top_15_;
+  wire [31:0] _zz_MR1Top_16_;
+  wire  _zz_MR1Top_17_;
+  wire [31:0] _zz_MR1Top_18_;
+  reg [31:0] _zz_MR1Top_19_;
+  reg [31:0] _zz_MR1Top_20_;
+  wire  _zz_MR1Top_21_;
+  wire [31:0] _zz_MR1Top_22_;
+  wire  _zz_MR1Top_23_;
+  wire [31:0] _zz_MR1Top_24_;
+  wire  _zz_MR1Top_25_;
+  wire [1:0] _zz_MR1Top_26_;
+  wire [31:0] _zz_MR1Top_27_;
+  wire [10:0] _zz_MR1Top_28_;
+  wire [10:0] _zz_MR1Top_29_;
+  wire [31:0] _zz_MR1Top_30_;
+  wire [29:0] _zz_MR1Top_31_;
+  wire [0:0] _zz_MR1Top_32_;
+  wire [30:0] _zz_MR1Top_33_;
+  wire [0:0] _zz_MR1Top_34_;
+  wire [31:0] _zz_MR1Top_35_;
+  wire [31:0] _zz_MR1Top_36_;
+  reg [3:0] _zz_MR1Top_1_;
   wire [3:0] wmask;
-  reg  instr_req_valid_regNext;
+  reg  mr1_1__instr_req_valid_regNext;
   wire [31:0] cpu_ram_rd_data;
   wire [31:0] reg_rd_data;
-  reg  _zz_2_;
-  reg  _zz_3_;
+  reg  _zz_MR1Top_2_;
+  reg  _zz_MR1Top_3_;
   wire [31:0] ram_cpuRamContent_0;
   wire [31:0] ram_cpuRamContent_1;
   wire [31:0] ram_cpuRamContent_2;
@@ -3771,14 +3775,14 @@ module MR1Top (
   wire [31:0] ram_cpuRamContent_2045;
   wire [31:0] ram_cpuRamContent_2046;
   wire [31:0] ram_cpuRamContent_2047;
-  wire [29:0] _zz_4_;
-  wire  _zz_5_;
-  wire [29:0] _zz_6_;
-  wire [31:0] _zz_7_;
+  wire [29:0] _zz_MR1Top_4_;
+  wire  _zz_MR1Top_5_;
+  wire [29:0] _zz_MR1Top_6_;
+  wire [31:0] _zz_MR1Top_7_;
   wire  update_leds;
-  reg  _zz_8_;
-  reg  _zz_9_;
-  reg  _zz_10_;
+  reg  _zz_MR1Top_8_;
+  reg  _zz_MR1Top_9_;
+  reg  _zz_MR1Top_10_;
   wire  button_addr;
   reg  button;
   wire  dvi_ctrl_addr;
@@ -3794,10 +3798,10 @@ module MR1Top (
   wire  test_pattern_const_color_addr;
   wire  update_test_pattern_nr;
   wire  update_test_pattern_const_color;
-  reg [3:0] _zz_11_;
-  reg [7:0] _zz_12_;
-  reg [7:0] _zz_13_;
-  reg [7:0] _zz_14_;
+  reg [3:0] _zz_MR1Top_11_;
+  reg [7:0] _zz_MR1Top_12_;
+  reg [7:0] _zz_MR1Top_13_;
+  reg [7:0] _zz_MR1Top_14_;
   wire  txt_buf_addr;
   wire  update_txt_buf;
   reg  button_addr_regNext;
@@ -3809,23 +3813,23 @@ module MR1Top (
   reg [7:0] ram_cpu_ram_symbol1 [0:2047];
   reg [7:0] ram_cpu_ram_symbol2 [0:2047];
   reg [7:0] ram_cpu_ram_symbol3 [0:2047];
-  reg [7:0] _zz_37_;
-  reg [7:0] _zz_38_;
-  reg [7:0] _zz_39_;
-  reg [7:0] _zz_40_;
-  reg [7:0] _zz_41_;
-  reg [7:0] _zz_42_;
-  reg [7:0] _zz_43_;
-  reg [7:0] _zz_44_;
-  assign _zz_28_ = _zz_4_[10:0];
-  assign _zz_29_ = _zz_6_[10:0];
-  assign _zz_30_ = (32'b00000000000010001000000000000000);
-  assign _zz_31_ = (30'b000000000000000000000000000000);
-  assign _zz_32_ = dvi_ctrl_sda;
-  assign _zz_33_ = {(30'b000000000000000000000000000000),dvi_ctrl_sda};
-  assign _zz_34_ = dvi_ctrl_scl;
-  assign _zz_35_ = {{(30'b000000000000000000000000000000),io_dvi_ctrl_sda_read},io_dvi_ctrl_scl_read};
-  assign _zz_36_ = (32'b00000000000000000000000000000000);
+  reg [7:0] _zz_MR1Top_37_;
+  reg [7:0] _zz_MR1Top_38_;
+  reg [7:0] _zz_MR1Top_39_;
+  reg [7:0] _zz_MR1Top_40_;
+  reg [7:0] _zz_MR1Top_41_;
+  reg [7:0] _zz_MR1Top_42_;
+  reg [7:0] _zz_MR1Top_43_;
+  reg [7:0] _zz_MR1Top_44_;
+  assign _zz_MR1Top_28_ = _zz_MR1Top_4_[10:0];
+  assign _zz_MR1Top_29_ = _zz_MR1Top_6_[10:0];
+  assign _zz_MR1Top_30_ = (32'b00000000000010001000000000000000);
+  assign _zz_MR1Top_31_ = (30'b000000000000000000000000000000);
+  assign _zz_MR1Top_32_ = dvi_ctrl_sda;
+  assign _zz_MR1Top_33_ = {(30'b000000000000000000000000000000),dvi_ctrl_sda};
+  assign _zz_MR1Top_34_ = dvi_ctrl_scl;
+  assign _zz_MR1Top_35_ = {{(30'b000000000000000000000000000000),io_dvi_ctrl_sda_read},io_dvi_ctrl_scl_read};
+  assign _zz_MR1Top_36_ = (32'b00000000000000000000000000000000);
   initial begin
     $readmemb("Pano.v_toplevel_core_u_pano_core_u_mr1_top_ram_cpu_ram_symbol0.bin",ram_cpu_ram_symbol0);
     $readmemb("Pano.v_toplevel_core_u_pano_core_u_mr1_top_ram_cpu_ram_symbol1.bin",ram_cpu_ram_symbol1);
@@ -3833,76 +3837,76 @@ module MR1Top (
     $readmemb("Pano.v_toplevel_core_u_pano_core_u_mr1_top_ram_cpu_ram_symbol3.bin",ram_cpu_ram_symbol3);
   end
   always @ (*) begin
-    _zz_20_ = {_zz_40_, _zz_39_, _zz_38_, _zz_37_};
+    _zz_MR1Top_20_ = {_zz_MR1Top_40_, _zz_MR1Top_39_, _zz_MR1Top_38_, _zz_MR1Top_37_};
   end
   always @ (*) begin
-    _zz_19_ = {_zz_44_, _zz_43_, _zz_42_, _zz_41_};
+    _zz_MR1Top_19_ = {_zz_MR1Top_44_, _zz_MR1Top_43_, _zz_MR1Top_42_, _zz_MR1Top_41_};
   end
   always @ (posedge clk25) begin
-    if(wmask[0] && _zz_5_ && _zz_25_ ) begin
-      ram_cpu_ram_symbol0[_zz_29_] <= _zz_7_[7 : 0];
+    if(wmask[0] && _zz_MR1Top_5_ && _zz_MR1Top_25_ ) begin
+      ram_cpu_ram_symbol0[_zz_MR1Top_29_] <= _zz_MR1Top_7_[7 : 0];
     end
-    if(wmask[1] && _zz_5_ && _zz_25_ ) begin
-      ram_cpu_ram_symbol1[_zz_29_] <= _zz_7_[15 : 8];
+    if(wmask[1] && _zz_MR1Top_5_ && _zz_MR1Top_25_ ) begin
+      ram_cpu_ram_symbol1[_zz_MR1Top_29_] <= _zz_MR1Top_7_[15 : 8];
     end
-    if(wmask[2] && _zz_5_ && _zz_25_ ) begin
-      ram_cpu_ram_symbol2[_zz_29_] <= _zz_7_[23 : 16];
+    if(wmask[2] && _zz_MR1Top_5_ && _zz_MR1Top_25_ ) begin
+      ram_cpu_ram_symbol2[_zz_MR1Top_29_] <= _zz_MR1Top_7_[23 : 16];
     end
-    if(wmask[3] && _zz_5_ && _zz_25_ ) begin
-      ram_cpu_ram_symbol3[_zz_29_] <= _zz_7_[31 : 24];
+    if(wmask[3] && _zz_MR1Top_5_ && _zz_MR1Top_25_ ) begin
+      ram_cpu_ram_symbol3[_zz_MR1Top_29_] <= _zz_MR1Top_7_[31 : 24];
     end
-    if(_zz_5_) begin
-      _zz_37_ <= ram_cpu_ram_symbol0[_zz_29_];
-      _zz_38_ <= ram_cpu_ram_symbol1[_zz_29_];
-      _zz_39_ <= ram_cpu_ram_symbol2[_zz_29_];
-      _zz_40_ <= ram_cpu_ram_symbol3[_zz_29_];
+    if(_zz_MR1Top_5_) begin
+      _zz_MR1Top_37_ <= ram_cpu_ram_symbol0[_zz_MR1Top_29_];
+      _zz_MR1Top_38_ <= ram_cpu_ram_symbol1[_zz_MR1Top_29_];
+      _zz_MR1Top_39_ <= ram_cpu_ram_symbol2[_zz_MR1Top_29_];
+      _zz_MR1Top_40_ <= ram_cpu_ram_symbol3[_zz_MR1Top_29_];
     end
   end
 
   always @ (posedge clk25) begin
-    if(_zz_21_) begin
-      _zz_41_ <= ram_cpu_ram_symbol0[_zz_28_];
-      _zz_42_ <= ram_cpu_ram_symbol1[_zz_28_];
-      _zz_43_ <= ram_cpu_ram_symbol2[_zz_28_];
-      _zz_44_ <= ram_cpu_ram_symbol3[_zz_28_];
+    if(_zz_MR1Top_21_) begin
+      _zz_MR1Top_41_ <= ram_cpu_ram_symbol0[_zz_MR1Top_28_];
+      _zz_MR1Top_42_ <= ram_cpu_ram_symbol1[_zz_MR1Top_28_];
+      _zz_MR1Top_43_ <= ram_cpu_ram_symbol2[_zz_MR1Top_28_];
+      _zz_MR1Top_44_ <= ram_cpu_ram_symbol3[_zz_MR1Top_28_];
     end
   end
 
   MR1 mr1_1_ ( 
-    .instr_req_valid(_zz_21_),
-    .instr_req_ready(_zz_15_),
-    .instr_req_addr(_zz_22_),
-    .instr_rsp_valid(instr_req_valid_regNext),
-    .instr_rsp_data(_zz_16_),
-    .data_req_valid(_zz_23_),
-    .data_req_ready(_zz_17_),
-    .data_req_addr(_zz_24_),
-    .data_req_wr(_zz_25_),
-    .data_req_size(_zz_26_),
-    .data_req_data(_zz_27_),
-    .data_rsp_valid(_zz_2_),
-    .data_rsp_data(_zz_18_),
+    .instr_req_valid(_zz_MR1Top_21_),
+    .instr_req_ready(_zz_MR1Top_15_),
+    .instr_req_addr(_zz_MR1Top_22_),
+    .instr_rsp_valid(mr1_1__instr_req_valid_regNext),
+    .instr_rsp_data(_zz_MR1Top_16_),
+    .data_req_valid(_zz_MR1Top_23_),
+    .data_req_ready(_zz_MR1Top_17_),
+    .data_req_addr(_zz_MR1Top_24_),
+    .data_req_wr(_zz_MR1Top_25_),
+    .data_req_size(_zz_MR1Top_26_),
+    .data_req_data(_zz_MR1Top_27_),
+    .data_rsp_valid(_zz_MR1Top_2_),
+    .data_rsp_data(_zz_MR1Top_18_),
     .clk25(clk25),
     .reset25_(reset25_) 
   );
   always @ (*) begin
-    case(_zz_26_)
+    case(_zz_MR1Top_26_)
       2'b00 : begin
-        _zz_1_ = (4'b0001);
+        _zz_MR1Top_1_ = (4'b0001);
       end
       2'b01 : begin
-        _zz_1_ = (4'b0011);
+        _zz_MR1Top_1_ = (4'b0011);
       end
       default : begin
-        _zz_1_ = (4'b1111);
+        _zz_MR1Top_1_ = (4'b1111);
       end
     endcase
   end
 
-  assign wmask = (_zz_1_ <<< _zz_24_[1 : 0]);
-  assign _zz_15_ = 1'b1;
-  assign _zz_17_ = 1'b1;
-  assign _zz_18_ = (_zz_3_ ? reg_rd_data : cpu_ram_rd_data);
+  assign wmask = (_zz_MR1Top_1_ <<< _zz_MR1Top_24_[1 : 0]);
+  assign _zz_MR1Top_15_ = 1'b1;
+  assign _zz_MR1Top_17_ = 1'b1;
+  assign _zz_MR1Top_18_ = (_zz_MR1Top_3_ ? reg_rd_data : cpu_ram_rd_data);
   assign ram_cpuRamContent_0 = (32'b00000000000000000010000100110111);
   assign ram_cpuRamContent_1 = (32'b01010001000100000000000011101111);
   assign ram_cpuRamContent_2 = (32'b00000000000100000000000001110011);
@@ -5951,88 +5955,88 @@ module MR1Top (
   assign ram_cpuRamContent_2045 = (32'b00000000000000000000000000000000);
   assign ram_cpuRamContent_2046 = (32'b00000000000000000000000000000000);
   assign ram_cpuRamContent_2047 = (32'b00000000000000000000000000000000);
-  assign _zz_4_ = (_zz_22_ >>> 2);
-  assign _zz_16_ = _zz_19_;
-  assign _zz_5_ = (_zz_23_ && (! _zz_24_[19]));
-  assign _zz_6_ = (_zz_24_ >>> 2);
-  assign _zz_7_ = _zz_27_;
-  assign cpu_ram_rd_data = _zz_20_;
-  assign update_leds = ((_zz_23_ && _zz_25_) && (_zz_24_ == (32'b00000000000010000000000000000000)));
-  assign io_led1 = _zz_8_;
-  assign io_led2 = _zz_9_;
-  assign io_led3 = _zz_10_;
-  assign button_addr = (_zz_24_ == (32'b00000000000010000000000000000100));
-  assign dvi_ctrl_addr = (_zz_24_ == (32'b00000000000010000000000000010000));
-  assign dvi_ctrl_set_addr = (_zz_24_ == (32'b00000000000010000000000000010100));
-  assign dvi_ctrl_clr_addr = (_zz_24_ == (32'b00000000000010000000000000011000));
-  assign dvi_ctrl_rd_addr = (_zz_24_ == (32'b00000000000010000000000000011100));
-  assign update_dvi_ctrl = ((_zz_23_ && _zz_25_) && dvi_ctrl_addr);
-  assign update_dvi_ctrl_set = ((_zz_23_ && _zz_25_) && dvi_ctrl_set_addr);
-  assign update_dvi_ctrl_clr = ((_zz_23_ && _zz_25_) && dvi_ctrl_clr_addr);
+  assign _zz_MR1Top_4_ = (_zz_MR1Top_22_ >>> 2);
+  assign _zz_MR1Top_16_ = _zz_MR1Top_19_;
+  assign _zz_MR1Top_5_ = (_zz_MR1Top_23_ && (! _zz_MR1Top_24_[19]));
+  assign _zz_MR1Top_6_ = (_zz_MR1Top_24_ >>> 2);
+  assign _zz_MR1Top_7_ = _zz_MR1Top_27_;
+  assign cpu_ram_rd_data = _zz_MR1Top_20_;
+  assign update_leds = ((_zz_MR1Top_23_ && _zz_MR1Top_25_) && (_zz_MR1Top_24_ == (32'b00000000000010000000000000000000)));
+  assign io_led1 = _zz_MR1Top_8_;
+  assign io_led2 = _zz_MR1Top_9_;
+  assign io_led3 = _zz_MR1Top_10_;
+  assign button_addr = (_zz_MR1Top_24_ == (32'b00000000000010000000000000000100));
+  assign dvi_ctrl_addr = (_zz_MR1Top_24_ == (32'b00000000000010000000000000010000));
+  assign dvi_ctrl_set_addr = (_zz_MR1Top_24_ == (32'b00000000000010000000000000010100));
+  assign dvi_ctrl_clr_addr = (_zz_MR1Top_24_ == (32'b00000000000010000000000000011000));
+  assign dvi_ctrl_rd_addr = (_zz_MR1Top_24_ == (32'b00000000000010000000000000011100));
+  assign update_dvi_ctrl = ((_zz_MR1Top_23_ && _zz_MR1Top_25_) && dvi_ctrl_addr);
+  assign update_dvi_ctrl_set = ((_zz_MR1Top_23_ && _zz_MR1Top_25_) && dvi_ctrl_set_addr);
+  assign update_dvi_ctrl_clr = ((_zz_MR1Top_23_ && _zz_MR1Top_25_) && dvi_ctrl_clr_addr);
   assign io_dvi_ctrl_scl_writeEnable = (dvi_ctrl_scl == 1'b0);
   assign io_dvi_ctrl_scl_write = dvi_ctrl_scl;
   assign io_dvi_ctrl_sda_writeEnable = (dvi_ctrl_sda == 1'b0);
   assign io_dvi_ctrl_sda_write = dvi_ctrl_sda;
-  assign test_pattern_nr_addr = (_zz_24_ == (32'b00000000000010000000000000100000));
-  assign test_pattern_const_color_addr = (_zz_24_ == (32'b00000000000010000000000000100100));
-  assign update_test_pattern_nr = ((_zz_23_ && _zz_25_) && test_pattern_nr_addr);
-  assign update_test_pattern_const_color = ((_zz_23_ && _zz_25_) && test_pattern_const_color_addr);
-  assign io_test_pattern_nr = _zz_11_;
-  assign io_test_pattern_const_color_r = _zz_12_;
-  assign io_test_pattern_const_color_g = _zz_13_;
-  assign io_test_pattern_const_color_b = _zz_14_;
-  assign txt_buf_addr = (_zz_24_[31 : 15] == _zz_30_[31 : 15]);
-  assign update_txt_buf = ((_zz_23_ && _zz_25_) && txt_buf_addr);
+  assign test_pattern_nr_addr = (_zz_MR1Top_24_ == (32'b00000000000010000000000000100000));
+  assign test_pattern_const_color_addr = (_zz_MR1Top_24_ == (32'b00000000000010000000000000100100));
+  assign update_test_pattern_nr = ((_zz_MR1Top_23_ && _zz_MR1Top_25_) && test_pattern_nr_addr);
+  assign update_test_pattern_const_color = ((_zz_MR1Top_23_ && _zz_MR1Top_25_) && test_pattern_const_color_addr);
+  assign io_test_pattern_nr = _zz_MR1Top_11_;
+  assign io_test_pattern_const_color_r = _zz_MR1Top_12_;
+  assign io_test_pattern_const_color_g = _zz_MR1Top_13_;
+  assign io_test_pattern_const_color_b = _zz_MR1Top_14_;
+  assign txt_buf_addr = (_zz_MR1Top_24_[31 : 15] == _zz_MR1Top_30_[31 : 15]);
+  assign update_txt_buf = ((_zz_MR1Top_23_ && _zz_MR1Top_25_) && txt_buf_addr);
   assign io_txt_buf_wr = update_txt_buf;
-  assign io_txt_buf_wr_addr = _zz_24_[12 : 2];
-  assign io_txt_buf_wr_data = _zz_27_[7 : 0];
-  assign reg_rd_data = (button_addr_regNext ? {(31'b0000000000000000000000000000000),button} : (dvi_ctrl_addr_regNext ? {{(30'b000000000000000000000000000000),dvi_ctrl_sda},dvi_ctrl_scl} : (dvi_ctrl_set_addr_regNext ? {{_zz_31_,_zz_32_},dvi_ctrl_scl} : (dvi_ctrl_clr_addr_regNext ? {_zz_33_,_zz_34_} : (dvi_ctrl_rd_addr_regNext ? _zz_35_ : _zz_36_)))));
+  assign io_txt_buf_wr_addr = _zz_MR1Top_24_[12 : 2];
+  assign io_txt_buf_wr_data = _zz_MR1Top_27_[7 : 0];
+  assign reg_rd_data = (button_addr_regNext ? {(31'b0000000000000000000000000000000),button} : (dvi_ctrl_addr_regNext ? {{(30'b000000000000000000000000000000),dvi_ctrl_sda},dvi_ctrl_scl} : (dvi_ctrl_set_addr_regNext ? {{_zz_MR1Top_31_,_zz_MR1Top_32_},dvi_ctrl_scl} : (dvi_ctrl_clr_addr_regNext ? {_zz_MR1Top_33_,_zz_MR1Top_34_} : (dvi_ctrl_rd_addr_regNext ? _zz_MR1Top_35_ : _zz_MR1Top_36_)))));
   always @ (posedge clk25) begin
     if(!reset25_) begin
-      instr_req_valid_regNext <= 1'b0;
-      _zz_2_ <= 1'b0;
-      _zz_8_ <= 1'b0;
-      _zz_9_ <= 1'b0;
-      _zz_10_ <= 1'b0;
+      mr1_1__instr_req_valid_regNext <= 1'b0;
+      _zz_MR1Top_2_ <= 1'b0;
+      _zz_MR1Top_8_ <= 1'b0;
+      _zz_MR1Top_9_ <= 1'b0;
+      _zz_MR1Top_10_ <= 1'b0;
       button <= 1'b0;
       dvi_ctrl_scl <= 1'b1;
       dvi_ctrl_sda <= 1'b1;
-      _zz_11_ <= (4'b0000);
-      _zz_12_ <= (8'b00000000);
-      _zz_13_ <= (8'b00000000);
-      _zz_14_ <= (8'b00000000);
+      _zz_MR1Top_11_ <= (4'b0000);
+      _zz_MR1Top_12_ <= (8'b00000000);
+      _zz_MR1Top_13_ <= (8'b00000000);
+      _zz_MR1Top_14_ <= (8'b00000000);
     end else begin
-      instr_req_valid_regNext <= _zz_21_;
-      _zz_2_ <= (_zz_23_ && (! _zz_25_));
+      mr1_1__instr_req_valid_regNext <= _zz_MR1Top_21_;
+      _zz_MR1Top_2_ <= (_zz_MR1Top_23_ && (! _zz_MR1Top_25_));
       if(update_leds)begin
-        _zz_8_ <= _zz_27_[0];
+        _zz_MR1Top_8_ <= _zz_MR1Top_27_[0];
       end
       if(update_leds)begin
-        _zz_9_ <= _zz_27_[1];
+        _zz_MR1Top_9_ <= _zz_MR1Top_27_[1];
       end
       if(update_leds)begin
-        _zz_10_ <= _zz_27_[2];
+        _zz_MR1Top_10_ <= _zz_MR1Top_27_[2];
       end
       button <= (! io_switch_);
-      dvi_ctrl_scl <= (update_dvi_ctrl ? _zz_27_[0] : ((update_dvi_ctrl_set && _zz_27_[0]) ? 1'b1 : ((update_dvi_ctrl_clr && _zz_27_[0]) ? 1'b0 : dvi_ctrl_scl)));
-      dvi_ctrl_sda <= (update_dvi_ctrl ? _zz_27_[1] : ((update_dvi_ctrl_set && _zz_27_[1]) ? 1'b1 : ((update_dvi_ctrl_clr && _zz_27_[1]) ? 1'b0 : dvi_ctrl_sda)));
+      dvi_ctrl_scl <= (update_dvi_ctrl ? _zz_MR1Top_27_[0] : ((update_dvi_ctrl_set && _zz_MR1Top_27_[0]) ? 1'b1 : ((update_dvi_ctrl_clr && _zz_MR1Top_27_[0]) ? 1'b0 : dvi_ctrl_scl)));
+      dvi_ctrl_sda <= (update_dvi_ctrl ? _zz_MR1Top_27_[1] : ((update_dvi_ctrl_set && _zz_MR1Top_27_[1]) ? 1'b1 : ((update_dvi_ctrl_clr && _zz_MR1Top_27_[1]) ? 1'b0 : dvi_ctrl_sda)));
       if(update_test_pattern_nr)begin
-        _zz_11_ <= _zz_27_[3 : 0];
+        _zz_MR1Top_11_ <= _zz_MR1Top_27_[3 : 0];
       end
       if(update_test_pattern_const_color)begin
-        _zz_12_ <= _zz_27_[7 : 0];
+        _zz_MR1Top_12_ <= _zz_MR1Top_27_[7 : 0];
       end
       if(update_test_pattern_const_color)begin
-        _zz_13_ <= _zz_27_[15 : 8];
+        _zz_MR1Top_13_ <= _zz_MR1Top_27_[15 : 8];
       end
       if(update_test_pattern_const_color)begin
-        _zz_14_ <= _zz_27_[23 : 16];
+        _zz_MR1Top_14_ <= _zz_MR1Top_27_[23 : 16];
       end
     end
   end
 
   always @ (posedge clk25) begin
-    _zz_3_ <= _zz_24_[19];
+    _zz_MR1Top_3_ <= _zz_MR1Top_24_[19];
     button_addr_regNext <= button_addr;
     dvi_ctrl_addr_regNext <= dvi_ctrl_addr;
     dvi_ctrl_set_addr_regNext <= dvi_ctrl_set_addr;
@@ -6044,15 +6048,15 @@ endmodule
 
 module VideoTimingGen (
       input  [11:0] io_timings_h_active,
-      input  [7:0] io_timings_h_fp,
-      input  [7:0] io_timings_h_sync,
-      input  [7:0] io_timings_h_bp,
+      input  [8:0] io_timings_h_fp,
+      input  [8:0] io_timings_h_sync,
+      input  [8:0] io_timings_h_bp,
       input   io_timings_h_sync_positive,
       input  [11:0] io_timings_h_total_m1,
       input  [10:0] io_timings_v_active,
-      input  [5:0] io_timings_v_fp,
-      input  [5:0] io_timings_v_sync,
-      input  [5:0] io_timings_v_bp,
+      input  [8:0] io_timings_v_fp,
+      input  [8:0] io_timings_v_sync,
+      input  [8:0] io_timings_v_bp,
       input   io_timings_v_sync_positive,
       input  [11:0] io_timings_v_total_m1,
       output reg  io_pixel_out_vsync,
@@ -6062,32 +6066,32 @@ module VideoTimingGen (
       output reg [7:0] io_pixel_out_pixel_r,
       output reg [7:0] io_pixel_out_pixel_g,
       output reg [7:0] io_pixel_out_pixel_b,
-      input   clk25,
-      input   reset25_);
-  wire [11:0] _zz_1_;
-  wire [7:0] _zz_2_;
-  wire [5:0] _zz_3_;
-  wire [11:0] _zz_4_;
-  wire [10:0] _zz_5_;
+      input   vo_clk,
+      input   vo_reset_);
+  wire [11:0] _zz_VideoTimingGen_1_;
+  wire [8:0] _zz_VideoTimingGen_2_;
+  wire [8:0] _zz_VideoTimingGen_3_;
+  wire [11:0] _zz_VideoTimingGen_4_;
+  wire [10:0] _zz_VideoTimingGen_5_;
   reg [11:0] col_cntr;
   reg [10:0] line_cntr;
   wire  last_col;
   wire  last_line;
-  wire [7:0] h_blank;
-  wire [5:0] v_blank;
+  wire [8:0] h_blank;
+  wire [8:0] v_blank;
   wire  pixel_active;
-  assign _zz_1_ = {1'd0, line_cntr};
-  assign _zz_2_ = (io_timings_h_fp + io_timings_h_sync);
-  assign _zz_3_ = (io_timings_v_fp + io_timings_v_sync);
-  assign _zz_4_ = {4'd0, h_blank};
-  assign _zz_5_ = {5'd0, v_blank};
+  assign _zz_VideoTimingGen_1_ = {1'd0, line_cntr};
+  assign _zz_VideoTimingGen_2_ = (io_timings_h_fp + io_timings_h_sync);
+  assign _zz_VideoTimingGen_3_ = (io_timings_v_fp + io_timings_v_sync);
+  assign _zz_VideoTimingGen_4_ = {3'd0, h_blank};
+  assign _zz_VideoTimingGen_5_ = {2'd0, v_blank};
   assign last_col = (col_cntr == io_timings_h_total_m1);
-  assign last_line = (_zz_1_ == io_timings_v_total_m1);
-  assign h_blank = (_zz_2_ + io_timings_h_bp);
-  assign v_blank = (_zz_3_ + io_timings_v_bp);
-  assign pixel_active = ((_zz_4_ <= col_cntr) && (_zz_5_ <= line_cntr));
-  always @ (posedge clk25) begin
-    if(!reset25_) begin
+  assign last_line = (_zz_VideoTimingGen_1_ == io_timings_v_total_m1);
+  assign h_blank = (_zz_VideoTimingGen_2_ + io_timings_h_bp);
+  assign v_blank = (_zz_VideoTimingGen_3_ + io_timings_v_bp);
+  assign pixel_active = ((_zz_VideoTimingGen_4_ <= col_cntr) && (_zz_VideoTimingGen_5_ <= line_cntr));
+  always @ (posedge vo_clk) begin
+    if(!vo_reset_) begin
       col_cntr <= (12'b000000000000);
       line_cntr <= (11'b00000000000);
     end else begin
@@ -6104,7 +6108,7 @@ module VideoTimingGen (
     end
   end
 
-  always @ (posedge clk25) begin
+  always @ (posedge vo_clk) begin
     io_pixel_out_vsync <= ((col_cntr == (12'b000000000000)) && (line_cntr == (11'b00000000000)));
     io_pixel_out_req <= pixel_active;
     io_pixel_out_eol <= (pixel_active ? last_col : 1'b0);
@@ -6118,15 +6122,15 @@ endmodule
 
 module VideoTestPattern (
       input  [11:0] io_timings_h_active,
-      input  [7:0] io_timings_h_fp,
-      input  [7:0] io_timings_h_sync,
-      input  [7:0] io_timings_h_bp,
+      input  [8:0] io_timings_h_fp,
+      input  [8:0] io_timings_h_sync,
+      input  [8:0] io_timings_h_bp,
       input   io_timings_h_sync_positive,
       input  [11:0] io_timings_h_total_m1,
       input  [10:0] io_timings_v_active,
-      input  [5:0] io_timings_v_fp,
-      input  [5:0] io_timings_v_sync,
-      input  [5:0] io_timings_v_bp,
+      input  [8:0] io_timings_v_fp,
+      input  [8:0] io_timings_v_sync,
+      input  [8:0] io_timings_v_bp,
       input   io_timings_v_sync_positive,
       input  [11:0] io_timings_v_total_m1,
       input   io_pixel_in_vsync,
@@ -6147,25 +6151,25 @@ module VideoTestPattern (
       input  [7:0] io_const_color_r,
       input  [7:0] io_const_color_g,
       input  [7:0] io_const_color_b,
-      input   clk25,
-      input   reset25_);
-  wire [13:0] _zz_1_;
-  wire [13:0] _zz_2_;
-  wire [13:0] _zz_3_;
-  wire [13:0] _zz_4_;
-  wire [14:0] _zz_5_;
-  wire [14:0] _zz_6_;
-  wire [12:0] _zz_7_;
-  wire [12:0] _zz_8_;
-  wire [12:0] _zz_9_;
-  wire [12:0] _zz_10_;
-  wire [13:0] _zz_11_;
-  wire [13:0] _zz_12_;
-  wire [7:0] _zz_13_;
-  wire [7:0] _zz_14_;
-  wire [7:0] _zz_15_;
-  wire [10:0] _zz_16_;
-  wire [11:0] _zz_17_;
+      input   vo_clk,
+      input   vo_reset_);
+  wire [13:0] _zz_VideoTestPattern_1_;
+  wire [13:0] _zz_VideoTestPattern_2_;
+  wire [13:0] _zz_VideoTestPattern_3_;
+  wire [13:0] _zz_VideoTestPattern_4_;
+  wire [14:0] _zz_VideoTestPattern_5_;
+  wire [14:0] _zz_VideoTestPattern_6_;
+  wire [12:0] _zz_VideoTestPattern_7_;
+  wire [12:0] _zz_VideoTestPattern_8_;
+  wire [12:0] _zz_VideoTestPattern_9_;
+  wire [12:0] _zz_VideoTestPattern_10_;
+  wire [13:0] _zz_VideoTestPattern_11_;
+  wire [13:0] _zz_VideoTestPattern_12_;
+  wire [7:0] _zz_VideoTestPattern_13_;
+  wire [7:0] _zz_VideoTestPattern_14_;
+  wire [7:0] _zz_VideoTestPattern_15_;
+  wire [10:0] _zz_VideoTestPattern_16_;
+  wire [11:0] _zz_VideoTestPattern_17_;
   reg [11:0] col_cntr;
   reg [10:0] line_cntr;
   wire [11:0] h_active_div4;
@@ -6178,35 +6182,35 @@ module VideoTestPattern (
   wire  v2;
   wire  v3;
   wire  v4;
-  assign _zz_1_ = {2'd0, col_cntr};
-  assign _zz_2_ = (h_active_div4 * (2'b10));
-  assign _zz_3_ = {2'd0, col_cntr};
-  assign _zz_4_ = (h_active_div4 * (2'b11));
-  assign _zz_5_ = {3'd0, col_cntr};
-  assign _zz_6_ = (h_active_div4 * (3'b100));
-  assign _zz_7_ = {2'd0, line_cntr};
-  assign _zz_8_ = (v_active_div4 * (2'b10));
-  assign _zz_9_ = {2'd0, line_cntr};
-  assign _zz_10_ = (v_active_div4 * (2'b11));
-  assign _zz_11_ = {3'd0, line_cntr};
-  assign _zz_12_ = (v_active_div4 * (3'b100));
-  assign _zz_13_ = (col_cntr[7 : 0] + line_cntr[7 : 0]);
-  assign _zz_14_ = (col_cntr[7 : 0] + line_cntr[7 : 0]);
-  assign _zz_15_ = (col_cntr[7 : 0] + line_cntr[7 : 0]);
-  assign _zz_16_ = (line_cntr <<< 3);
-  assign _zz_17_ = (col_cntr <<< 3);
+  assign _zz_VideoTestPattern_1_ = {2'd0, col_cntr};
+  assign _zz_VideoTestPattern_2_ = (h_active_div4 * (2'b10));
+  assign _zz_VideoTestPattern_3_ = {2'd0, col_cntr};
+  assign _zz_VideoTestPattern_4_ = (h_active_div4 * (2'b11));
+  assign _zz_VideoTestPattern_5_ = {3'd0, col_cntr};
+  assign _zz_VideoTestPattern_6_ = (h_active_div4 * (3'b100));
+  assign _zz_VideoTestPattern_7_ = {2'd0, line_cntr};
+  assign _zz_VideoTestPattern_8_ = (v_active_div4 * (2'b10));
+  assign _zz_VideoTestPattern_9_ = {2'd0, line_cntr};
+  assign _zz_VideoTestPattern_10_ = (v_active_div4 * (2'b11));
+  assign _zz_VideoTestPattern_11_ = {3'd0, line_cntr};
+  assign _zz_VideoTestPattern_12_ = (v_active_div4 * (3'b100));
+  assign _zz_VideoTestPattern_13_ = (col_cntr[7 : 0] + line_cntr[7 : 0]);
+  assign _zz_VideoTestPattern_14_ = (col_cntr[7 : 0] + line_cntr[7 : 0]);
+  assign _zz_VideoTestPattern_15_ = (col_cntr[7 : 0] + line_cntr[7 : 0]);
+  assign _zz_VideoTestPattern_16_ = (line_cntr <<< 3);
+  assign _zz_VideoTestPattern_17_ = (col_cntr <<< 3);
   assign h_active_div4 = (io_timings_h_active >>> 2);
   assign v_active_div4 = (io_timings_v_active >>> 2);
   assign h1 = (col_cntr < h_active_div4);
-  assign h2 = (_zz_1_ < _zz_2_);
-  assign h3 = (_zz_3_ < _zz_4_);
-  assign h4 = (_zz_5_ < _zz_6_);
+  assign h2 = (_zz_VideoTestPattern_1_ < _zz_VideoTestPattern_2_);
+  assign h3 = (_zz_VideoTestPattern_3_ < _zz_VideoTestPattern_4_);
+  assign h4 = (_zz_VideoTestPattern_5_ < _zz_VideoTestPattern_6_);
   assign v1 = (line_cntr < v_active_div4);
-  assign v2 = (_zz_7_ < _zz_8_);
-  assign v3 = (_zz_9_ < _zz_10_);
-  assign v4 = (_zz_11_ < _zz_12_);
-  always @ (posedge clk25) begin
-    if(!reset25_) begin
+  assign v2 = (_zz_VideoTestPattern_7_ < _zz_VideoTestPattern_8_);
+  assign v3 = (_zz_VideoTestPattern_9_ < _zz_VideoTestPattern_10_);
+  assign v4 = (_zz_VideoTestPattern_11_ < _zz_VideoTestPattern_12_);
+  always @ (posedge vo_clk) begin
+    if(!vo_reset_) begin
       col_cntr <= (12'b000000000000);
       line_cntr <= (11'b00000000000);
     end else begin
@@ -6231,7 +6235,7 @@ module VideoTestPattern (
     end
   end
 
-  always @ (posedge clk25) begin
+  always @ (posedge vo_clk) begin
     io_pixel_out_vsync <= io_pixel_in_vsync;
     io_pixel_out_req <= io_pixel_in_req;
     io_pixel_out_eol <= io_pixel_in_eol;
@@ -6246,19 +6250,19 @@ module VideoTestPattern (
         io_pixel_out_pixel_b <= io_const_color_b;
       end
       4'b0001 : begin
-        io_pixel_out_pixel_r <= _zz_13_;
+        io_pixel_out_pixel_r <= _zz_VideoTestPattern_13_;
         io_pixel_out_pixel_g <= (8'b00000000);
         io_pixel_out_pixel_b <= (8'b00000000);
       end
       4'b0010 : begin
         io_pixel_out_pixel_r <= (8'b00000000);
-        io_pixel_out_pixel_g <= _zz_14_;
+        io_pixel_out_pixel_g <= _zz_VideoTestPattern_14_;
         io_pixel_out_pixel_b <= (8'b00000000);
       end
       4'b0011 : begin
         io_pixel_out_pixel_r <= (8'b00000000);
         io_pixel_out_pixel_g <= (8'b00000000);
-        io_pixel_out_pixel_b <= _zz_15_;
+        io_pixel_out_pixel_b <= _zz_VideoTestPattern_15_;
       end
       4'b0100 : begin
         if(h1)begin
@@ -6308,8 +6312,8 @@ module VideoTestPattern (
       end
       4'b0110 : begin
         io_pixel_out_pixel_r <= {line_cntr[3 : 0],col_cntr[3 : 0]};
-        io_pixel_out_pixel_g <= _zz_16_[7 : 0];
-        io_pixel_out_pixel_b <= _zz_17_[7 : 0];
+        io_pixel_out_pixel_g <= _zz_VideoTestPattern_16_[7 : 0];
+        io_pixel_out_pixel_b <= _zz_VideoTestPattern_17_[7 : 0];
       end
       default : begin
       end
@@ -6336,20 +6340,22 @@ module VideoTxtGen (
       input   io_txt_buf_wr,
       input  [10:0] io_txt_buf_wr_addr,
       input  [7:0] io_txt_buf_wr_data,
+      input   vo_clk,
+      input   vo_reset_,
       input   clk25,
       input   reset25_);
-  reg [7:0] _zz_1_;
-  reg [7:0] _zz_2_;
-  reg [7:0] _zz_3_;
-  wire [10:0] _zz_4_;
-  wire [7:0] _zz_5_;
-  wire [11:0] _zz_6_;
-  wire [8:0] _zz_7_;
-  wire [11:0] _zz_8_;
-  wire [12:0] _zz_9_;
-  wire [3:0] _zz_10_;
-  wire [7:0] _zz_11_;
-  wire [7:0] _zz_12_;
+  reg [7:0] _zz_VideoTxtGen_1_;
+  reg [7:0] _zz_VideoTxtGen_2_;
+  reg [7:0] _zz_VideoTxtGen_3_;
+  wire [10:0] _zz_VideoTxtGen_4_;
+  wire [7:0] _zz_VideoTxtGen_5_;
+  wire [11:0] _zz_VideoTxtGen_6_;
+  wire [8:0] _zz_VideoTxtGen_7_;
+  wire [11:0] _zz_VideoTxtGen_8_;
+  wire [12:0] _zz_VideoTxtGen_9_;
+  wire [3:0] _zz_VideoTxtGen_10_;
+  wire [7:0] _zz_VideoTxtGen_11_;
+  wire [7:0] _zz_VideoTxtGen_12_;
   reg [11:0] pix_x;
   reg [10:0] pix_y;
   reg [7:0] char_x;
@@ -10481,44 +10487,44 @@ module VideoTxtGen (
   reg [7:0] pixel_in_p2_pixel_b;
   reg [7:0] u_txt_buf [0:2047];
   reg [7:0] u_font_bitmap_ram [0:4095];
-  assign _zz_4_ = {3'd0, char_x};
-  assign _zz_5_ = (cur_char & (8'b00001111));
-  assign _zz_6_ = {4'd0, _zz_5_};
-  assign _zz_7_ = (char_sub_y[3 : 0] * (5'b10000));
-  assign _zz_8_ = {3'd0, _zz_7_};
-  assign _zz_9_ = (_zz_10_ * (9'b100000000));
-  assign _zz_10_ = (cur_char >>> 4);
-  assign _zz_11_ = (bitmap_byte >>> ((3'b111) ^ char_sub_x_p2[2 : 0]));
-  assign _zz_12_ = io_txt_buf_wr_data;
+  assign _zz_VideoTxtGen_4_ = {3'd0, char_x};
+  assign _zz_VideoTxtGen_5_ = (cur_char & (8'b00001111));
+  assign _zz_VideoTxtGen_6_ = {4'd0, _zz_VideoTxtGen_5_};
+  assign _zz_VideoTxtGen_7_ = (char_sub_y[3 : 0] * (5'b10000));
+  assign _zz_VideoTxtGen_8_ = {3'd0, _zz_VideoTxtGen_7_};
+  assign _zz_VideoTxtGen_9_ = (_zz_VideoTxtGen_10_ * (9'b100000000));
+  assign _zz_VideoTxtGen_10_ = (cur_char >>> 4);
+  assign _zz_VideoTxtGen_11_ = (bitmap_byte >>> ((3'b111) ^ char_sub_x_p2[2 : 0]));
+  assign _zz_VideoTxtGen_12_ = io_txt_buf_wr_data;
   always @ (posedge clk25) begin
     if(io_txt_buf_wr && io_txt_buf_wr ) begin
-      u_txt_buf[io_txt_buf_wr_addr] <= _zz_12_;
+      u_txt_buf[io_txt_buf_wr_addr] <= _zz_VideoTxtGen_12_;
     end
     if(io_txt_buf_wr) begin
-      _zz_2_ <= u_txt_buf[io_txt_buf_wr_addr];
+      _zz_VideoTxtGen_2_ <= u_txt_buf[io_txt_buf_wr_addr];
     end
   end
 
-  always @ (posedge clk25) begin
+  always @ (posedge vo_clk) begin
     if(txt_buf_rd_p0) begin
-      _zz_1_ <= u_txt_buf[txt_buf_addr];
+      _zz_VideoTxtGen_1_ <= u_txt_buf[txt_buf_addr];
     end
   end
 
   initial begin
-    $readmemb("Pano.v_toplevel_core_u_pano_core_u_txt_gen_u_font_bitmap_ram.bin",u_font_bitmap_ram);
+    $readmemb("Pano.v_toplevel_core_u_pano_core_vo_area_u_txt_gen_u_font_bitmap_ram.bin",u_font_bitmap_ram);
   end
-  always @ (posedge clk25) begin
+  always @ (posedge vo_clk) begin
     if(txt_buf_rd_p1) begin
-      _zz_3_ <= u_font_bitmap_ram[bitmap_addr];
+      _zz_VideoTxtGen_3_ <= u_font_bitmap_ram[bitmap_addr];
     end
   end
 
-  assign txt_buf_addr = (txt_buf_addr_sol + _zz_4_);
+  assign txt_buf_addr = (txt_buf_addr_sol + _zz_VideoTxtGen_4_);
   assign txt_buf_rd_p0 = (((char_x < (8'b00110010)) && (char_y < (7'b0001010))) && io_pixel_in_req);
-  assign cur_char = _zz_1_;
-  assign bitmap_lsb_addr = (_zz_6_ + _zz_8_);
-  assign bitmap_msb_addr = _zz_9_[11:0];
+  assign cur_char = _zz_VideoTxtGen_1_;
+  assign bitmap_lsb_addr = (_zz_VideoTxtGen_6_ + _zz_VideoTxtGen_8_);
+  assign bitmap_msb_addr = _zz_VideoTxtGen_9_[11:0];
   assign bitmap_addr = (bitmap_msb_addr + bitmap_lsb_addr);
   assign fontBitmapRamContent_0 = (8'b00000000);
   assign fontBitmapRamContent_1 = (8'b00000000);
@@ -14616,8 +14622,8 @@ module VideoTxtGen (
   assign fontBitmapRamContent_4093 = (8'b00000000);
   assign fontBitmapRamContent_4094 = (8'b00000000);
   assign fontBitmapRamContent_4095 = (8'b00000000);
-  assign bitmap_byte = _zz_3_;
-  assign bitmap_pixel = (_zz_11_[0] && (! char_sub_x_p2[3]));
+  assign bitmap_byte = _zz_VideoTxtGen_3_;
+  assign bitmap_pixel = (_zz_VideoTxtGen_11_[0] && (! char_sub_x_p2[3]));
   assign io_pixel_out_vsync = pixel_in_p2_vsync;
   assign io_pixel_out_req = pixel_in_p2_req;
   assign io_pixel_out_eol = pixel_in_p2_eol;
@@ -14633,8 +14639,8 @@ module VideoTxtGen (
     end
   end
 
-  always @ (posedge clk25) begin
-    if(!reset25_) begin
+  always @ (posedge vo_clk) begin
+    if(!vo_reset_) begin
       pix_x <= (12'b000000000000);
       pix_y <= (11'b00000000000);
       char_x <= (8'b00000000);
@@ -14679,7 +14685,7 @@ module VideoTxtGen (
     end
   end
 
-  always @ (posedge clk25) begin
+  always @ (posedge vo_clk) begin
     txt_buf_rd_p1 <= txt_buf_rd_p0;
     char_sub_x_p1 <= char_sub_x;
     txt_buf_rd_p2 <= txt_buf_rd_p1;
@@ -14704,15 +14710,15 @@ endmodule
 
 module VideoOut (
       input  [11:0] io_timings_h_active,
-      input  [7:0] io_timings_h_fp,
-      input  [7:0] io_timings_h_sync,
-      input  [7:0] io_timings_h_bp,
+      input  [8:0] io_timings_h_fp,
+      input  [8:0] io_timings_h_sync,
+      input  [8:0] io_timings_h_bp,
       input   io_timings_h_sync_positive,
       input  [11:0] io_timings_h_total_m1,
       input  [10:0] io_timings_v_active,
-      input  [5:0] io_timings_v_fp,
-      input  [5:0] io_timings_v_sync,
-      input  [5:0] io_timings_v_bp,
+      input  [8:0] io_timings_v_fp,
+      input  [8:0] io_timings_v_sync,
+      input  [8:0] io_timings_v_bp,
       input   io_timings_v_sync_positive,
       input  [11:0] io_timings_v_total_m1,
       input   io_pixel_in_vsync,
@@ -14729,38 +14735,38 @@ module VideoOut (
       output reg [7:0] io_vga_out_r,
       output reg [7:0] io_vga_out_g,
       output reg [7:0] io_vga_out_b,
-      input   clk25,
-      input   reset25_);
-  wire [7:0] _zz_1_;
-  wire [5:0] _zz_2_;
-  wire [10:0] _zz_3_;
-  wire [11:0] _zz_4_;
-  wire [11:0] _zz_5_;
-  wire [7:0] _zz_6_;
-  wire [11:0] _zz_7_;
-  wire [10:0] _zz_8_;
-  wire [5:0] _zz_9_;
-  wire [10:0] _zz_10_;
+      input   vo_clk,
+      input   vo_reset_);
+  wire [8:0] _zz_VideoOut_1_;
+  wire [8:0] _zz_VideoOut_2_;
+  wire [10:0] _zz_VideoOut_3_;
+  wire [11:0] _zz_VideoOut_4_;
+  wire [11:0] _zz_VideoOut_5_;
+  wire [8:0] _zz_VideoOut_6_;
+  wire [11:0] _zz_VideoOut_7_;
+  wire [10:0] _zz_VideoOut_8_;
+  wire [8:0] _zz_VideoOut_9_;
+  wire [10:0] _zz_VideoOut_10_;
   reg [11:0] h_cntr;
   reg [10:0] v_cntr;
-  wire [7:0] h_blank;
-  wire [5:0] v_blank;
+  wire [8:0] h_blank;
+  wire [8:0] v_blank;
   wire  blank;
-  assign _zz_1_ = (io_timings_h_fp + io_timings_h_sync);
-  assign _zz_2_ = (io_timings_v_fp + io_timings_v_sync);
-  assign _zz_3_ = {5'd0, v_blank};
-  assign _zz_4_ = {4'd0, h_blank};
-  assign _zz_5_ = {4'd0, io_timings_h_fp};
-  assign _zz_6_ = (io_timings_h_fp + io_timings_h_sync);
-  assign _zz_7_ = {4'd0, _zz_6_};
-  assign _zz_8_ = {5'd0, io_timings_v_fp};
-  assign _zz_9_ = (io_timings_v_fp + io_timings_v_sync);
-  assign _zz_10_ = {5'd0, _zz_9_};
-  assign h_blank = (_zz_1_ + io_timings_h_bp);
-  assign v_blank = (_zz_2_ + io_timings_v_bp);
-  assign blank = ((v_cntr < _zz_3_) || (h_cntr < _zz_4_));
-  always @ (posedge clk25) begin
-    if(!reset25_) begin
+  assign _zz_VideoOut_1_ = (io_timings_h_fp + io_timings_h_sync);
+  assign _zz_VideoOut_2_ = (io_timings_v_fp + io_timings_v_sync);
+  assign _zz_VideoOut_3_ = {2'd0, v_blank};
+  assign _zz_VideoOut_4_ = {3'd0, h_blank};
+  assign _zz_VideoOut_5_ = {3'd0, io_timings_h_fp};
+  assign _zz_VideoOut_6_ = (io_timings_h_fp + io_timings_h_sync);
+  assign _zz_VideoOut_7_ = {3'd0, _zz_VideoOut_6_};
+  assign _zz_VideoOut_8_ = {2'd0, io_timings_v_fp};
+  assign _zz_VideoOut_9_ = (io_timings_v_fp + io_timings_v_sync);
+  assign _zz_VideoOut_10_ = {2'd0, _zz_VideoOut_9_};
+  assign h_blank = (_zz_VideoOut_1_ + io_timings_h_bp);
+  assign v_blank = (_zz_VideoOut_2_ + io_timings_v_bp);
+  assign blank = ((v_cntr < _zz_VideoOut_3_) || (h_cntr < _zz_VideoOut_4_));
+  always @ (posedge vo_clk) begin
+    if(!vo_reset_) begin
       io_vga_out_vsync <= 1'b0;
       io_vga_out_hsync <= 1'b0;
       io_vga_out_blank_ <= 1'b0;
@@ -14784,1031 +14790,14 @@ module VideoOut (
       end
       io_vga_out_blank_ <= (! blank);
       io_vga_out_de <= (! blank);
-      io_vga_out_hsync <= (((_zz_5_ <= h_cntr) && (h_cntr < _zz_7_)) ^ (! io_timings_h_sync_positive));
-      io_vga_out_vsync <= (((_zz_8_ <= v_cntr) && (v_cntr < _zz_10_)) ^ (! io_timings_v_sync_positive));
+      io_vga_out_hsync <= (((_zz_VideoOut_5_ <= h_cntr) && (h_cntr < _zz_VideoOut_7_)) ^ (! io_timings_h_sync_positive));
+      io_vga_out_vsync <= (((_zz_VideoOut_8_ <= v_cntr) && (v_cntr < _zz_VideoOut_10_)) ^ (! io_timings_v_sync_positive));
       io_vga_out_r <= (blank ? (8'b00000000) : io_pixel_in_pixel_r);
       io_vga_out_g <= (blank ? (8'b00000000) : io_pixel_in_pixel_g);
       io_vga_out_b <= (blank ? (8'b00000000) : io_pixel_in_pixel_b);
     end
   end
 
-endmodule
-
-module ChrontelPads (
-      output  io_pads_reset_,
-      output  io_pads_xclk_p,
-      output  io_pads_xclk_n,
-      output  io_pads_v,
-      output  io_pads_h,
-      output  io_pads_de,
-      output reg [11:0] io_pads_d,
-      input   io_vsync,
-      input   io_hsync,
-      input   io_de,
-      input  [7:0] io_r,
-      input  [7:0] io_g,
-      input  [7:0] io_b,
-      input   clk,
-      input   reset_);
-  wire  _zz_1_;
-  wire  _zz_2_;
-  wire  _zz_3_;
-  wire  _zz_4_;
-  wire  _zz_5_;
-  wire  _zz_6_;
-  wire  _zz_7_;
-  wire  _zz_8_;
-  wire  _zz_9_;
-  wire  _zz_10_;
-  wire  _zz_11_;
-  wire  _zz_12_;
-  wire  _zz_13_;
-  wire  _zz_14_;
-  wire  _zz_15_;
-  wire  _zz_16_;
-  wire  _zz_17_;
-  wire  _zz_18_;
-  wire  _zz_19_;
-  wire  _zz_20_;
-  wire  _zz_21_;
-  wire  _zz_22_;
-  wire  _zz_23_;
-  wire  _zz_24_;
-  wire  _zz_25_;
-  wire  _zz_26_;
-  wire  _zz_27_;
-  wire  _zz_28_;
-  wire  _zz_29_;
-  wire  _zz_30_;
-  wire  _zz_31_;
-  wire  _zz_32_;
-  wire  _zz_33_;
-  wire  _zz_34_;
-  wire  _zz_35_;
-  wire  _zz_36_;
-  wire  _zz_37_;
-  wire  _zz_38_;
-  wire  _zz_39_;
-  wire  _zz_40_;
-  wire  _zz_41_;
-  wire  _zz_42_;
-  wire  _zz_43_;
-  wire  _zz_44_;
-  wire  _zz_45_;
-  wire  _zz_46_;
-  wire  _zz_47_;
-  wire  _zz_48_;
-  wire  _zz_49_;
-  wire  _zz_50_;
-  wire  _zz_51_;
-  wire  _zz_52_;
-  wire  _zz_53_;
-  wire  _zz_54_;
-  wire  _zz_55_;
-  wire  _zz_56_;
-  wire  _zz_57_;
-  wire  _zz_58_;
-  wire  _zz_59_;
-  wire  _zz_60_;
-  wire  _zz_61_;
-  wire  _zz_62_;
-  wire  _zz_63_;
-  wire  _zz_64_;
-  wire  _zz_65_;
-  wire  _zz_66_;
-  wire  _zz_67_;
-  wire  _zz_68_;
-  wire  _zz_69_;
-  wire  _zz_70_;
-  wire  _zz_71_;
-  wire  _zz_72_;
-  wire  _zz_73_;
-  wire  _zz_74_;
-  wire  _zz_75_;
-  wire  _zz_76_;
-  wire  _zz_77_;
-  wire  _zz_78_;
-  wire  _zz_79_;
-  wire  _zz_80_;
-  wire  _zz_81_;
-  wire  _zz_82_;
-  wire  _zz_83_;
-  wire  _zz_84_;
-  wire  _zz_85_;
-  wire  _zz_86_;
-  wire  _zz_87_;
-  wire  _zz_88_;
-  wire  _zz_89_;
-  wire  _zz_90_;
-  wire  _zz_91_;
-  wire  _zz_92_;
-  wire  _zz_93_;
-  wire  _zz_94_;
-  wire  _zz_95_;
-  wire [7:0] _zz_96_;
-  wire  _zz_97_;
-  wire  _zz_98_;
-  wire  _zz_99_;
-  wire  _zz_100_;
-  wire  _zz_101_;
-  wire  _zz_102_;
-  wire  _zz_103_;
-  wire  _zz_104_;
-  wire  _zz_105_;
-  wire  _zz_106_;
-  wire  _zz_107_;
-  wire  _zz_108_;
-  wire  _zz_109_;
-  wire  _zz_110_;
-  wire  _zz_111_;
-  wire  _zz_112_;
-  wire  _zz_113_;
-  wire  clk0;
-  wire  clk90;
-  wire  clk180;
-  wire  clk270;
-  wire [11:0] d_p;
-  wire [11:0] d_n;
-  DCM_SP #( 
-    .CLKDV_DIVIDE(2.0),
-    .CLK_FEEDBACK("1X"),
-    .CLKFX_DIVIDE(1),
-    .CLKFX_MULTIPLY(2),
-    .CLKIN_DIVIDE_BY_2(1'b0),
-    .CLKIN_PERIOD("40.0"),
-    .CLKOUT_PHASE_SHIFT("NONE"),
-    .DESKEW_ADJUST("SYSTEM_SYNCHRONOUS"),
-    .DLL_FREQUENCY_MODE("LOW"),
-    .DSS_MODE("NONE"),
-    .DUTY_CYCLE_CORRECTION(1'b0),
-    .PHASE_SHIFT(0),
-    .STARTUP_WAIT(1'b0) 
-  ) u_dcm ( 
-    .RST(_zz_1_),
-    .CLKIN(clk),
-    .CLKFB(clk0),
-    .DSSEN(_zz_2_),
-    .PSCLK(_zz_3_),
-    .PSINCDEC(_zz_4_),
-    .PSEN(_zz_5_),
-    .PSDONE(_zz_6_),
-    .CLK0(_zz_86_),
-    .CLK90(_zz_87_),
-    .CLK180(_zz_88_),
-    .CLK270(_zz_89_),
-    .CLK2X(_zz_90_),
-    .CLK2X180(_zz_91_),
-    .CLKDV(_zz_92_),
-    .CLKFX(_zz_93_),
-    .CLKFX180(_zz_94_),
-    .LOCKED(_zz_95_),
-    .STATUS(_zz_96_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) u_pad_xclk_p ( 
-    .D0(_zz_7_),
-    .D1(_zz_8_),
-    .C0(clk90),
-    .C1(clk270),
-    .CE(_zz_9_),
-    .R(_zz_10_),
-    .S(_zz_11_),
-    .Q(_zz_97_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) oDDR2_1_ ( 
-    .D0(_zz_12_),
-    .D1(_zz_13_),
-    .C0(clk90),
-    .C1(clk270),
-    .CE(_zz_14_),
-    .R(_zz_15_),
-    .S(_zz_16_),
-    .Q(_zz_98_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) u_pad_vsync ( 
-    .D0(io_vsync),
-    .D1(io_vsync),
-    .C0(clk0),
-    .C1(clk180),
-    .CE(_zz_17_),
-    .R(_zz_18_),
-    .S(_zz_19_),
-    .Q(_zz_99_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) u_pad_hsync ( 
-    .D0(io_hsync),
-    .D1(io_hsync),
-    .C0(clk0),
-    .C1(clk180),
-    .CE(_zz_20_),
-    .R(_zz_21_),
-    .S(_zz_22_),
-    .Q(_zz_100_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) u_pad_de ( 
-    .D0(io_de),
-    .D1(io_de),
-    .C0(clk0),
-    .C1(clk180),
-    .CE(_zz_23_),
-    .R(_zz_24_),
-    .S(_zz_25_),
-    .Q(_zz_101_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) oDDR2_2_ ( 
-    .D0(_zz_26_),
-    .D1(_zz_27_),
-    .C0(clk0),
-    .C1(clk180),
-    .CE(_zz_28_),
-    .R(_zz_29_),
-    .S(_zz_30_),
-    .Q(_zz_102_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) oDDR2_3_ ( 
-    .D0(_zz_31_),
-    .D1(_zz_32_),
-    .C0(clk0),
-    .C1(clk180),
-    .CE(_zz_33_),
-    .R(_zz_34_),
-    .S(_zz_35_),
-    .Q(_zz_103_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) oDDR2_4_ ( 
-    .D0(_zz_36_),
-    .D1(_zz_37_),
-    .C0(clk0),
-    .C1(clk180),
-    .CE(_zz_38_),
-    .R(_zz_39_),
-    .S(_zz_40_),
-    .Q(_zz_104_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) oDDR2_5_ ( 
-    .D0(_zz_41_),
-    .D1(_zz_42_),
-    .C0(clk0),
-    .C1(clk180),
-    .CE(_zz_43_),
-    .R(_zz_44_),
-    .S(_zz_45_),
-    .Q(_zz_105_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) oDDR2_6_ ( 
-    .D0(_zz_46_),
-    .D1(_zz_47_),
-    .C0(clk0),
-    .C1(clk180),
-    .CE(_zz_48_),
-    .R(_zz_49_),
-    .S(_zz_50_),
-    .Q(_zz_106_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) oDDR2_7_ ( 
-    .D0(_zz_51_),
-    .D1(_zz_52_),
-    .C0(clk0),
-    .C1(clk180),
-    .CE(_zz_53_),
-    .R(_zz_54_),
-    .S(_zz_55_),
-    .Q(_zz_107_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) oDDR2_8_ ( 
-    .D0(_zz_56_),
-    .D1(_zz_57_),
-    .C0(clk0),
-    .C1(clk180),
-    .CE(_zz_58_),
-    .R(_zz_59_),
-    .S(_zz_60_),
-    .Q(_zz_108_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) oDDR2_9_ ( 
-    .D0(_zz_61_),
-    .D1(_zz_62_),
-    .C0(clk0),
-    .C1(clk180),
-    .CE(_zz_63_),
-    .R(_zz_64_),
-    .S(_zz_65_),
-    .Q(_zz_109_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) oDDR2_10_ ( 
-    .D0(_zz_66_),
-    .D1(_zz_67_),
-    .C0(clk0),
-    .C1(clk180),
-    .CE(_zz_68_),
-    .R(_zz_69_),
-    .S(_zz_70_),
-    .Q(_zz_110_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) oDDR2_11_ ( 
-    .D0(_zz_71_),
-    .D1(_zz_72_),
-    .C0(clk0),
-    .C1(clk180),
-    .CE(_zz_73_),
-    .R(_zz_74_),
-    .S(_zz_75_),
-    .Q(_zz_111_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) oDDR2_12_ ( 
-    .D0(_zz_76_),
-    .D1(_zz_77_),
-    .C0(clk0),
-    .C1(clk180),
-    .CE(_zz_78_),
-    .R(_zz_79_),
-    .S(_zz_80_),
-    .Q(_zz_112_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) oDDR2_13_ ( 
-    .D0(_zz_81_),
-    .D1(_zz_82_),
-    .C0(clk0),
-    .C1(clk180),
-    .CE(_zz_83_),
-    .R(_zz_84_),
-    .S(_zz_85_),
-    .Q(_zz_113_) 
-  );
-  assign io_pads_reset_ = reset_;
-  assign _zz_1_ = (! reset_);
-  assign _zz_2_ = 1'b0;
-  assign _zz_3_ = 1'b0;
-  assign _zz_4_ = 1'b0;
-  assign _zz_5_ = 1'b0;
-  assign _zz_6_ = 1'b0;
-  assign clk0 = _zz_86_;
-  assign clk90 = _zz_87_;
-  assign clk180 = _zz_88_;
-  assign clk270 = _zz_89_;
-  assign _zz_7_ = 1'b1;
-  assign _zz_8_ = 1'b0;
-  assign _zz_9_ = 1'b1;
-  assign _zz_10_ = (! reset_);
-  assign _zz_11_ = 1'b0;
-  assign io_pads_xclk_p = _zz_97_;
-  assign _zz_12_ = 1'b0;
-  assign _zz_13_ = 1'b1;
-  assign _zz_14_ = 1'b1;
-  assign _zz_15_ = (! reset_);
-  assign _zz_16_ = 1'b0;
-  assign io_pads_xclk_n = _zz_98_;
-  assign _zz_17_ = 1'b1;
-  assign _zz_18_ = (! reset_);
-  assign _zz_19_ = 1'b0;
-  assign io_pads_v = _zz_99_;
-  assign _zz_20_ = 1'b1;
-  assign _zz_21_ = (! reset_);
-  assign _zz_22_ = 1'b0;
-  assign io_pads_h = _zz_100_;
-  assign _zz_23_ = 1'b1;
-  assign _zz_24_ = (! reset_);
-  assign _zz_25_ = 1'b0;
-  assign io_pads_de = _zz_101_;
-  assign d_p = {io_g[3 : 0],io_b[7 : 0]};
-  assign d_n = {io_r[7 : 0],io_g[7 : 4]};
-  assign _zz_26_ = d_p[0];
-  assign _zz_27_ = d_n[0];
-  assign _zz_28_ = 1'b1;
-  assign _zz_29_ = (! reset_);
-  assign _zz_30_ = 1'b0;
-  always @ (*) begin
-    io_pads_d[0] = _zz_102_;
-    io_pads_d[1] = _zz_103_;
-    io_pads_d[2] = _zz_104_;
-    io_pads_d[3] = _zz_105_;
-    io_pads_d[4] = _zz_106_;
-    io_pads_d[5] = _zz_107_;
-    io_pads_d[6] = _zz_108_;
-    io_pads_d[7] = _zz_109_;
-    io_pads_d[8] = _zz_110_;
-    io_pads_d[9] = _zz_111_;
-    io_pads_d[10] = _zz_112_;
-    io_pads_d[11] = _zz_113_;
-  end
-
-  assign _zz_31_ = d_p[1];
-  assign _zz_32_ = d_n[1];
-  assign _zz_33_ = 1'b1;
-  assign _zz_34_ = (! reset_);
-  assign _zz_35_ = 1'b0;
-  assign _zz_36_ = d_p[2];
-  assign _zz_37_ = d_n[2];
-  assign _zz_38_ = 1'b1;
-  assign _zz_39_ = (! reset_);
-  assign _zz_40_ = 1'b0;
-  assign _zz_41_ = d_p[3];
-  assign _zz_42_ = d_n[3];
-  assign _zz_43_ = 1'b1;
-  assign _zz_44_ = (! reset_);
-  assign _zz_45_ = 1'b0;
-  assign _zz_46_ = d_p[4];
-  assign _zz_47_ = d_n[4];
-  assign _zz_48_ = 1'b1;
-  assign _zz_49_ = (! reset_);
-  assign _zz_50_ = 1'b0;
-  assign _zz_51_ = d_p[5];
-  assign _zz_52_ = d_n[5];
-  assign _zz_53_ = 1'b1;
-  assign _zz_54_ = (! reset_);
-  assign _zz_55_ = 1'b0;
-  assign _zz_56_ = d_p[6];
-  assign _zz_57_ = d_n[6];
-  assign _zz_58_ = 1'b1;
-  assign _zz_59_ = (! reset_);
-  assign _zz_60_ = 1'b0;
-  assign _zz_61_ = d_p[7];
-  assign _zz_62_ = d_n[7];
-  assign _zz_63_ = 1'b1;
-  assign _zz_64_ = (! reset_);
-  assign _zz_65_ = 1'b0;
-  assign _zz_66_ = d_p[8];
-  assign _zz_67_ = d_n[8];
-  assign _zz_68_ = 1'b1;
-  assign _zz_69_ = (! reset_);
-  assign _zz_70_ = 1'b0;
-  assign _zz_71_ = d_p[9];
-  assign _zz_72_ = d_n[9];
-  assign _zz_73_ = 1'b1;
-  assign _zz_74_ = (! reset_);
-  assign _zz_75_ = 1'b0;
-  assign _zz_76_ = d_p[10];
-  assign _zz_77_ = d_n[10];
-  assign _zz_78_ = 1'b1;
-  assign _zz_79_ = (! reset_);
-  assign _zz_80_ = 1'b0;
-  assign _zz_81_ = d_p[11];
-  assign _zz_82_ = d_n[11];
-  assign _zz_83_ = 1'b1;
-  assign _zz_84_ = (! reset_);
-  assign _zz_85_ = 1'b0;
-endmodule
-
-module ChrontelPads_1_ (
-      output  io_pads_reset_,
-      output  io_pads_xclk_p,
-      output  io_pads_v,
-      output  io_pads_h,
-      output  io_pads_de,
-      output reg [11:0] io_pads_d,
-      input   io_vsync,
-      input   io_hsync,
-      input   io_de,
-      input  [7:0] io_r,
-      input  [7:0] io_g,
-      input  [7:0] io_b,
-      input   clk,
-      input   reset_);
-  wire  _zz_1_;
-  wire  _zz_2_;
-  wire  _zz_3_;
-  wire  _zz_4_;
-  wire  _zz_5_;
-  wire  _zz_6_;
-  wire  _zz_7_;
-  wire  _zz_8_;
-  wire  _zz_9_;
-  wire  _zz_10_;
-  wire  _zz_11_;
-  wire  _zz_12_;
-  wire  _zz_13_;
-  wire  _zz_14_;
-  wire  _zz_15_;
-  wire  _zz_16_;
-  wire  _zz_17_;
-  wire  _zz_18_;
-  wire  _zz_19_;
-  wire  _zz_20_;
-  wire  _zz_21_;
-  wire  _zz_22_;
-  wire  _zz_23_;
-  wire  _zz_24_;
-  wire  _zz_25_;
-  wire  _zz_26_;
-  wire  _zz_27_;
-  wire  _zz_28_;
-  wire  _zz_29_;
-  wire  _zz_30_;
-  wire  _zz_31_;
-  wire  _zz_32_;
-  wire  _zz_33_;
-  wire  _zz_34_;
-  wire  _zz_35_;
-  wire  _zz_36_;
-  wire  _zz_37_;
-  wire  _zz_38_;
-  wire  _zz_39_;
-  wire  _zz_40_;
-  wire  _zz_41_;
-  wire  _zz_42_;
-  wire  _zz_43_;
-  wire  _zz_44_;
-  wire  _zz_45_;
-  wire  _zz_46_;
-  wire  _zz_47_;
-  wire  _zz_48_;
-  wire  _zz_49_;
-  wire  _zz_50_;
-  wire  _zz_51_;
-  wire  _zz_52_;
-  wire  _zz_53_;
-  wire  _zz_54_;
-  wire  _zz_55_;
-  wire  _zz_56_;
-  wire  _zz_57_;
-  wire  _zz_58_;
-  wire  _zz_59_;
-  wire  _zz_60_;
-  wire  _zz_61_;
-  wire  _zz_62_;
-  wire  _zz_63_;
-  wire  _zz_64_;
-  wire  _zz_65_;
-  wire  _zz_66_;
-  wire  _zz_67_;
-  wire  _zz_68_;
-  wire  _zz_69_;
-  wire  _zz_70_;
-  wire  _zz_71_;
-  wire  _zz_72_;
-  wire  _zz_73_;
-  wire  _zz_74_;
-  wire  _zz_75_;
-  wire  _zz_76_;
-  wire  _zz_77_;
-  wire  _zz_78_;
-  wire  _zz_79_;
-  wire  _zz_80_;
-  wire  _zz_81_;
-  wire  _zz_82_;
-  wire  _zz_83_;
-  wire  _zz_84_;
-  wire  _zz_85_;
-  wire  _zz_86_;
-  wire  _zz_87_;
-  wire  _zz_88_;
-  wire  _zz_89_;
-  wire  _zz_90_;
-  wire [7:0] _zz_91_;
-  wire  _zz_92_;
-  wire  _zz_93_;
-  wire  _zz_94_;
-  wire  _zz_95_;
-  wire  _zz_96_;
-  wire  _zz_97_;
-  wire  _zz_98_;
-  wire  _zz_99_;
-  wire  _zz_100_;
-  wire  _zz_101_;
-  wire  _zz_102_;
-  wire  _zz_103_;
-  wire  _zz_104_;
-  wire  _zz_105_;
-  wire  _zz_106_;
-  wire  _zz_107_;
-  wire  clk0;
-  wire  clk90;
-  wire  clk180;
-  wire  clk270;
-  wire [11:0] d_p;
-  wire [11:0] d_n;
-  DCM_SP #( 
-    .CLKDV_DIVIDE(2.0),
-    .CLK_FEEDBACK("1X"),
-    .CLKFX_DIVIDE(1),
-    .CLKFX_MULTIPLY(2),
-    .CLKIN_DIVIDE_BY_2(1'b0),
-    .CLKIN_PERIOD("40.0"),
-    .CLKOUT_PHASE_SHIFT("NONE"),
-    .DESKEW_ADJUST("SYSTEM_SYNCHRONOUS"),
-    .DLL_FREQUENCY_MODE("LOW"),
-    .DSS_MODE("NONE"),
-    .DUTY_CYCLE_CORRECTION(1'b0),
-    .PHASE_SHIFT(0),
-    .STARTUP_WAIT(1'b0) 
-  ) u_dcm ( 
-    .RST(_zz_1_),
-    .CLKIN(clk),
-    .CLKFB(clk0),
-    .DSSEN(_zz_2_),
-    .PSCLK(_zz_3_),
-    .PSINCDEC(_zz_4_),
-    .PSEN(_zz_5_),
-    .PSDONE(_zz_6_),
-    .CLK0(_zz_81_),
-    .CLK90(_zz_82_),
-    .CLK180(_zz_83_),
-    .CLK270(_zz_84_),
-    .CLK2X(_zz_85_),
-    .CLK2X180(_zz_86_),
-    .CLKDV(_zz_87_),
-    .CLKFX(_zz_88_),
-    .CLKFX180(_zz_89_),
-    .LOCKED(_zz_90_),
-    .STATUS(_zz_91_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) u_pad_xclk_p ( 
-    .D0(_zz_7_),
-    .D1(_zz_8_),
-    .C0(clk90),
-    .C1(clk270),
-    .CE(_zz_9_),
-    .R(_zz_10_),
-    .S(_zz_11_),
-    .Q(_zz_92_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) u_pad_vsync ( 
-    .D0(io_vsync),
-    .D1(io_vsync),
-    .C0(clk0),
-    .C1(clk180),
-    .CE(_zz_12_),
-    .R(_zz_13_),
-    .S(_zz_14_),
-    .Q(_zz_93_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) u_pad_hsync ( 
-    .D0(io_hsync),
-    .D1(io_hsync),
-    .C0(clk0),
-    .C1(clk180),
-    .CE(_zz_15_),
-    .R(_zz_16_),
-    .S(_zz_17_),
-    .Q(_zz_94_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) u_pad_de ( 
-    .D0(io_de),
-    .D1(io_de),
-    .C0(clk0),
-    .C1(clk180),
-    .CE(_zz_18_),
-    .R(_zz_19_),
-    .S(_zz_20_),
-    .Q(_zz_95_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) oDDR2_1_ ( 
-    .D0(_zz_21_),
-    .D1(_zz_22_),
-    .C0(clk0),
-    .C1(clk180),
-    .CE(_zz_23_),
-    .R(_zz_24_),
-    .S(_zz_25_),
-    .Q(_zz_96_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) oDDR2_2_ ( 
-    .D0(_zz_26_),
-    .D1(_zz_27_),
-    .C0(clk0),
-    .C1(clk180),
-    .CE(_zz_28_),
-    .R(_zz_29_),
-    .S(_zz_30_),
-    .Q(_zz_97_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) oDDR2_3_ ( 
-    .D0(_zz_31_),
-    .D1(_zz_32_),
-    .C0(clk0),
-    .C1(clk180),
-    .CE(_zz_33_),
-    .R(_zz_34_),
-    .S(_zz_35_),
-    .Q(_zz_98_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) oDDR2_4_ ( 
-    .D0(_zz_36_),
-    .D1(_zz_37_),
-    .C0(clk0),
-    .C1(clk180),
-    .CE(_zz_38_),
-    .R(_zz_39_),
-    .S(_zz_40_),
-    .Q(_zz_99_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) oDDR2_5_ ( 
-    .D0(_zz_41_),
-    .D1(_zz_42_),
-    .C0(clk0),
-    .C1(clk180),
-    .CE(_zz_43_),
-    .R(_zz_44_),
-    .S(_zz_45_),
-    .Q(_zz_100_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) oDDR2_6_ ( 
-    .D0(_zz_46_),
-    .D1(_zz_47_),
-    .C0(clk0),
-    .C1(clk180),
-    .CE(_zz_48_),
-    .R(_zz_49_),
-    .S(_zz_50_),
-    .Q(_zz_101_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) oDDR2_7_ ( 
-    .D0(_zz_51_),
-    .D1(_zz_52_),
-    .C0(clk0),
-    .C1(clk180),
-    .CE(_zz_53_),
-    .R(_zz_54_),
-    .S(_zz_55_),
-    .Q(_zz_102_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) oDDR2_8_ ( 
-    .D0(_zz_56_),
-    .D1(_zz_57_),
-    .C0(clk0),
-    .C1(clk180),
-    .CE(_zz_58_),
-    .R(_zz_59_),
-    .S(_zz_60_),
-    .Q(_zz_103_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) oDDR2_9_ ( 
-    .D0(_zz_61_),
-    .D1(_zz_62_),
-    .C0(clk0),
-    .C1(clk180),
-    .CE(_zz_63_),
-    .R(_zz_64_),
-    .S(_zz_65_),
-    .Q(_zz_104_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) oDDR2_10_ ( 
-    .D0(_zz_66_),
-    .D1(_zz_67_),
-    .C0(clk0),
-    .C1(clk180),
-    .CE(_zz_68_),
-    .R(_zz_69_),
-    .S(_zz_70_),
-    .Q(_zz_105_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) oDDR2_11_ ( 
-    .D0(_zz_71_),
-    .D1(_zz_72_),
-    .C0(clk0),
-    .C1(clk180),
-    .CE(_zz_73_),
-    .R(_zz_74_),
-    .S(_zz_75_),
-    .Q(_zz_106_) 
-  );
-  ODDR2 #( 
-    .DDR_ALIGNMENT("C0"),
-    .INIT(1'b0),
-    .SRTYPE("ASYNC") 
-  ) oDDR2_12_ ( 
-    .D0(_zz_76_),
-    .D1(_zz_77_),
-    .C0(clk0),
-    .C1(clk180),
-    .CE(_zz_78_),
-    .R(_zz_79_),
-    .S(_zz_80_),
-    .Q(_zz_107_) 
-  );
-  assign io_pads_reset_ = reset_;
-  assign _zz_1_ = (! reset_);
-  assign _zz_2_ = 1'b0;
-  assign _zz_3_ = 1'b0;
-  assign _zz_4_ = 1'b0;
-  assign _zz_5_ = 1'b0;
-  assign _zz_6_ = 1'b0;
-  assign clk0 = _zz_81_;
-  assign clk90 = _zz_82_;
-  assign clk180 = _zz_83_;
-  assign clk270 = _zz_84_;
-  assign _zz_7_ = 1'b1;
-  assign _zz_8_ = 1'b0;
-  assign _zz_9_ = 1'b1;
-  assign _zz_10_ = (! reset_);
-  assign _zz_11_ = 1'b0;
-  assign io_pads_xclk_p = _zz_92_;
-  assign _zz_12_ = 1'b1;
-  assign _zz_13_ = (! reset_);
-  assign _zz_14_ = 1'b0;
-  assign io_pads_v = _zz_93_;
-  assign _zz_15_ = 1'b1;
-  assign _zz_16_ = (! reset_);
-  assign _zz_17_ = 1'b0;
-  assign io_pads_h = _zz_94_;
-  assign _zz_18_ = 1'b1;
-  assign _zz_19_ = (! reset_);
-  assign _zz_20_ = 1'b0;
-  assign io_pads_de = _zz_95_;
-  assign d_p = {io_g[3 : 0],io_b[7 : 0]};
-  assign d_n = {io_r[7 : 0],io_g[7 : 4]};
-  assign _zz_21_ = d_p[0];
-  assign _zz_22_ = d_n[0];
-  assign _zz_23_ = 1'b1;
-  assign _zz_24_ = (! reset_);
-  assign _zz_25_ = 1'b0;
-  always @ (*) begin
-    io_pads_d[0] = _zz_96_;
-    io_pads_d[1] = _zz_97_;
-    io_pads_d[2] = _zz_98_;
-    io_pads_d[3] = _zz_99_;
-    io_pads_d[4] = _zz_100_;
-    io_pads_d[5] = _zz_101_;
-    io_pads_d[6] = _zz_102_;
-    io_pads_d[7] = _zz_103_;
-    io_pads_d[8] = _zz_104_;
-    io_pads_d[9] = _zz_105_;
-    io_pads_d[10] = _zz_106_;
-    io_pads_d[11] = _zz_107_;
-  end
-
-  assign _zz_26_ = d_p[1];
-  assign _zz_27_ = d_n[1];
-  assign _zz_28_ = 1'b1;
-  assign _zz_29_ = (! reset_);
-  assign _zz_30_ = 1'b0;
-  assign _zz_31_ = d_p[2];
-  assign _zz_32_ = d_n[2];
-  assign _zz_33_ = 1'b1;
-  assign _zz_34_ = (! reset_);
-  assign _zz_35_ = 1'b0;
-  assign _zz_36_ = d_p[3];
-  assign _zz_37_ = d_n[3];
-  assign _zz_38_ = 1'b1;
-  assign _zz_39_ = (! reset_);
-  assign _zz_40_ = 1'b0;
-  assign _zz_41_ = d_p[4];
-  assign _zz_42_ = d_n[4];
-  assign _zz_43_ = 1'b1;
-  assign _zz_44_ = (! reset_);
-  assign _zz_45_ = 1'b0;
-  assign _zz_46_ = d_p[5];
-  assign _zz_47_ = d_n[5];
-  assign _zz_48_ = 1'b1;
-  assign _zz_49_ = (! reset_);
-  assign _zz_50_ = 1'b0;
-  assign _zz_51_ = d_p[6];
-  assign _zz_52_ = d_n[6];
-  assign _zz_53_ = 1'b1;
-  assign _zz_54_ = (! reset_);
-  assign _zz_55_ = 1'b0;
-  assign _zz_56_ = d_p[7];
-  assign _zz_57_ = d_n[7];
-  assign _zz_58_ = 1'b1;
-  assign _zz_59_ = (! reset_);
-  assign _zz_60_ = 1'b0;
-  assign _zz_61_ = d_p[8];
-  assign _zz_62_ = d_n[8];
-  assign _zz_63_ = 1'b1;
-  assign _zz_64_ = (! reset_);
-  assign _zz_65_ = 1'b0;
-  assign _zz_66_ = d_p[9];
-  assign _zz_67_ = d_n[9];
-  assign _zz_68_ = 1'b1;
-  assign _zz_69_ = (! reset_);
-  assign _zz_70_ = 1'b0;
-  assign _zz_71_ = d_p[10];
-  assign _zz_72_ = d_n[10];
-  assign _zz_73_ = 1'b1;
-  assign _zz_74_ = (! reset_);
-  assign _zz_75_ = 1'b0;
-  assign _zz_76_ = d_p[11];
-  assign _zz_77_ = d_n[11];
-  assign _zz_78_ = 1'b1;
-  assign _zz_79_ = (! reset_);
-  assign _zz_80_ = 1'b0;
 endmodule
 
 module PanoCore (
@@ -15830,307 +14819,1316 @@ module PanoCore (
       output [7:0] io_vo_g,
       output [7:0] io_vo_b,
       input   clk25,
-      input   reset25_);
-  wire  _zz_2_;
-  wire  _zz_3_;
-  wire  _zz_4_;
-  wire  _zz_5_;
-  wire  _zz_6_;
-  wire  _zz_7_;
-  wire  _zz_8_;
-  wire [3:0] _zz_9_;
-  wire [7:0] _zz_10_;
-  wire [7:0] _zz_11_;
-  wire [7:0] _zz_12_;
-  wire  _zz_13_;
-  wire [10:0] _zz_14_;
-  wire [7:0] _zz_15_;
-  wire  _zz_16_;
-  wire  _zz_17_;
-  wire  _zz_18_;
-  wire  _zz_19_;
-  wire [7:0] _zz_20_;
-  wire [7:0] _zz_21_;
-  wire [7:0] _zz_22_;
-  wire  _zz_23_;
-  wire  _zz_24_;
-  wire  _zz_25_;
-  wire  _zz_26_;
-  wire [7:0] _zz_27_;
-  wire [7:0] _zz_28_;
-  wire [7:0] _zz_29_;
-  wire  _zz_30_;
-  wire  _zz_31_;
-  wire  _zz_32_;
-  wire  _zz_33_;
-  wire [7:0] _zz_34_;
-  wire [7:0] _zz_35_;
-  wire [7:0] _zz_36_;
-  wire  _zz_37_;
-  wire  _zz_38_;
-  wire  _zz_39_;
-  wire  _zz_40_;
-  wire [7:0] _zz_41_;
-  wire [7:0] _zz_42_;
-  wire [7:0] _zz_43_;
-  wire [11:0] _zz_44_;
-  wire [11:0] _zz_45_;
-  wire [11:0] _zz_46_;
-  wire [11:0] _zz_47_;
-  wire [11:0] _zz_48_;
-  wire [11:0] _zz_49_;
-  wire [11:0] _zz_50_;
-  wire [10:0] _zz_51_;
-  wire [10:0] _zz_52_;
-  wire [10:0] _zz_53_;
-  wire [10:0] _zz_54_;
-  wire [10:0] _zz_55_;
-  wire [10:0] _zz_56_;
-  wire [10:0] _zz_57_;
+      input   reset25_,
+      input   vo_clk,
+      input   vo_reset_);
+  wire  _zz_PanoCore_2_;
+  wire  _zz_PanoCore_3_;
+  wire  _zz_PanoCore_4_;
+  wire  _zz_PanoCore_5_;
+  wire  _zz_PanoCore_6_;
+  wire  _zz_PanoCore_7_;
+  wire  _zz_PanoCore_8_;
+  wire [3:0] _zz_PanoCore_9_;
+  wire [7:0] _zz_PanoCore_10_;
+  wire [7:0] _zz_PanoCore_11_;
+  wire [7:0] _zz_PanoCore_12_;
+  wire  _zz_PanoCore_13_;
+  wire [10:0] _zz_PanoCore_14_;
+  wire [7:0] _zz_PanoCore_15_;
+  wire  _zz_PanoCore_16_;
+  wire  _zz_PanoCore_17_;
+  wire  _zz_PanoCore_18_;
+  wire  _zz_PanoCore_19_;
+  wire [7:0] _zz_PanoCore_20_;
+  wire [7:0] _zz_PanoCore_21_;
+  wire [7:0] _zz_PanoCore_22_;
+  wire  _zz_PanoCore_23_;
+  wire  _zz_PanoCore_24_;
+  wire  _zz_PanoCore_25_;
+  wire  _zz_PanoCore_26_;
+  wire [7:0] _zz_PanoCore_27_;
+  wire [7:0] _zz_PanoCore_28_;
+  wire [7:0] _zz_PanoCore_29_;
+  wire  _zz_PanoCore_30_;
+  wire  _zz_PanoCore_31_;
+  wire  _zz_PanoCore_32_;
+  wire  _zz_PanoCore_33_;
+  wire [7:0] _zz_PanoCore_34_;
+  wire [7:0] _zz_PanoCore_35_;
+  wire [7:0] _zz_PanoCore_36_;
+  wire  _zz_PanoCore_37_;
+  wire  _zz_PanoCore_38_;
+  wire  _zz_PanoCore_39_;
+  wire  _zz_PanoCore_40_;
+  wire [7:0] _zz_PanoCore_41_;
+  wire [7:0] _zz_PanoCore_42_;
+  wire [7:0] _zz_PanoCore_43_;
+  wire [11:0] _zz_PanoCore_44_;
+  wire [11:0] _zz_PanoCore_45_;
+  wire [11:0] _zz_PanoCore_46_;
+  wire [11:0] _zz_PanoCore_47_;
+  wire [11:0] _zz_PanoCore_48_;
+  wire [11:0] _zz_PanoCore_49_;
+  wire [11:0] _zz_PanoCore_50_;
+  wire [10:0] _zz_PanoCore_51_;
+  wire [10:0] _zz_PanoCore_52_;
+  wire [10:0] _zz_PanoCore_53_;
+  wire [10:0] _zz_PanoCore_54_;
+  wire [10:0] _zz_PanoCore_55_;
+  wire [10:0] _zz_PanoCore_56_;
+  wire [10:0] _zz_PanoCore_57_;
   reg [23:0] leds_led_cntr;
-  wire [23:0] _zz_1_;
+  wire [23:0] _zz_PanoCore_1_;
   wire [3:0] test_pattern_nr;
   wire [7:0] const_color_r;
   wire [7:0] const_color_g;
   wire [7:0] const_color_b;
-  wire [11:0] timings_h_active;
-  wire [7:0] timings_h_fp;
-  wire [7:0] timings_h_sync;
-  wire [7:0] timings_h_bp;
-  wire  timings_h_sync_positive;
-  wire [11:0] timings_h_total_m1;
-  wire [10:0] timings_v_active;
-  wire [5:0] timings_v_fp;
-  wire [5:0] timings_v_sync;
-  wire [5:0] timings_v_bp;
-  wire  timings_v_sync_positive;
-  wire [11:0] timings_v_total_m1;
-  wire  vi_gen_pixel_out_vsync;
-  wire  vi_gen_pixel_out_req;
-  wire  vi_gen_pixel_out_eol;
-  wire  vi_gen_pixel_out_eof;
-  wire [7:0] vi_gen_pixel_out_pixel_r;
-  wire [7:0] vi_gen_pixel_out_pixel_g;
-  wire [7:0] vi_gen_pixel_out_pixel_b;
-  wire  test_patt_pixel_out_vsync;
-  wire  test_patt_pixel_out_req;
-  wire  test_patt_pixel_out_eol;
-  wire  test_patt_pixel_out_eof;
-  wire [7:0] test_patt_pixel_out_pixel_r;
-  wire [7:0] test_patt_pixel_out_pixel_g;
-  wire [7:0] test_patt_pixel_out_pixel_b;
-  wire  txt_gen_pixel_out_vsync;
-  wire  txt_gen_pixel_out_req;
-  wire  txt_gen_pixel_out_eol;
-  wire  txt_gen_pixel_out_eof;
-  wire [7:0] txt_gen_pixel_out_pixel_r;
-  wire [7:0] txt_gen_pixel_out_pixel_g;
-  wire [7:0] txt_gen_pixel_out_pixel_b;
-  assign _zz_44_ = (_zz_45_ - (12'b000000000001));
-  assign _zz_45_ = (_zz_46_ + _zz_50_);
-  assign _zz_46_ = (_zz_47_ + _zz_49_);
-  assign _zz_47_ = (timings_h_active + _zz_48_);
-  assign _zz_48_ = {4'd0, timings_h_fp};
-  assign _zz_49_ = {4'd0, timings_h_sync};
-  assign _zz_50_ = {4'd0, timings_h_bp};
-  assign _zz_51_ = (_zz_52_ - (11'b00000000001));
-  assign _zz_52_ = (_zz_53_ + _zz_57_);
-  assign _zz_53_ = (_zz_54_ + _zz_56_);
-  assign _zz_54_ = (timings_v_active + _zz_55_);
-  assign _zz_55_ = {5'd0, timings_v_fp};
-  assign _zz_56_ = {5'd0, timings_v_sync};
-  assign _zz_57_ = {5'd0, timings_v_bp};
+  wire [11:0] vo_area_timings_h_active;
+  wire [8:0] vo_area_timings_h_fp;
+  wire [8:0] vo_area_timings_h_sync;
+  wire [8:0] vo_area_timings_h_bp;
+  wire  vo_area_timings_h_sync_positive;
+  wire [11:0] vo_area_timings_h_total_m1;
+  wire [10:0] vo_area_timings_v_active;
+  wire [8:0] vo_area_timings_v_fp;
+  wire [8:0] vo_area_timings_v_sync;
+  wire [8:0] vo_area_timings_v_bp;
+  wire  vo_area_timings_v_sync_positive;
+  wire [11:0] vo_area_timings_v_total_m1;
+  wire  vo_area_vi_gen_pixel_out_vsync;
+  wire  vo_area_vi_gen_pixel_out_req;
+  wire  vo_area_vi_gen_pixel_out_eol;
+  wire  vo_area_vi_gen_pixel_out_eof;
+  wire [7:0] vo_area_vi_gen_pixel_out_pixel_r;
+  wire [7:0] vo_area_vi_gen_pixel_out_pixel_g;
+  wire [7:0] vo_area_vi_gen_pixel_out_pixel_b;
+  wire  vo_area_test_patt_pixel_out_vsync;
+  wire  vo_area_test_patt_pixel_out_req;
+  wire  vo_area_test_patt_pixel_out_eol;
+  wire  vo_area_test_patt_pixel_out_eof;
+  wire [7:0] vo_area_test_patt_pixel_out_pixel_r;
+  wire [7:0] vo_area_test_patt_pixel_out_pixel_g;
+  wire [7:0] vo_area_test_patt_pixel_out_pixel_b;
+  wire  vo_area_txt_gen_pixel_out_vsync;
+  wire  vo_area_txt_gen_pixel_out_req;
+  wire  vo_area_txt_gen_pixel_out_eol;
+  wire  vo_area_txt_gen_pixel_out_eof;
+  wire [7:0] vo_area_txt_gen_pixel_out_pixel_r;
+  wire [7:0] vo_area_txt_gen_pixel_out_pixel_g;
+  wire [7:0] vo_area_txt_gen_pixel_out_pixel_b;
+  assign _zz_PanoCore_44_ = (_zz_PanoCore_45_ - (12'b000000000001));
+  assign _zz_PanoCore_45_ = (_zz_PanoCore_46_ + _zz_PanoCore_50_);
+  assign _zz_PanoCore_46_ = (_zz_PanoCore_47_ + _zz_PanoCore_49_);
+  assign _zz_PanoCore_47_ = (vo_area_timings_h_active + _zz_PanoCore_48_);
+  assign _zz_PanoCore_48_ = {3'd0, vo_area_timings_h_fp};
+  assign _zz_PanoCore_49_ = {3'd0, vo_area_timings_h_sync};
+  assign _zz_PanoCore_50_ = {3'd0, vo_area_timings_h_bp};
+  assign _zz_PanoCore_51_ = (_zz_PanoCore_52_ - (11'b00000000001));
+  assign _zz_PanoCore_52_ = (_zz_PanoCore_53_ + _zz_PanoCore_57_);
+  assign _zz_PanoCore_53_ = (_zz_PanoCore_54_ + _zz_PanoCore_56_);
+  assign _zz_PanoCore_54_ = (vo_area_timings_v_active + _zz_PanoCore_55_);
+  assign _zz_PanoCore_55_ = {2'd0, vo_area_timings_v_fp};
+  assign _zz_PanoCore_56_ = {2'd0, vo_area_timings_v_sync};
+  assign _zz_PanoCore_57_ = {2'd0, vo_area_timings_v_bp};
   MR1Top u_mr1_top ( 
-    .io_led1(_zz_2_),
-    .io_led2(_zz_3_),
-    .io_led3(_zz_4_),
+    .io_led1(_zz_PanoCore_2_),
+    .io_led2(_zz_PanoCore_3_),
+    .io_led3(_zz_PanoCore_4_),
     .io_switch_(io_switch_),
     .io_dvi_ctrl_scl_read(io_dvi_ctrl_scl_read),
-    .io_dvi_ctrl_scl_write(_zz_5_),
-    .io_dvi_ctrl_scl_writeEnable(_zz_6_),
+    .io_dvi_ctrl_scl_write(_zz_PanoCore_5_),
+    .io_dvi_ctrl_scl_writeEnable(_zz_PanoCore_6_),
     .io_dvi_ctrl_sda_read(io_dvi_ctrl_sda_read),
-    .io_dvi_ctrl_sda_write(_zz_7_),
-    .io_dvi_ctrl_sda_writeEnable(_zz_8_),
-    .io_test_pattern_nr(_zz_9_),
-    .io_test_pattern_const_color_r(_zz_10_),
-    .io_test_pattern_const_color_g(_zz_11_),
-    .io_test_pattern_const_color_b(_zz_12_),
-    .io_txt_buf_wr(_zz_13_),
-    .io_txt_buf_wr_addr(_zz_14_),
-    .io_txt_buf_wr_data(_zz_15_),
+    .io_dvi_ctrl_sda_write(_zz_PanoCore_7_),
+    .io_dvi_ctrl_sda_writeEnable(_zz_PanoCore_8_),
+    .io_test_pattern_nr(_zz_PanoCore_9_),
+    .io_test_pattern_const_color_r(_zz_PanoCore_10_),
+    .io_test_pattern_const_color_g(_zz_PanoCore_11_),
+    .io_test_pattern_const_color_b(_zz_PanoCore_12_),
+    .io_txt_buf_wr(_zz_PanoCore_13_),
+    .io_txt_buf_wr_addr(_zz_PanoCore_14_),
+    .io_txt_buf_wr_data(_zz_PanoCore_15_),
     .clk25(clk25),
     .reset25_(reset25_) 
   );
-  VideoTimingGen u_vi_gen ( 
-    .io_timings_h_active(timings_h_active),
-    .io_timings_h_fp(timings_h_fp),
-    .io_timings_h_sync(timings_h_sync),
-    .io_timings_h_bp(timings_h_bp),
-    .io_timings_h_sync_positive(timings_h_sync_positive),
-    .io_timings_h_total_m1(timings_h_total_m1),
-    .io_timings_v_active(timings_v_active),
-    .io_timings_v_fp(timings_v_fp),
-    .io_timings_v_sync(timings_v_sync),
-    .io_timings_v_bp(timings_v_bp),
-    .io_timings_v_sync_positive(timings_v_sync_positive),
-    .io_timings_v_total_m1(timings_v_total_m1),
-    .io_pixel_out_vsync(_zz_16_),
-    .io_pixel_out_req(_zz_17_),
-    .io_pixel_out_eol(_zz_18_),
-    .io_pixel_out_eof(_zz_19_),
-    .io_pixel_out_pixel_r(_zz_20_),
-    .io_pixel_out_pixel_g(_zz_21_),
-    .io_pixel_out_pixel_b(_zz_22_),
-    .clk25(clk25),
-    .reset25_(reset25_) 
+  VideoTimingGen vo_area_u_vi_gen ( 
+    .io_timings_h_active(vo_area_timings_h_active),
+    .io_timings_h_fp(vo_area_timings_h_fp),
+    .io_timings_h_sync(vo_area_timings_h_sync),
+    .io_timings_h_bp(vo_area_timings_h_bp),
+    .io_timings_h_sync_positive(vo_area_timings_h_sync_positive),
+    .io_timings_h_total_m1(vo_area_timings_h_total_m1),
+    .io_timings_v_active(vo_area_timings_v_active),
+    .io_timings_v_fp(vo_area_timings_v_fp),
+    .io_timings_v_sync(vo_area_timings_v_sync),
+    .io_timings_v_bp(vo_area_timings_v_bp),
+    .io_timings_v_sync_positive(vo_area_timings_v_sync_positive),
+    .io_timings_v_total_m1(vo_area_timings_v_total_m1),
+    .io_pixel_out_vsync(_zz_PanoCore_16_),
+    .io_pixel_out_req(_zz_PanoCore_17_),
+    .io_pixel_out_eol(_zz_PanoCore_18_),
+    .io_pixel_out_eof(_zz_PanoCore_19_),
+    .io_pixel_out_pixel_r(_zz_PanoCore_20_),
+    .io_pixel_out_pixel_g(_zz_PanoCore_21_),
+    .io_pixel_out_pixel_b(_zz_PanoCore_22_),
+    .vo_clk(vo_clk),
+    .vo_reset_(vo_reset_) 
   );
-  VideoTestPattern u_test_patt ( 
-    .io_timings_h_active(timings_h_active),
-    .io_timings_h_fp(timings_h_fp),
-    .io_timings_h_sync(timings_h_sync),
-    .io_timings_h_bp(timings_h_bp),
-    .io_timings_h_sync_positive(timings_h_sync_positive),
-    .io_timings_h_total_m1(timings_h_total_m1),
-    .io_timings_v_active(timings_v_active),
-    .io_timings_v_fp(timings_v_fp),
-    .io_timings_v_sync(timings_v_sync),
-    .io_timings_v_bp(timings_v_bp),
-    .io_timings_v_sync_positive(timings_v_sync_positive),
-    .io_timings_v_total_m1(timings_v_total_m1),
-    .io_pixel_in_vsync(vi_gen_pixel_out_vsync),
-    .io_pixel_in_req(vi_gen_pixel_out_req),
-    .io_pixel_in_eol(vi_gen_pixel_out_eol),
-    .io_pixel_in_eof(vi_gen_pixel_out_eof),
-    .io_pixel_in_pixel_r(vi_gen_pixel_out_pixel_r),
-    .io_pixel_in_pixel_g(vi_gen_pixel_out_pixel_g),
-    .io_pixel_in_pixel_b(vi_gen_pixel_out_pixel_b),
-    .io_pixel_out_vsync(_zz_23_),
-    .io_pixel_out_req(_zz_24_),
-    .io_pixel_out_eol(_zz_25_),
-    .io_pixel_out_eof(_zz_26_),
-    .io_pixel_out_pixel_r(_zz_27_),
-    .io_pixel_out_pixel_g(_zz_28_),
-    .io_pixel_out_pixel_b(_zz_29_),
+  VideoTestPattern vo_area_u_test_patt ( 
+    .io_timings_h_active(vo_area_timings_h_active),
+    .io_timings_h_fp(vo_area_timings_h_fp),
+    .io_timings_h_sync(vo_area_timings_h_sync),
+    .io_timings_h_bp(vo_area_timings_h_bp),
+    .io_timings_h_sync_positive(vo_area_timings_h_sync_positive),
+    .io_timings_h_total_m1(vo_area_timings_h_total_m1),
+    .io_timings_v_active(vo_area_timings_v_active),
+    .io_timings_v_fp(vo_area_timings_v_fp),
+    .io_timings_v_sync(vo_area_timings_v_sync),
+    .io_timings_v_bp(vo_area_timings_v_bp),
+    .io_timings_v_sync_positive(vo_area_timings_v_sync_positive),
+    .io_timings_v_total_m1(vo_area_timings_v_total_m1),
+    .io_pixel_in_vsync(vo_area_vi_gen_pixel_out_vsync),
+    .io_pixel_in_req(vo_area_vi_gen_pixel_out_req),
+    .io_pixel_in_eol(vo_area_vi_gen_pixel_out_eol),
+    .io_pixel_in_eof(vo_area_vi_gen_pixel_out_eof),
+    .io_pixel_in_pixel_r(vo_area_vi_gen_pixel_out_pixel_r),
+    .io_pixel_in_pixel_g(vo_area_vi_gen_pixel_out_pixel_g),
+    .io_pixel_in_pixel_b(vo_area_vi_gen_pixel_out_pixel_b),
+    .io_pixel_out_vsync(_zz_PanoCore_23_),
+    .io_pixel_out_req(_zz_PanoCore_24_),
+    .io_pixel_out_eol(_zz_PanoCore_25_),
+    .io_pixel_out_eof(_zz_PanoCore_26_),
+    .io_pixel_out_pixel_r(_zz_PanoCore_27_),
+    .io_pixel_out_pixel_g(_zz_PanoCore_28_),
+    .io_pixel_out_pixel_b(_zz_PanoCore_29_),
     .io_pattern_nr(test_pattern_nr),
     .io_const_color_r(const_color_r),
     .io_const_color_g(const_color_g),
     .io_const_color_b(const_color_b),
+    .vo_clk(vo_clk),
+    .vo_reset_(vo_reset_) 
+  );
+  VideoTxtGen vo_area_u_txt_gen ( 
+    .io_pixel_in_vsync(vo_area_test_patt_pixel_out_vsync),
+    .io_pixel_in_req(vo_area_test_patt_pixel_out_req),
+    .io_pixel_in_eol(vo_area_test_patt_pixel_out_eol),
+    .io_pixel_in_eof(vo_area_test_patt_pixel_out_eof),
+    .io_pixel_in_pixel_r(vo_area_test_patt_pixel_out_pixel_r),
+    .io_pixel_in_pixel_g(vo_area_test_patt_pixel_out_pixel_g),
+    .io_pixel_in_pixel_b(vo_area_test_patt_pixel_out_pixel_b),
+    .io_pixel_out_vsync(_zz_PanoCore_30_),
+    .io_pixel_out_req(_zz_PanoCore_31_),
+    .io_pixel_out_eol(_zz_PanoCore_32_),
+    .io_pixel_out_eof(_zz_PanoCore_33_),
+    .io_pixel_out_pixel_r(_zz_PanoCore_34_),
+    .io_pixel_out_pixel_g(_zz_PanoCore_35_),
+    .io_pixel_out_pixel_b(_zz_PanoCore_36_),
+    .io_txt_buf_wr(_zz_PanoCore_13_),
+    .io_txt_buf_wr_addr(_zz_PanoCore_14_),
+    .io_txt_buf_wr_data(_zz_PanoCore_15_),
+    .vo_clk(vo_clk),
+    .vo_reset_(vo_reset_),
     .clk25(clk25),
     .reset25_(reset25_) 
   );
-  VideoTxtGen u_txt_gen ( 
-    .io_pixel_in_vsync(test_patt_pixel_out_vsync),
-    .io_pixel_in_req(test_patt_pixel_out_req),
-    .io_pixel_in_eol(test_patt_pixel_out_eol),
-    .io_pixel_in_eof(test_patt_pixel_out_eof),
-    .io_pixel_in_pixel_r(test_patt_pixel_out_pixel_r),
-    .io_pixel_in_pixel_g(test_patt_pixel_out_pixel_g),
-    .io_pixel_in_pixel_b(test_patt_pixel_out_pixel_b),
-    .io_pixel_out_vsync(_zz_30_),
-    .io_pixel_out_req(_zz_31_),
-    .io_pixel_out_eol(_zz_32_),
-    .io_pixel_out_eof(_zz_33_),
-    .io_pixel_out_pixel_r(_zz_34_),
-    .io_pixel_out_pixel_g(_zz_35_),
-    .io_pixel_out_pixel_b(_zz_36_),
-    .io_txt_buf_wr(_zz_13_),
-    .io_txt_buf_wr_addr(_zz_14_),
-    .io_txt_buf_wr_data(_zz_15_),
-    .clk25(clk25),
-    .reset25_(reset25_) 
+  VideoOut vo_area_u_vo ( 
+    .io_timings_h_active(vo_area_timings_h_active),
+    .io_timings_h_fp(vo_area_timings_h_fp),
+    .io_timings_h_sync(vo_area_timings_h_sync),
+    .io_timings_h_bp(vo_area_timings_h_bp),
+    .io_timings_h_sync_positive(vo_area_timings_h_sync_positive),
+    .io_timings_h_total_m1(vo_area_timings_h_total_m1),
+    .io_timings_v_active(vo_area_timings_v_active),
+    .io_timings_v_fp(vo_area_timings_v_fp),
+    .io_timings_v_sync(vo_area_timings_v_sync),
+    .io_timings_v_bp(vo_area_timings_v_bp),
+    .io_timings_v_sync_positive(vo_area_timings_v_sync_positive),
+    .io_timings_v_total_m1(vo_area_timings_v_total_m1),
+    .io_pixel_in_vsync(vo_area_txt_gen_pixel_out_vsync),
+    .io_pixel_in_req(vo_area_txt_gen_pixel_out_req),
+    .io_pixel_in_eol(vo_area_txt_gen_pixel_out_eol),
+    .io_pixel_in_eof(vo_area_txt_gen_pixel_out_eof),
+    .io_pixel_in_pixel_r(vo_area_txt_gen_pixel_out_pixel_r),
+    .io_pixel_in_pixel_g(vo_area_txt_gen_pixel_out_pixel_g),
+    .io_pixel_in_pixel_b(vo_area_txt_gen_pixel_out_pixel_b),
+    .io_vga_out_vsync(_zz_PanoCore_37_),
+    .io_vga_out_hsync(_zz_PanoCore_38_),
+    .io_vga_out_blank_(_zz_PanoCore_39_),
+    .io_vga_out_de(_zz_PanoCore_40_),
+    .io_vga_out_r(_zz_PanoCore_41_),
+    .io_vga_out_g(_zz_PanoCore_42_),
+    .io_vga_out_b(_zz_PanoCore_43_),
+    .vo_clk(vo_clk),
+    .vo_reset_(vo_reset_) 
   );
-  VideoOut u_vo ( 
-    .io_timings_h_active(timings_h_active),
-    .io_timings_h_fp(timings_h_fp),
-    .io_timings_h_sync(timings_h_sync),
-    .io_timings_h_bp(timings_h_bp),
-    .io_timings_h_sync_positive(timings_h_sync_positive),
-    .io_timings_h_total_m1(timings_h_total_m1),
-    .io_timings_v_active(timings_v_active),
-    .io_timings_v_fp(timings_v_fp),
-    .io_timings_v_sync(timings_v_sync),
-    .io_timings_v_bp(timings_v_bp),
-    .io_timings_v_sync_positive(timings_v_sync_positive),
-    .io_timings_v_total_m1(timings_v_total_m1),
-    .io_pixel_in_vsync(txt_gen_pixel_out_vsync),
-    .io_pixel_in_req(txt_gen_pixel_out_req),
-    .io_pixel_in_eol(txt_gen_pixel_out_eol),
-    .io_pixel_in_eof(txt_gen_pixel_out_eof),
-    .io_pixel_in_pixel_r(txt_gen_pixel_out_pixel_r),
-    .io_pixel_in_pixel_g(txt_gen_pixel_out_pixel_g),
-    .io_pixel_in_pixel_b(txt_gen_pixel_out_pixel_b),
-    .io_vga_out_vsync(_zz_37_),
-    .io_vga_out_hsync(_zz_38_),
-    .io_vga_out_blank_(_zz_39_),
-    .io_vga_out_de(_zz_40_),
-    .io_vga_out_r(_zz_41_),
-    .io_vga_out_g(_zz_42_),
-    .io_vga_out_b(_zz_43_),
-    .clk25(clk25),
-    .reset25_(reset25_) 
-  );
-  assign _zz_1_[23 : 0] = (24'b111111111111111111111111);
+  assign _zz_PanoCore_1_[23 : 0] = (24'b111111111111111111111111);
   assign io_led_green = leds_led_cntr[23];
-  assign io_led_red = _zz_2_;
-  assign io_led_blue = _zz_3_;
-  assign io_dvi_ctrl_scl_write = _zz_5_;
-  assign io_dvi_ctrl_scl_writeEnable = _zz_6_;
-  assign io_dvi_ctrl_sda_write = _zz_7_;
-  assign io_dvi_ctrl_sda_writeEnable = _zz_8_;
-  assign test_pattern_nr = _zz_9_;
-  assign const_color_r = _zz_10_;
-  assign const_color_g = _zz_11_;
-  assign const_color_b = _zz_12_;
-  assign timings_h_active = (12'b001010000000);
-  assign timings_h_fp = (8'b00010000);
-  assign timings_h_sync = (8'b01100000);
-  assign timings_h_bp = (8'b00110000);
-  assign timings_h_sync_positive = 1'b0;
-  assign timings_h_total_m1 = _zz_44_;
-  assign timings_v_active = (11'b00111100000);
-  assign timings_v_fp = (6'b001011);
-  assign timings_v_sync = (6'b000010);
-  assign timings_v_bp = (6'b011111);
-  assign timings_v_sync_positive = 1'b0;
-  assign timings_v_total_m1 = {1'd0, _zz_51_};
-  assign vi_gen_pixel_out_vsync = _zz_16_;
-  assign vi_gen_pixel_out_req = _zz_17_;
-  assign vi_gen_pixel_out_eol = _zz_18_;
-  assign vi_gen_pixel_out_eof = _zz_19_;
-  assign vi_gen_pixel_out_pixel_r = _zz_20_;
-  assign vi_gen_pixel_out_pixel_g = _zz_21_;
-  assign vi_gen_pixel_out_pixel_b = _zz_22_;
-  assign test_patt_pixel_out_vsync = _zz_23_;
-  assign test_patt_pixel_out_req = _zz_24_;
-  assign test_patt_pixel_out_eol = _zz_25_;
-  assign test_patt_pixel_out_eof = _zz_26_;
-  assign test_patt_pixel_out_pixel_r = _zz_27_;
-  assign test_patt_pixel_out_pixel_g = _zz_28_;
-  assign test_patt_pixel_out_pixel_b = _zz_29_;
-  assign txt_gen_pixel_out_vsync = _zz_30_;
-  assign txt_gen_pixel_out_req = _zz_31_;
-  assign txt_gen_pixel_out_eol = _zz_32_;
-  assign txt_gen_pixel_out_eof = _zz_33_;
-  assign txt_gen_pixel_out_pixel_r = _zz_34_;
-  assign txt_gen_pixel_out_pixel_g = _zz_35_;
-  assign txt_gen_pixel_out_pixel_b = _zz_36_;
-  assign io_vo_vsync = _zz_37_;
-  assign io_vo_hsync = _zz_38_;
-  assign io_vo_blank_ = _zz_39_;
-  assign io_vo_de = _zz_40_;
-  assign io_vo_r = _zz_41_;
-  assign io_vo_g = _zz_42_;
-  assign io_vo_b = _zz_43_;
+  assign io_led_red = _zz_PanoCore_2_;
+  assign io_led_blue = _zz_PanoCore_3_;
+  assign io_dvi_ctrl_scl_write = _zz_PanoCore_5_;
+  assign io_dvi_ctrl_scl_writeEnable = _zz_PanoCore_6_;
+  assign io_dvi_ctrl_sda_write = _zz_PanoCore_7_;
+  assign io_dvi_ctrl_sda_writeEnable = _zz_PanoCore_8_;
+  assign test_pattern_nr = _zz_PanoCore_9_;
+  assign const_color_r = _zz_PanoCore_10_;
+  assign const_color_g = _zz_PanoCore_11_;
+  assign const_color_b = _zz_PanoCore_12_;
+  assign vo_area_timings_h_active = (12'b001010000000);
+  assign vo_area_timings_h_fp = (9'b000010000);
+  assign vo_area_timings_h_sync = (9'b001100000);
+  assign vo_area_timings_h_bp = (9'b000110000);
+  assign vo_area_timings_h_sync_positive = 1'b0;
+  assign vo_area_timings_h_total_m1 = _zz_PanoCore_44_;
+  assign vo_area_timings_v_active = (11'b00111100000);
+  assign vo_area_timings_v_fp = (9'b000001011);
+  assign vo_area_timings_v_sync = (9'b000000010);
+  assign vo_area_timings_v_bp = (9'b000011111);
+  assign vo_area_timings_v_sync_positive = 1'b0;
+  assign vo_area_timings_v_total_m1 = {1'd0, _zz_PanoCore_51_};
+  assign vo_area_vi_gen_pixel_out_vsync = _zz_PanoCore_16_;
+  assign vo_area_vi_gen_pixel_out_req = _zz_PanoCore_17_;
+  assign vo_area_vi_gen_pixel_out_eol = _zz_PanoCore_18_;
+  assign vo_area_vi_gen_pixel_out_eof = _zz_PanoCore_19_;
+  assign vo_area_vi_gen_pixel_out_pixel_r = _zz_PanoCore_20_;
+  assign vo_area_vi_gen_pixel_out_pixel_g = _zz_PanoCore_21_;
+  assign vo_area_vi_gen_pixel_out_pixel_b = _zz_PanoCore_22_;
+  assign vo_area_test_patt_pixel_out_vsync = _zz_PanoCore_23_;
+  assign vo_area_test_patt_pixel_out_req = _zz_PanoCore_24_;
+  assign vo_area_test_patt_pixel_out_eol = _zz_PanoCore_25_;
+  assign vo_area_test_patt_pixel_out_eof = _zz_PanoCore_26_;
+  assign vo_area_test_patt_pixel_out_pixel_r = _zz_PanoCore_27_;
+  assign vo_area_test_patt_pixel_out_pixel_g = _zz_PanoCore_28_;
+  assign vo_area_test_patt_pixel_out_pixel_b = _zz_PanoCore_29_;
+  assign vo_area_txt_gen_pixel_out_vsync = _zz_PanoCore_30_;
+  assign vo_area_txt_gen_pixel_out_req = _zz_PanoCore_31_;
+  assign vo_area_txt_gen_pixel_out_eol = _zz_PanoCore_32_;
+  assign vo_area_txt_gen_pixel_out_eof = _zz_PanoCore_33_;
+  assign vo_area_txt_gen_pixel_out_pixel_r = _zz_PanoCore_34_;
+  assign vo_area_txt_gen_pixel_out_pixel_g = _zz_PanoCore_35_;
+  assign vo_area_txt_gen_pixel_out_pixel_b = _zz_PanoCore_36_;
+  assign io_vo_vsync = _zz_PanoCore_37_;
+  assign io_vo_hsync = _zz_PanoCore_38_;
+  assign io_vo_blank_ = _zz_PanoCore_39_;
+  assign io_vo_de = _zz_PanoCore_40_;
+  assign io_vo_r = _zz_PanoCore_41_;
+  assign io_vo_g = _zz_PanoCore_42_;
+  assign io_vo_b = _zz_PanoCore_43_;
   always @ (posedge clk25) begin
     if(!reset25_) begin
       leds_led_cntr <= (24'b000000000000000000000000);
     end else begin
-      if((leds_led_cntr == _zz_1_))begin
+      if((leds_led_cntr == _zz_PanoCore_1_))begin
         leds_led_cntr <= (24'b000000000000000000000000);
       end else begin
         leds_led_cntr <= (leds_led_cntr + (24'b000000000000000000000001));
       end
     end
+  end
+
+endmodule
+
+module ChrontelPads (
+      output  io_pads_reset_,
+      output  io_pads_xclk_p,
+      output  io_pads_xclk_n,
+      output  io_pads_v,
+      output  io_pads_h,
+      output  io_pads_de,
+      output reg [11:0] io_pads_d,
+      input   io_vsync,
+      input   io_hsync,
+      input   io_de,
+      input  [7:0] io_r,
+      input  [7:0] io_g,
+      input  [7:0] io_b,
+      input   clk,
+      input   reset_);
+  wire  _zz_ChrontelPads_1_;
+  wire  _zz_ChrontelPads_2_;
+  wire  _zz_ChrontelPads_3_;
+  wire  _zz_ChrontelPads_4_;
+  wire  _zz_ChrontelPads_5_;
+  wire  _zz_ChrontelPads_6_;
+  wire  _zz_ChrontelPads_7_;
+  wire  _zz_ChrontelPads_8_;
+  wire  _zz_ChrontelPads_9_;
+  wire  _zz_ChrontelPads_10_;
+  wire  _zz_ChrontelPads_11_;
+  wire  _zz_ChrontelPads_12_;
+  wire  _zz_ChrontelPads_13_;
+  wire  _zz_ChrontelPads_14_;
+  wire  _zz_ChrontelPads_15_;
+  wire  _zz_ChrontelPads_16_;
+  wire  _zz_ChrontelPads_17_;
+  wire  _zz_ChrontelPads_18_;
+  wire  _zz_ChrontelPads_19_;
+  wire  _zz_ChrontelPads_20_;
+  wire  _zz_ChrontelPads_21_;
+  wire  _zz_ChrontelPads_22_;
+  wire  _zz_ChrontelPads_23_;
+  wire  _zz_ChrontelPads_24_;
+  wire  _zz_ChrontelPads_25_;
+  wire  _zz_ChrontelPads_26_;
+  wire  _zz_ChrontelPads_27_;
+  wire  _zz_ChrontelPads_28_;
+  wire  _zz_ChrontelPads_29_;
+  wire  _zz_ChrontelPads_30_;
+  wire  _zz_ChrontelPads_31_;
+  wire  _zz_ChrontelPads_32_;
+  wire  _zz_ChrontelPads_33_;
+  wire  _zz_ChrontelPads_34_;
+  wire  _zz_ChrontelPads_35_;
+  wire  _zz_ChrontelPads_36_;
+  wire  _zz_ChrontelPads_37_;
+  wire  _zz_ChrontelPads_38_;
+  wire  _zz_ChrontelPads_39_;
+  wire  _zz_ChrontelPads_40_;
+  wire  _zz_ChrontelPads_41_;
+  wire  _zz_ChrontelPads_42_;
+  wire  _zz_ChrontelPads_43_;
+  wire  _zz_ChrontelPads_44_;
+  wire  _zz_ChrontelPads_45_;
+  wire  _zz_ChrontelPads_46_;
+  wire  _zz_ChrontelPads_47_;
+  wire  _zz_ChrontelPads_48_;
+  wire  _zz_ChrontelPads_49_;
+  wire  _zz_ChrontelPads_50_;
+  wire  _zz_ChrontelPads_51_;
+  wire  _zz_ChrontelPads_52_;
+  wire  _zz_ChrontelPads_53_;
+  wire  _zz_ChrontelPads_54_;
+  wire  _zz_ChrontelPads_55_;
+  wire  _zz_ChrontelPads_56_;
+  wire  _zz_ChrontelPads_57_;
+  wire  _zz_ChrontelPads_58_;
+  wire  _zz_ChrontelPads_59_;
+  wire  _zz_ChrontelPads_60_;
+  wire  _zz_ChrontelPads_61_;
+  wire  _zz_ChrontelPads_62_;
+  wire  _zz_ChrontelPads_63_;
+  wire  _zz_ChrontelPads_64_;
+  wire  _zz_ChrontelPads_65_;
+  wire  _zz_ChrontelPads_66_;
+  wire  _zz_ChrontelPads_67_;
+  wire  _zz_ChrontelPads_68_;
+  wire  _zz_ChrontelPads_69_;
+  wire  _zz_ChrontelPads_70_;
+  wire  _zz_ChrontelPads_71_;
+  wire  _zz_ChrontelPads_72_;
+  wire  _zz_ChrontelPads_73_;
+  wire  _zz_ChrontelPads_74_;
+  wire  _zz_ChrontelPads_75_;
+  wire  _zz_ChrontelPads_76_;
+  wire  _zz_ChrontelPads_77_;
+  wire [7:0] _zz_ChrontelPads_78_;
+  wire  _zz_ChrontelPads_79_;
+  wire  _zz_ChrontelPads_80_;
+  wire  _zz_ChrontelPads_81_;
+  wire  _zz_ChrontelPads_82_;
+  wire  _zz_ChrontelPads_83_;
+  wire  _zz_ChrontelPads_84_;
+  wire  _zz_ChrontelPads_85_;
+  wire  _zz_ChrontelPads_86_;
+  wire  _zz_ChrontelPads_87_;
+  wire  _zz_ChrontelPads_88_;
+  wire  _zz_ChrontelPads_89_;
+  wire  _zz_ChrontelPads_90_;
+  wire  _zz_ChrontelPads_91_;
+  wire  _zz_ChrontelPads_92_;
+  wire  _zz_ChrontelPads_93_;
+  wire  _zz_ChrontelPads_94_;
+  wire  _zz_ChrontelPads_95_;
+  wire  vsync_p1;
+  wire  hsync_p1;
+  wire  de_p1;
+  wire [7:0] r_p1;
+  wire [7:0] g_p1;
+  wire [7:0] b_p1;
+  (* keep = "true" *) reg  io_vsync_regNext;
+  (* keep = "true" *) reg  io_hsync_regNext;
+  (* keep = "true" *) reg  io_de_regNext;
+  (* keep = "true" *) reg [7:0] io_r_regNext;
+  (* keep = "true" *) reg [7:0] io_g_regNext;
+  (* keep = "true" *) reg [7:0] io_b_regNext;
+  wire  clk0;
+  wire  clk90;
+  wire  clk180;
+  wire  clk270;
+  wire  pad_reset;
+  wire [11:0] d_p;
+  wire [11:0] d_n;
+  DCM_SP #( 
+    .CLKDV_DIVIDE(2.0),
+    .CLK_FEEDBACK("1X"),
+    .CLKFX_DIVIDE(1),
+    .CLKFX_MULTIPLY(2),
+    .CLKIN_DIVIDE_BY_2(1'b0),
+    .CLKIN_PERIOD("10.0"),
+    .CLKOUT_PHASE_SHIFT("NONE"),
+    .DESKEW_ADJUST("SYSTEM_SYNCHRONOUS"),
+    .DLL_FREQUENCY_MODE("LOW"),
+    .DSS_MODE("NONE"),
+    .DUTY_CYCLE_CORRECTION(1'b0),
+    .PHASE_SHIFT(0),
+    .STARTUP_WAIT(1'b0) 
+  ) u_dcm ( 
+    .RST(pad_reset),
+    .CLKIN(clk),
+    .CLKFB(clk0),
+    .DSSEN(_zz_ChrontelPads_1_),
+    .PSCLK(_zz_ChrontelPads_2_),
+    .PSINCDEC(_zz_ChrontelPads_3_),
+    .PSEN(_zz_ChrontelPads_4_),
+    .PSDONE(_zz_ChrontelPads_5_),
+    .CLK0(_zz_ChrontelPads_68_),
+    .CLK90(_zz_ChrontelPads_69_),
+    .CLK180(_zz_ChrontelPads_70_),
+    .CLK270(_zz_ChrontelPads_71_),
+    .CLK2X(_zz_ChrontelPads_72_),
+    .CLK2X180(_zz_ChrontelPads_73_),
+    .CLKDV(_zz_ChrontelPads_74_),
+    .CLKFX(_zz_ChrontelPads_75_),
+    .CLKFX180(_zz_ChrontelPads_76_),
+    .LOCKED(_zz_ChrontelPads_77_),
+    .STATUS(_zz_ChrontelPads_78_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) u_pad_xclk_p ( 
+    .D0(_zz_ChrontelPads_6_),
+    .D1(_zz_ChrontelPads_7_),
+    .C0(clk90),
+    .C1(clk270),
+    .CE(_zz_ChrontelPads_8_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_9_),
+    .Q(_zz_ChrontelPads_79_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) oDDR2_1_ ( 
+    .D0(_zz_ChrontelPads_10_),
+    .D1(_zz_ChrontelPads_11_),
+    .C0(clk90),
+    .C1(clk270),
+    .CE(_zz_ChrontelPads_12_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_13_),
+    .Q(_zz_ChrontelPads_80_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) u_pad_vsync ( 
+    .D0(vsync_p1),
+    .D1(vsync_p1),
+    .C0(clk0),
+    .C1(clk180),
+    .CE(_zz_ChrontelPads_14_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_15_),
+    .Q(_zz_ChrontelPads_81_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) u_pad_hsync ( 
+    .D0(hsync_p1),
+    .D1(hsync_p1),
+    .C0(clk0),
+    .C1(clk180),
+    .CE(_zz_ChrontelPads_16_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_17_),
+    .Q(_zz_ChrontelPads_82_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) u_pad_de ( 
+    .D0(de_p1),
+    .D1(de_p1),
+    .C0(clk0),
+    .C1(clk180),
+    .CE(_zz_ChrontelPads_18_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_19_),
+    .Q(_zz_ChrontelPads_83_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) oDDR2_2_ ( 
+    .D0(_zz_ChrontelPads_20_),
+    .D1(_zz_ChrontelPads_21_),
+    .C0(clk0),
+    .C1(clk180),
+    .CE(_zz_ChrontelPads_22_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_23_),
+    .Q(_zz_ChrontelPads_84_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) oDDR2_3_ ( 
+    .D0(_zz_ChrontelPads_24_),
+    .D1(_zz_ChrontelPads_25_),
+    .C0(clk0),
+    .C1(clk180),
+    .CE(_zz_ChrontelPads_26_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_27_),
+    .Q(_zz_ChrontelPads_85_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) oDDR2_4_ ( 
+    .D0(_zz_ChrontelPads_28_),
+    .D1(_zz_ChrontelPads_29_),
+    .C0(clk0),
+    .C1(clk180),
+    .CE(_zz_ChrontelPads_30_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_31_),
+    .Q(_zz_ChrontelPads_86_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) oDDR2_5_ ( 
+    .D0(_zz_ChrontelPads_32_),
+    .D1(_zz_ChrontelPads_33_),
+    .C0(clk0),
+    .C1(clk180),
+    .CE(_zz_ChrontelPads_34_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_35_),
+    .Q(_zz_ChrontelPads_87_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) oDDR2_6_ ( 
+    .D0(_zz_ChrontelPads_36_),
+    .D1(_zz_ChrontelPads_37_),
+    .C0(clk0),
+    .C1(clk180),
+    .CE(_zz_ChrontelPads_38_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_39_),
+    .Q(_zz_ChrontelPads_88_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) oDDR2_7_ ( 
+    .D0(_zz_ChrontelPads_40_),
+    .D1(_zz_ChrontelPads_41_),
+    .C0(clk0),
+    .C1(clk180),
+    .CE(_zz_ChrontelPads_42_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_43_),
+    .Q(_zz_ChrontelPads_89_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) oDDR2_8_ ( 
+    .D0(_zz_ChrontelPads_44_),
+    .D1(_zz_ChrontelPads_45_),
+    .C0(clk0),
+    .C1(clk180),
+    .CE(_zz_ChrontelPads_46_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_47_),
+    .Q(_zz_ChrontelPads_90_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) oDDR2_9_ ( 
+    .D0(_zz_ChrontelPads_48_),
+    .D1(_zz_ChrontelPads_49_),
+    .C0(clk0),
+    .C1(clk180),
+    .CE(_zz_ChrontelPads_50_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_51_),
+    .Q(_zz_ChrontelPads_91_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) oDDR2_10_ ( 
+    .D0(_zz_ChrontelPads_52_),
+    .D1(_zz_ChrontelPads_53_),
+    .C0(clk0),
+    .C1(clk180),
+    .CE(_zz_ChrontelPads_54_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_55_),
+    .Q(_zz_ChrontelPads_92_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) oDDR2_11_ ( 
+    .D0(_zz_ChrontelPads_56_),
+    .D1(_zz_ChrontelPads_57_),
+    .C0(clk0),
+    .C1(clk180),
+    .CE(_zz_ChrontelPads_58_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_59_),
+    .Q(_zz_ChrontelPads_93_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) oDDR2_12_ ( 
+    .D0(_zz_ChrontelPads_60_),
+    .D1(_zz_ChrontelPads_61_),
+    .C0(clk0),
+    .C1(clk180),
+    .CE(_zz_ChrontelPads_62_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_63_),
+    .Q(_zz_ChrontelPads_94_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) oDDR2_13_ ( 
+    .D0(_zz_ChrontelPads_64_),
+    .D1(_zz_ChrontelPads_65_),
+    .C0(clk0),
+    .C1(clk180),
+    .CE(_zz_ChrontelPads_66_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_67_),
+    .Q(_zz_ChrontelPads_95_) 
+  );
+  assign vsync_p1 = io_vsync_regNext;
+  assign hsync_p1 = io_hsync_regNext;
+  assign de_p1 = io_de_regNext;
+  assign r_p1 = io_r_regNext;
+  assign g_p1 = io_g_regNext;
+  assign b_p1 = io_b_regNext;
+  assign io_pads_reset_ = reset_;
+  assign pad_reset = 1'b0;
+  assign _zz_ChrontelPads_1_ = 1'b0;
+  assign _zz_ChrontelPads_2_ = 1'b0;
+  assign _zz_ChrontelPads_3_ = 1'b0;
+  assign _zz_ChrontelPads_4_ = 1'b0;
+  assign _zz_ChrontelPads_5_ = 1'b0;
+  assign clk0 = _zz_ChrontelPads_68_;
+  assign clk90 = _zz_ChrontelPads_69_;
+  assign clk180 = _zz_ChrontelPads_70_;
+  assign clk270 = _zz_ChrontelPads_71_;
+  assign _zz_ChrontelPads_6_ = 1'b1;
+  assign _zz_ChrontelPads_7_ = 1'b0;
+  assign _zz_ChrontelPads_8_ = 1'b1;
+  assign _zz_ChrontelPads_9_ = 1'b0;
+  assign io_pads_xclk_p = _zz_ChrontelPads_79_;
+  assign _zz_ChrontelPads_10_ = 1'b0;
+  assign _zz_ChrontelPads_11_ = 1'b1;
+  assign _zz_ChrontelPads_12_ = 1'b1;
+  assign _zz_ChrontelPads_13_ = 1'b0;
+  assign io_pads_xclk_n = _zz_ChrontelPads_80_;
+  assign _zz_ChrontelPads_14_ = 1'b1;
+  assign _zz_ChrontelPads_15_ = 1'b0;
+  assign io_pads_v = _zz_ChrontelPads_81_;
+  assign _zz_ChrontelPads_16_ = 1'b1;
+  assign _zz_ChrontelPads_17_ = 1'b0;
+  assign io_pads_h = _zz_ChrontelPads_82_;
+  assign _zz_ChrontelPads_18_ = 1'b1;
+  assign _zz_ChrontelPads_19_ = 1'b0;
+  assign io_pads_de = _zz_ChrontelPads_83_;
+  assign d_p = {g_p1[3 : 0],b_p1[7 : 0]};
+  assign d_n = {r_p1[7 : 0],g_p1[7 : 4]};
+  assign _zz_ChrontelPads_20_ = d_p[0];
+  assign _zz_ChrontelPads_21_ = d_n[0];
+  assign _zz_ChrontelPads_22_ = 1'b1;
+  assign _zz_ChrontelPads_23_ = 1'b0;
+  always @ (*) begin
+    io_pads_d[0] = _zz_ChrontelPads_84_;
+    io_pads_d[1] = _zz_ChrontelPads_85_;
+    io_pads_d[2] = _zz_ChrontelPads_86_;
+    io_pads_d[3] = _zz_ChrontelPads_87_;
+    io_pads_d[4] = _zz_ChrontelPads_88_;
+    io_pads_d[5] = _zz_ChrontelPads_89_;
+    io_pads_d[6] = _zz_ChrontelPads_90_;
+    io_pads_d[7] = _zz_ChrontelPads_91_;
+    io_pads_d[8] = _zz_ChrontelPads_92_;
+    io_pads_d[9] = _zz_ChrontelPads_93_;
+    io_pads_d[10] = _zz_ChrontelPads_94_;
+    io_pads_d[11] = _zz_ChrontelPads_95_;
+  end
+
+  assign _zz_ChrontelPads_24_ = d_p[1];
+  assign _zz_ChrontelPads_25_ = d_n[1];
+  assign _zz_ChrontelPads_26_ = 1'b1;
+  assign _zz_ChrontelPads_27_ = 1'b0;
+  assign _zz_ChrontelPads_28_ = d_p[2];
+  assign _zz_ChrontelPads_29_ = d_n[2];
+  assign _zz_ChrontelPads_30_ = 1'b1;
+  assign _zz_ChrontelPads_31_ = 1'b0;
+  assign _zz_ChrontelPads_32_ = d_p[3];
+  assign _zz_ChrontelPads_33_ = d_n[3];
+  assign _zz_ChrontelPads_34_ = 1'b1;
+  assign _zz_ChrontelPads_35_ = 1'b0;
+  assign _zz_ChrontelPads_36_ = d_p[4];
+  assign _zz_ChrontelPads_37_ = d_n[4];
+  assign _zz_ChrontelPads_38_ = 1'b1;
+  assign _zz_ChrontelPads_39_ = 1'b0;
+  assign _zz_ChrontelPads_40_ = d_p[5];
+  assign _zz_ChrontelPads_41_ = d_n[5];
+  assign _zz_ChrontelPads_42_ = 1'b1;
+  assign _zz_ChrontelPads_43_ = 1'b0;
+  assign _zz_ChrontelPads_44_ = d_p[6];
+  assign _zz_ChrontelPads_45_ = d_n[6];
+  assign _zz_ChrontelPads_46_ = 1'b1;
+  assign _zz_ChrontelPads_47_ = 1'b0;
+  assign _zz_ChrontelPads_48_ = d_p[7];
+  assign _zz_ChrontelPads_49_ = d_n[7];
+  assign _zz_ChrontelPads_50_ = 1'b1;
+  assign _zz_ChrontelPads_51_ = 1'b0;
+  assign _zz_ChrontelPads_52_ = d_p[8];
+  assign _zz_ChrontelPads_53_ = d_n[8];
+  assign _zz_ChrontelPads_54_ = 1'b1;
+  assign _zz_ChrontelPads_55_ = 1'b0;
+  assign _zz_ChrontelPads_56_ = d_p[9];
+  assign _zz_ChrontelPads_57_ = d_n[9];
+  assign _zz_ChrontelPads_58_ = 1'b1;
+  assign _zz_ChrontelPads_59_ = 1'b0;
+  assign _zz_ChrontelPads_60_ = d_p[10];
+  assign _zz_ChrontelPads_61_ = d_n[10];
+  assign _zz_ChrontelPads_62_ = 1'b1;
+  assign _zz_ChrontelPads_63_ = 1'b0;
+  assign _zz_ChrontelPads_64_ = d_p[11];
+  assign _zz_ChrontelPads_65_ = d_n[11];
+  assign _zz_ChrontelPads_66_ = 1'b1;
+  assign _zz_ChrontelPads_67_ = 1'b0;
+  always @ (posedge clk) begin
+    io_vsync_regNext <= io_vsync;
+    io_hsync_regNext <= io_hsync;
+    io_de_regNext <= io_de;
+    io_r_regNext <= io_r;
+    io_g_regNext <= io_g;
+    io_b_regNext <= io_b;
+  end
+
+endmodule
+
+module ChrontelPads_1_ (
+      output  io_pads_reset_,
+      output  io_pads_xclk_p,
+      output  io_pads_v,
+      output  io_pads_h,
+      output  io_pads_de,
+      output reg [11:0] io_pads_d,
+      input   io_vsync,
+      input   io_hsync,
+      input   io_de,
+      input  [7:0] io_r,
+      input  [7:0] io_g,
+      input  [7:0] io_b,
+      input   clk,
+      input   reset_);
+  wire  _zz_ChrontelPads_1__1_;
+  wire  _zz_ChrontelPads_1__2_;
+  wire  _zz_ChrontelPads_1__3_;
+  wire  _zz_ChrontelPads_1__4_;
+  wire  _zz_ChrontelPads_1__5_;
+  wire  _zz_ChrontelPads_1__6_;
+  wire  _zz_ChrontelPads_1__7_;
+  wire  _zz_ChrontelPads_1__8_;
+  wire  _zz_ChrontelPads_1__9_;
+  wire  _zz_ChrontelPads_1__10_;
+  wire  _zz_ChrontelPads_1__11_;
+  wire  _zz_ChrontelPads_1__12_;
+  wire  _zz_ChrontelPads_1__13_;
+  wire  _zz_ChrontelPads_1__14_;
+  wire  _zz_ChrontelPads_1__15_;
+  wire  _zz_ChrontelPads_1__16_;
+  wire  _zz_ChrontelPads_1__17_;
+  wire  _zz_ChrontelPads_1__18_;
+  wire  _zz_ChrontelPads_1__19_;
+  wire  _zz_ChrontelPads_1__20_;
+  wire  _zz_ChrontelPads_1__21_;
+  wire  _zz_ChrontelPads_1__22_;
+  wire  _zz_ChrontelPads_1__23_;
+  wire  _zz_ChrontelPads_1__24_;
+  wire  _zz_ChrontelPads_1__25_;
+  wire  _zz_ChrontelPads_1__26_;
+  wire  _zz_ChrontelPads_1__27_;
+  wire  _zz_ChrontelPads_1__28_;
+  wire  _zz_ChrontelPads_1__29_;
+  wire  _zz_ChrontelPads_1__30_;
+  wire  _zz_ChrontelPads_1__31_;
+  wire  _zz_ChrontelPads_1__32_;
+  wire  _zz_ChrontelPads_1__33_;
+  wire  _zz_ChrontelPads_1__34_;
+  wire  _zz_ChrontelPads_1__35_;
+  wire  _zz_ChrontelPads_1__36_;
+  wire  _zz_ChrontelPads_1__37_;
+  wire  _zz_ChrontelPads_1__38_;
+  wire  _zz_ChrontelPads_1__39_;
+  wire  _zz_ChrontelPads_1__40_;
+  wire  _zz_ChrontelPads_1__41_;
+  wire  _zz_ChrontelPads_1__42_;
+  wire  _zz_ChrontelPads_1__43_;
+  wire  _zz_ChrontelPads_1__44_;
+  wire  _zz_ChrontelPads_1__45_;
+  wire  _zz_ChrontelPads_1__46_;
+  wire  _zz_ChrontelPads_1__47_;
+  wire  _zz_ChrontelPads_1__48_;
+  wire  _zz_ChrontelPads_1__49_;
+  wire  _zz_ChrontelPads_1__50_;
+  wire  _zz_ChrontelPads_1__51_;
+  wire  _zz_ChrontelPads_1__52_;
+  wire  _zz_ChrontelPads_1__53_;
+  wire  _zz_ChrontelPads_1__54_;
+  wire  _zz_ChrontelPads_1__55_;
+  wire  _zz_ChrontelPads_1__56_;
+  wire  _zz_ChrontelPads_1__57_;
+  wire  _zz_ChrontelPads_1__58_;
+  wire  _zz_ChrontelPads_1__59_;
+  wire  _zz_ChrontelPads_1__60_;
+  wire  _zz_ChrontelPads_1__61_;
+  wire  _zz_ChrontelPads_1__62_;
+  wire  _zz_ChrontelPads_1__63_;
+  wire  _zz_ChrontelPads_1__64_;
+  wire  _zz_ChrontelPads_1__65_;
+  wire  _zz_ChrontelPads_1__66_;
+  wire  _zz_ChrontelPads_1__67_;
+  wire  _zz_ChrontelPads_1__68_;
+  wire  _zz_ChrontelPads_1__69_;
+  wire  _zz_ChrontelPads_1__70_;
+  wire  _zz_ChrontelPads_1__71_;
+  wire  _zz_ChrontelPads_1__72_;
+  wire  _zz_ChrontelPads_1__73_;
+  wire [7:0] _zz_ChrontelPads_1__74_;
+  wire  _zz_ChrontelPads_1__75_;
+  wire  _zz_ChrontelPads_1__76_;
+  wire  _zz_ChrontelPads_1__77_;
+  wire  _zz_ChrontelPads_1__78_;
+  wire  _zz_ChrontelPads_1__79_;
+  wire  _zz_ChrontelPads_1__80_;
+  wire  _zz_ChrontelPads_1__81_;
+  wire  _zz_ChrontelPads_1__82_;
+  wire  _zz_ChrontelPads_1__83_;
+  wire  _zz_ChrontelPads_1__84_;
+  wire  _zz_ChrontelPads_1__85_;
+  wire  _zz_ChrontelPads_1__86_;
+  wire  _zz_ChrontelPads_1__87_;
+  wire  _zz_ChrontelPads_1__88_;
+  wire  _zz_ChrontelPads_1__89_;
+  wire  _zz_ChrontelPads_1__90_;
+  wire  vsync_p1;
+  wire  hsync_p1;
+  wire  de_p1;
+  wire [7:0] r_p1;
+  wire [7:0] g_p1;
+  wire [7:0] b_p1;
+  (* keep = "true" *) reg  io_vsync_regNext;
+  (* keep = "true" *) reg  io_hsync_regNext;
+  (* keep = "true" *) reg  io_de_regNext;
+  (* keep = "true" *) reg [7:0] io_r_regNext;
+  (* keep = "true" *) reg [7:0] io_g_regNext;
+  (* keep = "true" *) reg [7:0] io_b_regNext;
+  wire  clk0;
+  wire  clk90;
+  wire  clk180;
+  wire  clk270;
+  wire  pad_reset;
+  wire [11:0] d_p;
+  wire [11:0] d_n;
+  DCM_SP #( 
+    .CLKDV_DIVIDE(2.0),
+    .CLK_FEEDBACK("1X"),
+    .CLKFX_DIVIDE(1),
+    .CLKFX_MULTIPLY(2),
+    .CLKIN_DIVIDE_BY_2(1'b0),
+    .CLKIN_PERIOD("10.0"),
+    .CLKOUT_PHASE_SHIFT("NONE"),
+    .DESKEW_ADJUST("SYSTEM_SYNCHRONOUS"),
+    .DLL_FREQUENCY_MODE("LOW"),
+    .DSS_MODE("NONE"),
+    .DUTY_CYCLE_CORRECTION(1'b0),
+    .PHASE_SHIFT(0),
+    .STARTUP_WAIT(1'b0) 
+  ) u_dcm ( 
+    .RST(pad_reset),
+    .CLKIN(clk),
+    .CLKFB(clk0),
+    .DSSEN(_zz_ChrontelPads_1__1_),
+    .PSCLK(_zz_ChrontelPads_1__2_),
+    .PSINCDEC(_zz_ChrontelPads_1__3_),
+    .PSEN(_zz_ChrontelPads_1__4_),
+    .PSDONE(_zz_ChrontelPads_1__5_),
+    .CLK0(_zz_ChrontelPads_1__64_),
+    .CLK90(_zz_ChrontelPads_1__65_),
+    .CLK180(_zz_ChrontelPads_1__66_),
+    .CLK270(_zz_ChrontelPads_1__67_),
+    .CLK2X(_zz_ChrontelPads_1__68_),
+    .CLK2X180(_zz_ChrontelPads_1__69_),
+    .CLKDV(_zz_ChrontelPads_1__70_),
+    .CLKFX(_zz_ChrontelPads_1__71_),
+    .CLKFX180(_zz_ChrontelPads_1__72_),
+    .LOCKED(_zz_ChrontelPads_1__73_),
+    .STATUS(_zz_ChrontelPads_1__74_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) u_pad_xclk_p ( 
+    .D0(_zz_ChrontelPads_1__6_),
+    .D1(_zz_ChrontelPads_1__7_),
+    .C0(clk90),
+    .C1(clk270),
+    .CE(_zz_ChrontelPads_1__8_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_1__9_),
+    .Q(_zz_ChrontelPads_1__75_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) u_pad_vsync ( 
+    .D0(vsync_p1),
+    .D1(vsync_p1),
+    .C0(clk0),
+    .C1(clk180),
+    .CE(_zz_ChrontelPads_1__10_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_1__11_),
+    .Q(_zz_ChrontelPads_1__76_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) u_pad_hsync ( 
+    .D0(hsync_p1),
+    .D1(hsync_p1),
+    .C0(clk0),
+    .C1(clk180),
+    .CE(_zz_ChrontelPads_1__12_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_1__13_),
+    .Q(_zz_ChrontelPads_1__77_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) u_pad_de ( 
+    .D0(de_p1),
+    .D1(de_p1),
+    .C0(clk0),
+    .C1(clk180),
+    .CE(_zz_ChrontelPads_1__14_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_1__15_),
+    .Q(_zz_ChrontelPads_1__78_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) oDDR2_1_ ( 
+    .D0(_zz_ChrontelPads_1__16_),
+    .D1(_zz_ChrontelPads_1__17_),
+    .C0(clk0),
+    .C1(clk180),
+    .CE(_zz_ChrontelPads_1__18_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_1__19_),
+    .Q(_zz_ChrontelPads_1__79_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) oDDR2_2_ ( 
+    .D0(_zz_ChrontelPads_1__20_),
+    .D1(_zz_ChrontelPads_1__21_),
+    .C0(clk0),
+    .C1(clk180),
+    .CE(_zz_ChrontelPads_1__22_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_1__23_),
+    .Q(_zz_ChrontelPads_1__80_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) oDDR2_3_ ( 
+    .D0(_zz_ChrontelPads_1__24_),
+    .D1(_zz_ChrontelPads_1__25_),
+    .C0(clk0),
+    .C1(clk180),
+    .CE(_zz_ChrontelPads_1__26_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_1__27_),
+    .Q(_zz_ChrontelPads_1__81_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) oDDR2_4_ ( 
+    .D0(_zz_ChrontelPads_1__28_),
+    .D1(_zz_ChrontelPads_1__29_),
+    .C0(clk0),
+    .C1(clk180),
+    .CE(_zz_ChrontelPads_1__30_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_1__31_),
+    .Q(_zz_ChrontelPads_1__82_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) oDDR2_5_ ( 
+    .D0(_zz_ChrontelPads_1__32_),
+    .D1(_zz_ChrontelPads_1__33_),
+    .C0(clk0),
+    .C1(clk180),
+    .CE(_zz_ChrontelPads_1__34_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_1__35_),
+    .Q(_zz_ChrontelPads_1__83_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) oDDR2_6_ ( 
+    .D0(_zz_ChrontelPads_1__36_),
+    .D1(_zz_ChrontelPads_1__37_),
+    .C0(clk0),
+    .C1(clk180),
+    .CE(_zz_ChrontelPads_1__38_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_1__39_),
+    .Q(_zz_ChrontelPads_1__84_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) oDDR2_7_ ( 
+    .D0(_zz_ChrontelPads_1__40_),
+    .D1(_zz_ChrontelPads_1__41_),
+    .C0(clk0),
+    .C1(clk180),
+    .CE(_zz_ChrontelPads_1__42_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_1__43_),
+    .Q(_zz_ChrontelPads_1__85_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) oDDR2_8_ ( 
+    .D0(_zz_ChrontelPads_1__44_),
+    .D1(_zz_ChrontelPads_1__45_),
+    .C0(clk0),
+    .C1(clk180),
+    .CE(_zz_ChrontelPads_1__46_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_1__47_),
+    .Q(_zz_ChrontelPads_1__86_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) oDDR2_9_ ( 
+    .D0(_zz_ChrontelPads_1__48_),
+    .D1(_zz_ChrontelPads_1__49_),
+    .C0(clk0),
+    .C1(clk180),
+    .CE(_zz_ChrontelPads_1__50_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_1__51_),
+    .Q(_zz_ChrontelPads_1__87_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) oDDR2_10_ ( 
+    .D0(_zz_ChrontelPads_1__52_),
+    .D1(_zz_ChrontelPads_1__53_),
+    .C0(clk0),
+    .C1(clk180),
+    .CE(_zz_ChrontelPads_1__54_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_1__55_),
+    .Q(_zz_ChrontelPads_1__88_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) oDDR2_11_ ( 
+    .D0(_zz_ChrontelPads_1__56_),
+    .D1(_zz_ChrontelPads_1__57_),
+    .C0(clk0),
+    .C1(clk180),
+    .CE(_zz_ChrontelPads_1__58_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_1__59_),
+    .Q(_zz_ChrontelPads_1__89_) 
+  );
+  ODDR2 #( 
+    .DDR_ALIGNMENT("C0"),
+    .INIT(1'b0),
+    .SRTYPE("ASYNC") 
+  ) oDDR2_12_ ( 
+    .D0(_zz_ChrontelPads_1__60_),
+    .D1(_zz_ChrontelPads_1__61_),
+    .C0(clk0),
+    .C1(clk180),
+    .CE(_zz_ChrontelPads_1__62_),
+    .R(pad_reset),
+    .S(_zz_ChrontelPads_1__63_),
+    .Q(_zz_ChrontelPads_1__90_) 
+  );
+  assign vsync_p1 = io_vsync_regNext;
+  assign hsync_p1 = io_hsync_regNext;
+  assign de_p1 = io_de_regNext;
+  assign r_p1 = io_r_regNext;
+  assign g_p1 = io_g_regNext;
+  assign b_p1 = io_b_regNext;
+  assign io_pads_reset_ = reset_;
+  assign pad_reset = 1'b0;
+  assign _zz_ChrontelPads_1__1_ = 1'b0;
+  assign _zz_ChrontelPads_1__2_ = 1'b0;
+  assign _zz_ChrontelPads_1__3_ = 1'b0;
+  assign _zz_ChrontelPads_1__4_ = 1'b0;
+  assign _zz_ChrontelPads_1__5_ = 1'b0;
+  assign clk0 = _zz_ChrontelPads_1__64_;
+  assign clk90 = _zz_ChrontelPads_1__65_;
+  assign clk180 = _zz_ChrontelPads_1__66_;
+  assign clk270 = _zz_ChrontelPads_1__67_;
+  assign _zz_ChrontelPads_1__6_ = 1'b1;
+  assign _zz_ChrontelPads_1__7_ = 1'b0;
+  assign _zz_ChrontelPads_1__8_ = 1'b1;
+  assign _zz_ChrontelPads_1__9_ = 1'b0;
+  assign io_pads_xclk_p = _zz_ChrontelPads_1__75_;
+  assign _zz_ChrontelPads_1__10_ = 1'b1;
+  assign _zz_ChrontelPads_1__11_ = 1'b0;
+  assign io_pads_v = _zz_ChrontelPads_1__76_;
+  assign _zz_ChrontelPads_1__12_ = 1'b1;
+  assign _zz_ChrontelPads_1__13_ = 1'b0;
+  assign io_pads_h = _zz_ChrontelPads_1__77_;
+  assign _zz_ChrontelPads_1__14_ = 1'b1;
+  assign _zz_ChrontelPads_1__15_ = 1'b0;
+  assign io_pads_de = _zz_ChrontelPads_1__78_;
+  assign d_p = {g_p1[3 : 0],b_p1[7 : 0]};
+  assign d_n = {r_p1[7 : 0],g_p1[7 : 4]};
+  assign _zz_ChrontelPads_1__16_ = d_p[0];
+  assign _zz_ChrontelPads_1__17_ = d_n[0];
+  assign _zz_ChrontelPads_1__18_ = 1'b1;
+  assign _zz_ChrontelPads_1__19_ = 1'b0;
+  always @ (*) begin
+    io_pads_d[0] = _zz_ChrontelPads_1__79_;
+    io_pads_d[1] = _zz_ChrontelPads_1__80_;
+    io_pads_d[2] = _zz_ChrontelPads_1__81_;
+    io_pads_d[3] = _zz_ChrontelPads_1__82_;
+    io_pads_d[4] = _zz_ChrontelPads_1__83_;
+    io_pads_d[5] = _zz_ChrontelPads_1__84_;
+    io_pads_d[6] = _zz_ChrontelPads_1__85_;
+    io_pads_d[7] = _zz_ChrontelPads_1__86_;
+    io_pads_d[8] = _zz_ChrontelPads_1__87_;
+    io_pads_d[9] = _zz_ChrontelPads_1__88_;
+    io_pads_d[10] = _zz_ChrontelPads_1__89_;
+    io_pads_d[11] = _zz_ChrontelPads_1__90_;
+  end
+
+  assign _zz_ChrontelPads_1__20_ = d_p[1];
+  assign _zz_ChrontelPads_1__21_ = d_n[1];
+  assign _zz_ChrontelPads_1__22_ = 1'b1;
+  assign _zz_ChrontelPads_1__23_ = 1'b0;
+  assign _zz_ChrontelPads_1__24_ = d_p[2];
+  assign _zz_ChrontelPads_1__25_ = d_n[2];
+  assign _zz_ChrontelPads_1__26_ = 1'b1;
+  assign _zz_ChrontelPads_1__27_ = 1'b0;
+  assign _zz_ChrontelPads_1__28_ = d_p[3];
+  assign _zz_ChrontelPads_1__29_ = d_n[3];
+  assign _zz_ChrontelPads_1__30_ = 1'b1;
+  assign _zz_ChrontelPads_1__31_ = 1'b0;
+  assign _zz_ChrontelPads_1__32_ = d_p[4];
+  assign _zz_ChrontelPads_1__33_ = d_n[4];
+  assign _zz_ChrontelPads_1__34_ = 1'b1;
+  assign _zz_ChrontelPads_1__35_ = 1'b0;
+  assign _zz_ChrontelPads_1__36_ = d_p[5];
+  assign _zz_ChrontelPads_1__37_ = d_n[5];
+  assign _zz_ChrontelPads_1__38_ = 1'b1;
+  assign _zz_ChrontelPads_1__39_ = 1'b0;
+  assign _zz_ChrontelPads_1__40_ = d_p[6];
+  assign _zz_ChrontelPads_1__41_ = d_n[6];
+  assign _zz_ChrontelPads_1__42_ = 1'b1;
+  assign _zz_ChrontelPads_1__43_ = 1'b0;
+  assign _zz_ChrontelPads_1__44_ = d_p[7];
+  assign _zz_ChrontelPads_1__45_ = d_n[7];
+  assign _zz_ChrontelPads_1__46_ = 1'b1;
+  assign _zz_ChrontelPads_1__47_ = 1'b0;
+  assign _zz_ChrontelPads_1__48_ = d_p[8];
+  assign _zz_ChrontelPads_1__49_ = d_n[8];
+  assign _zz_ChrontelPads_1__50_ = 1'b1;
+  assign _zz_ChrontelPads_1__51_ = 1'b0;
+  assign _zz_ChrontelPads_1__52_ = d_p[9];
+  assign _zz_ChrontelPads_1__53_ = d_n[9];
+  assign _zz_ChrontelPads_1__54_ = 1'b1;
+  assign _zz_ChrontelPads_1__55_ = 1'b0;
+  assign _zz_ChrontelPads_1__56_ = d_p[10];
+  assign _zz_ChrontelPads_1__57_ = d_n[10];
+  assign _zz_ChrontelPads_1__58_ = 1'b1;
+  assign _zz_ChrontelPads_1__59_ = 1'b0;
+  assign _zz_ChrontelPads_1__60_ = d_p[11];
+  assign _zz_ChrontelPads_1__61_ = d_n[11];
+  assign _zz_ChrontelPads_1__62_ = 1'b1;
+  assign _zz_ChrontelPads_1__63_ = 1'b0;
+  always @ (posedge clk) begin
+    io_vsync_regNext <= io_vsync;
+    io_hsync_regNext <= io_hsync;
+    io_de_regNext <= io_de;
+    io_r_regNext <= io_r;
+    io_g_regNext <= io_g;
+    io_b_regNext <= io_b;
   end
 
 endmodule
@@ -16156,48 +16154,66 @@ module Pano (
       output [11:0] hdmi_d,
       inout  dvi_spc,
       inout  dvi_spd);
-  wire  _zz_10_;
-  wire  _zz_11_;
-  wire  _zz_12_;
-  wire  _zz_13_;
-  wire  _zz_14_;
-  wire  _zz_15_;
-  wire [11:0] _zz_16_;
-  wire  _zz_17_;
-  wire  _zz_18_;
-  wire  _zz_19_;
-  wire  _zz_20_;
-  wire  _zz_21_;
-  wire [11:0] _zz_22_;
-  wire  _zz_23_;
-  wire  _zz_24_;
-  wire  _zz_25_;
-  wire  _zz_26_;
-  wire  _zz_27_;
-  wire  _zz_28_;
-  wire  _zz_29_;
-  wire  _zz_30_;
-  wire  _zz_31_;
-  wire  _zz_32_;
-  wire  _zz_33_;
-  wire [7:0] _zz_34_;
-  wire [7:0] _zz_35_;
-  wire [7:0] _zz_36_;
-  wire  _zz_37_;
-  reg  _zz_1_;
-  reg  _zz_2_;
-  wire  _zz_3_;
-  wire  _zz_4_;
-  wire  _zz_5_;
-  wire  _zz_6_;
-  wire  _zz_7_;
-  wire  _zz_8_;
-  reg  resetCtrl_reset_unbuffered_;
-  reg [4:0] resetCtrl_reset_cntr = (5'b00000);
-  wire [4:0] _zz_9_;
-  reg  resetCtrl_osc_reset_;
+  wire  _zz_Pano_11_;
+  wire  _zz_Pano_12_;
+  wire  _zz_Pano_13_;
+  wire  _zz_Pano_14_;
+  wire  _zz_Pano_15_;
+  wire  _zz_Pano_16_;
+  wire  _zz_Pano_17_;
+  wire  _zz_Pano_18_;
+  wire  _zz_Pano_19_;
+  wire  _zz_Pano_20_;
+  wire  _zz_Pano_21_;
+  wire  _zz_Pano_22_;
+  wire  _zz_Pano_23_;
+  wire  _zz_Pano_24_;
+  wire  _zz_Pano_25_;
+  wire  _zz_Pano_26_;
+  wire  _zz_Pano_27_;
+  wire  _zz_Pano_28_;
+  wire  _zz_Pano_29_;
+  wire  _zz_Pano_30_;
+  wire  _zz_Pano_31_;
+  wire [7:0] _zz_Pano_32_;
+  wire [7:0] _zz_Pano_33_;
+  wire [7:0] _zz_Pano_34_;
+  wire  _zz_Pano_35_;
+  wire  _zz_Pano_36_;
+  wire  _zz_Pano_37_;
+  wire  _zz_Pano_38_;
+  wire  _zz_Pano_39_;
+  wire  _zz_Pano_40_;
+  wire [11:0] _zz_Pano_41_;
+  wire  _zz_Pano_42_;
+  wire  _zz_Pano_43_;
+  wire  _zz_Pano_44_;
+  wire  _zz_Pano_45_;
+  wire  _zz_Pano_46_;
+  wire [11:0] _zz_Pano_47_;
+  wire  _zz_Pano_48_;
+  wire  _zz_Pano_49_;
+  reg  _zz_Pano_1_;
+  reg  _zz_Pano_2_;
+  wire  _zz_Pano_3_;
+  wire  _zz_Pano_4_;
+  wire  _zz_Pano_5_;
+  wire  _zz_Pano_6_;
+  wire  _zz_Pano_7_;
+  wire  _zz_Pano_8_;
+  wire  osc_reset_;
+  reg  osc_reset_gen_reset_unbuffered_;
+  reg [4:0] osc_reset_gen_reset_cntr = (5'b00000);
+  wire [4:0] _zz_Pano_9_;
+  reg  osc_reset_gen_reset_unbuffered__regNext;
   wire  clk25;
   wire  reset25_;
+  wire  vo_clk;
+  wire  vo_reset_;
+  reg  vo_reset_gen_reset_unbuffered_;
+  reg [4:0] vo_reset_gen_reset_cntr = (5'b00000);
+  wire [4:0] _zz_Pano_10_;
+  reg  vo_reset_gen_reset_unbuffered__regNext;
   wire  core_vo_vsync;
   wire  core_vo_hsync;
   wire  core_vo_blank_;
@@ -16205,124 +16221,174 @@ module Pano (
   wire [7:0] core_vo_r;
   wire [7:0] core_vo_g;
   wire [7:0] core_vo_b;
-  assign _zz_37_ = (resetCtrl_reset_cntr != _zz_9_);
-  ChrontelPads core_u_dvi ( 
-    .io_pads_reset_(_zz_10_),
-    .io_pads_xclk_p(_zz_11_),
-    .io_pads_xclk_n(_zz_12_),
-    .io_pads_v(_zz_13_),
-    .io_pads_h(_zz_14_),
-    .io_pads_de(_zz_15_),
-    .io_pads_d(_zz_16_),
-    .io_vsync(core_vo_vsync),
-    .io_hsync(core_vo_hsync),
-    .io_de(core_vo_de),
-    .io_r(core_vo_r),
-    .io_g(core_vo_g),
-    .io_b(core_vo_b),
-    .clk(clk25),
-    .reset_(reset25_) 
-  );
-  ChrontelPads_1_ core_u_hdmi ( 
-    .io_pads_reset_(_zz_17_),
-    .io_pads_xclk_p(_zz_18_),
-    .io_pads_v(_zz_19_),
-    .io_pads_h(_zz_20_),
-    .io_pads_de(_zz_21_),
-    .io_pads_d(_zz_22_),
-    .io_vsync(core_vo_vsync),
-    .io_hsync(core_vo_hsync),
-    .io_de(core_vo_de),
-    .io_r(core_vo_r),
-    .io_g(core_vo_g),
-    .io_b(core_vo_b),
-    .clk(clk25),
-    .reset_(reset25_) 
+  assign _zz_Pano_48_ = (osc_reset_gen_reset_cntr != _zz_Pano_9_);
+  assign _zz_Pano_49_ = (vo_reset_gen_reset_cntr != _zz_Pano_10_);
+  DCM_CLKGEN #( 
+    .CLKFX_DIVIDE(25),
+    .CLKFXDV_DIVIDE(2),
+    .CLKFX_MD_MAX(0.0),
+    .CLKFX_MULTIPLY(25),
+    .CLKIN_PERIOD("40.0"),
+    .SPREAD_SPECTRUM("NONE"),
+    .STARTUP_WAIT(1'b0) 
+  ) u_vo_clk_gen ( 
+    .CLKIN(osc_clk),
+    .CLKFX(_zz_Pano_16_),
+    .CLKFX180(_zz_Pano_17_),
+    .CLKFXDV(_zz_Pano_18_),
+    .RST(_zz_Pano_11_),
+    .FREEZEDCM(_zz_Pano_12_),
+    .LOCKED(_zz_Pano_19_),
+    .PROGCLK(_zz_Pano_13_),
+    .PROGDATA(_zz_Pano_14_),
+    .PROGEN(_zz_Pano_15_),
+    .PROGDONE(_zz_Pano_20_) 
   );
   PanoCore core_u_pano_core ( 
-    .io_led_red(_zz_23_),
-    .io_led_green(_zz_24_),
-    .io_led_blue(_zz_25_),
+    .io_led_red(_zz_Pano_21_),
+    .io_led_green(_zz_Pano_22_),
+    .io_led_blue(_zz_Pano_23_),
     .io_switch_(pano_button),
-    .io_dvi_ctrl_scl_read(_zz_3_),
-    .io_dvi_ctrl_scl_write(_zz_26_),
-    .io_dvi_ctrl_scl_writeEnable(_zz_27_),
-    .io_dvi_ctrl_sda_read(_zz_6_),
-    .io_dvi_ctrl_sda_write(_zz_28_),
-    .io_dvi_ctrl_sda_writeEnable(_zz_29_),
-    .io_vo_vsync(_zz_30_),
-    .io_vo_hsync(_zz_31_),
-    .io_vo_blank_(_zz_32_),
-    .io_vo_de(_zz_33_),
-    .io_vo_r(_zz_34_),
-    .io_vo_g(_zz_35_),
-    .io_vo_b(_zz_36_),
+    .io_dvi_ctrl_scl_read(_zz_Pano_3_),
+    .io_dvi_ctrl_scl_write(_zz_Pano_24_),
+    .io_dvi_ctrl_scl_writeEnable(_zz_Pano_25_),
+    .io_dvi_ctrl_sda_read(_zz_Pano_6_),
+    .io_dvi_ctrl_sda_write(_zz_Pano_26_),
+    .io_dvi_ctrl_sda_writeEnable(_zz_Pano_27_),
+    .io_vo_vsync(_zz_Pano_28_),
+    .io_vo_hsync(_zz_Pano_29_),
+    .io_vo_blank_(_zz_Pano_30_),
+    .io_vo_de(_zz_Pano_31_),
+    .io_vo_r(_zz_Pano_32_),
+    .io_vo_g(_zz_Pano_33_),
+    .io_vo_b(_zz_Pano_34_),
     .clk25(clk25),
-    .reset25_(reset25_) 
+    .reset25_(reset25_),
+    .vo_clk(vo_clk),
+    .vo_reset_(vo_reset_) 
   );
-  assign dvi_spc = _zz_2_ ? _zz_4_ : 1'bz;
-  assign dvi_spd = _zz_1_ ? _zz_7_ : 1'bz;
+  ChrontelPads core_u_dvi ( 
+    .io_pads_reset_(_zz_Pano_35_),
+    .io_pads_xclk_p(_zz_Pano_36_),
+    .io_pads_xclk_n(_zz_Pano_37_),
+    .io_pads_v(_zz_Pano_38_),
+    .io_pads_h(_zz_Pano_39_),
+    .io_pads_de(_zz_Pano_40_),
+    .io_pads_d(_zz_Pano_41_),
+    .io_vsync(core_vo_vsync),
+    .io_hsync(core_vo_hsync),
+    .io_de(core_vo_de),
+    .io_r(core_vo_r),
+    .io_g(core_vo_g),
+    .io_b(core_vo_b),
+    .clk(vo_clk),
+    .reset_(vo_reset_) 
+  );
+  ChrontelPads_1_ core_u_hdmi ( 
+    .io_pads_reset_(_zz_Pano_42_),
+    .io_pads_xclk_p(_zz_Pano_43_),
+    .io_pads_v(_zz_Pano_44_),
+    .io_pads_h(_zz_Pano_45_),
+    .io_pads_de(_zz_Pano_46_),
+    .io_pads_d(_zz_Pano_47_),
+    .io_vsync(core_vo_vsync),
+    .io_hsync(core_vo_hsync),
+    .io_de(core_vo_de),
+    .io_r(core_vo_r),
+    .io_g(core_vo_g),
+    .io_b(core_vo_b),
+    .clk(vo_clk),
+    .reset_(vo_reset_) 
+  );
+  assign dvi_spc = _zz_Pano_2_ ? _zz_Pano_4_ : 1'bz;
+  assign dvi_spd = _zz_Pano_1_ ? _zz_Pano_7_ : 1'bz;
   always @ (*) begin
-    _zz_1_ = 1'b0;
-    if(_zz_8_)begin
-      _zz_1_ = 1'b1;
+    _zz_Pano_1_ = 1'b0;
+    if(_zz_Pano_8_)begin
+      _zz_Pano_1_ = 1'b1;
     end
   end
 
   always @ (*) begin
-    _zz_2_ = 1'b0;
-    if(_zz_5_)begin
-      _zz_2_ = 1'b1;
+    _zz_Pano_2_ = 1'b0;
+    if(_zz_Pano_5_)begin
+      _zz_Pano_2_ = 1'b1;
     end
   end
 
   always @ (*) begin
-    resetCtrl_reset_unbuffered_ = 1'b1;
-    if(_zz_37_)begin
-      resetCtrl_reset_unbuffered_ = 1'b0;
+    osc_reset_gen_reset_unbuffered_ = 1'b1;
+    if(_zz_Pano_48_)begin
+      osc_reset_gen_reset_unbuffered_ = 1'b0;
     end
   end
 
-  assign _zz_9_[4 : 0] = (5'b11111);
+  assign _zz_Pano_9_[4 : 0] = (5'b11111);
+  assign osc_reset_ = osc_reset_gen_reset_unbuffered__regNext;
   assign clk25 = osc_clk;
-  assign reset25_ = resetCtrl_osc_reset_;
-  assign dvi_reset_ = _zz_10_;
-  assign dvi_xclk_p = _zz_11_;
-  assign dvi_xclk_n = _zz_12_;
-  assign dvi_v = _zz_13_;
-  assign dvi_h = _zz_14_;
-  assign dvi_de = _zz_15_;
-  assign dvi_d = _zz_16_;
-  assign hdmi_reset_ = _zz_17_;
-  assign hdmi_xclk_p = _zz_18_;
-  assign hdmi_v = _zz_19_;
-  assign hdmi_h = _zz_20_;
-  assign hdmi_de = _zz_21_;
-  assign hdmi_d = _zz_22_;
-  assign led_red = _zz_23_;
-  assign led_green = _zz_24_;
-  assign led_blue = _zz_25_;
-  assign _zz_4_ = _zz_26_;
-  assign _zz_5_ = _zz_27_;
-  assign _zz_7_ = _zz_28_;
-  assign _zz_8_ = _zz_29_;
-  assign core_vo_vsync = _zz_30_;
-  assign core_vo_hsync = _zz_31_;
-  assign core_vo_blank_ = _zz_32_;
-  assign core_vo_de = _zz_33_;
-  assign core_vo_r = _zz_34_;
-  assign core_vo_g = _zz_35_;
-  assign core_vo_b = _zz_36_;
-  assign _zz_3_ = dvi_spc;
-  assign _zz_6_ = dvi_spd;
+  assign reset25_ = osc_reset_;
+  assign vo_clk = _zz_Pano_16_;
+  assign _zz_Pano_11_ = 1'b0;
+  assign _zz_Pano_12_ = 1'b0;
+  assign _zz_Pano_13_ = 1'b0;
+  assign _zz_Pano_14_ = 1'b0;
+  assign _zz_Pano_15_ = 1'b0;
+  always @ (*) begin
+    vo_reset_gen_reset_unbuffered_ = 1'b1;
+    if(_zz_Pano_49_)begin
+      vo_reset_gen_reset_unbuffered_ = 1'b0;
+    end
+  end
+
+  assign _zz_Pano_10_[4 : 0] = (5'b11111);
+  assign vo_reset_ = vo_reset_gen_reset_unbuffered__regNext;
+  assign led_red = _zz_Pano_21_;
+  assign led_green = _zz_Pano_22_;
+  assign led_blue = _zz_Pano_23_;
+  assign _zz_Pano_4_ = _zz_Pano_24_;
+  assign _zz_Pano_5_ = _zz_Pano_25_;
+  assign _zz_Pano_7_ = _zz_Pano_26_;
+  assign _zz_Pano_8_ = _zz_Pano_27_;
+  assign core_vo_vsync = _zz_Pano_28_;
+  assign core_vo_hsync = _zz_Pano_29_;
+  assign core_vo_blank_ = _zz_Pano_30_;
+  assign core_vo_de = _zz_Pano_31_;
+  assign core_vo_r = _zz_Pano_32_;
+  assign core_vo_g = _zz_Pano_33_;
+  assign core_vo_b = _zz_Pano_34_;
+  assign dvi_reset_ = _zz_Pano_35_;
+  assign dvi_xclk_p = _zz_Pano_36_;
+  assign dvi_xclk_n = _zz_Pano_37_;
+  assign dvi_v = _zz_Pano_38_;
+  assign dvi_h = _zz_Pano_39_;
+  assign dvi_de = _zz_Pano_40_;
+  assign dvi_d = _zz_Pano_41_;
+  assign hdmi_reset_ = _zz_Pano_42_;
+  assign hdmi_xclk_p = _zz_Pano_43_;
+  assign hdmi_v = _zz_Pano_44_;
+  assign hdmi_h = _zz_Pano_45_;
+  assign hdmi_de = _zz_Pano_46_;
+  assign hdmi_d = _zz_Pano_47_;
+  assign _zz_Pano_3_ = dvi_spc;
+  assign _zz_Pano_6_ = dvi_spd;
   always @ (posedge osc_clk) begin
-    if(_zz_37_)begin
-      resetCtrl_reset_cntr <= (resetCtrl_reset_cntr + (5'b00001));
+    if(_zz_Pano_48_)begin
+      osc_reset_gen_reset_cntr <= (osc_reset_gen_reset_cntr + (5'b00001));
     end
   end
 
   always @ (posedge osc_clk) begin
-    resetCtrl_osc_reset_ <= resetCtrl_reset_unbuffered_;
+    osc_reset_gen_reset_unbuffered__regNext <= osc_reset_gen_reset_unbuffered_;
+  end
+
+  always @ (posedge vo_clk) begin
+    if(_zz_Pano_49_)begin
+      vo_reset_gen_reset_cntr <= (vo_reset_gen_reset_cntr + (5'b00001));
+    end
+  end
+
+  always @ (posedge vo_clk) begin
+    vo_reset_gen_reset_unbuffered__regNext <= vo_reset_gen_reset_unbuffered_;
   end
 
 endmodule
