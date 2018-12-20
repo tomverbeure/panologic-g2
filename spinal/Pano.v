@@ -1,5 +1,5 @@
 // Generator : SpinalHDL v1.2.2    git head : 3159d9865a8de00378e0b0405c338a97c2f5a601
-// Date      : 19/12/2018, 22:28:26
+// Date      : 19/12/2018, 23:05:23
 // Component : Pano
 
 
@@ -4828,8 +4828,8 @@ module MR1Top (
   assign ram_cpuRamContent_918 = (32'b00000011010001000010001000100011);
   assign ram_cpuRamContent_919 = (32'b11110111100111111111000001101111);
   assign ram_cpuRamContent_920 = (32'b01000000000111010000000000011100);
-  assign ram_cpuRamContent_921 = (32'b00001000001100111000000000011111);
-  assign ram_cpuRamContent_922 = (32'b01100000001101100001011000110100);
+  assign ram_cpuRamContent_921 = (32'b00000110001100111000000000011111);
+  assign ram_cpuRamContent_922 = (32'b10100000001101100010011000110100);
   assign ram_cpuRamContent_923 = (32'b11000000010010010001100001001000);
   assign ram_cpuRamContent_924 = (32'b00000000000000001111111111111111);
   assign ram_cpuRamContent_925 = (32'b01101111011011100110000101010000);
@@ -15074,17 +15074,17 @@ module PanoCore (
   assign const_color_r = _zz_PanoCore_10_;
   assign const_color_g = _zz_PanoCore_11_;
   assign const_color_b = _zz_PanoCore_12_;
-  assign vo_area_timings_h_active = (12'b001010000000);
-  assign vo_area_timings_h_fp = (9'b000010000);
-  assign vo_area_timings_h_sync = (9'b001100000);
-  assign vo_area_timings_h_bp = (9'b000110000);
-  assign vo_area_timings_h_sync_positive = 1'b0;
+  assign vo_area_timings_h_active = (12'b011110000000);
+  assign vo_area_timings_h_fp = (9'b001011000);
+  assign vo_area_timings_h_sync = (9'b000101100);
+  assign vo_area_timings_h_bp = (9'b010010100);
+  assign vo_area_timings_h_sync_positive = 1'b1;
   assign vo_area_timings_h_total_m1 = _zz_PanoCore_44_;
-  assign vo_area_timings_v_active = (11'b00111100000);
-  assign vo_area_timings_v_fp = (9'b000001011);
-  assign vo_area_timings_v_sync = (9'b000000010);
-  assign vo_area_timings_v_bp = (9'b000011111);
-  assign vo_area_timings_v_sync_positive = 1'b0;
+  assign vo_area_timings_v_active = (11'b10000111000);
+  assign vo_area_timings_v_fp = (9'b000000100);
+  assign vo_area_timings_v_sync = (9'b000000101);
+  assign vo_area_timings_v_bp = (9'b000100100);
+  assign vo_area_timings_v_sync_positive = 1'b1;
   assign vo_area_timings_v_total_m1 = {1'd0, _zz_PanoCore_51_};
   assign vo_area_vi_gen_pixel_out_vsync = _zz_PanoCore_16_;
   assign vo_area_vi_gen_pixel_out_req = _zz_PanoCore_17_;
@@ -16227,7 +16227,7 @@ module Pano (
     .CLKFX_DIVIDE(25),
     .CLKFXDV_DIVIDE(2),
     .CLKFX_MD_MAX(0.0),
-    .CLKFX_MULTIPLY(25),
+    .CLKFX_MULTIPLY(148),
     .CLKIN_PERIOD("40.0"),
     .SPREAD_SPECTRUM("NONE"),
     .STARTUP_WAIT(1'b0) 

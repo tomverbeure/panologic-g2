@@ -119,7 +119,8 @@ int main() {
     print("Pano Logic G2 Reverse Engineering\n");
     print("---------------------------------\n");
     print("\n");
-    print("Spartan-6 LX150 FPGA + DVI working\n");
+    print("Spartan-6 LX150 FPGA\n");
+    print("DVI & HDMI working @ 1080p\n");
     print("\n");
     print("Code at github.com/tomverbeure/panologic-g2\n");
 #endif

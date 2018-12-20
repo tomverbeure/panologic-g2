@@ -88,7 +88,7 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
             timings.v_sync_positive := True
             timings.v_total_m1      := (timings.v_active + timings.v_fp + timings.v_sync + timings.v_bp -1).resize(timings.v_total_m1.getWidth)
         }
-        else if (true) {
+        else if (false) {
             // 1152x864@60
             // Clock: 81.62MHz
             timings.h_active        := 1152
@@ -122,7 +122,7 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
             timings.v_sync_positive := True
             timings.v_total_m1      := (timings.v_active + timings.v_fp + timings.v_sync + timings.v_bp -1).resize(timings.v_total_m1.getWidth)
         }
-        else if (false) {
+        else if (true) {
             // 1080p@60
             // Clock: 147.5
             timings.h_active        := 1920

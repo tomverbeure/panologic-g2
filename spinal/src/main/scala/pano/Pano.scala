@@ -81,7 +81,7 @@ class Pano extends Component {
 
     val u_vo_clk_gen = new DCM_CLKGEN(
             clkfx_divide    = 25,
-            clkfx_multiply  = 82,
+            clkfx_multiply  = 148,
             clkin_period    = "40.0"
         )
     u_vo_clk_gen.io.CLKIN       <> io.osc_clk
