@@ -53,6 +53,7 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
 
         val timings = VideoTimings()
         if (false){
+            // 640x480@60
             timings.h_active        := 640
             timings.h_fp            := 16
             timings.h_sync          := 96
@@ -67,7 +68,26 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
             timings.v_sync_positive := False
             timings.v_total_m1      := (timings.v_active + timings.v_fp + timings.v_sync + timings.v_bp -1).resize(timings.v_total_m1.getWidth)
         }
-        else{
+        else if (false) {
+            // 1280x1024@60
+            // Clock: 108.0
+            timings.h_active        := 1280
+            timings.h_fp            := 48
+            timings.h_sync          := 112
+            timings.h_bp            := 248
+            timings.h_sync_positive := True
+            timings.h_total_m1      := (timings.h_active + timings.h_fp + timings.h_sync + timings.h_bp -1).resize(timings.h_total_m1.getWidth)
+
+            timings.v_active        := 1024
+            timings.v_fp            := 1
+            timings.v_sync          := 3
+            timings.v_bp            := 38
+            timings.v_sync_positive := True
+            timings.v_total_m1      := (timings.v_active + timings.v_fp + timings.v_sync + timings.v_bp -1).resize(timings.v_total_m1.getWidth)
+        }
+        else if (false) {
+            // 1080p@60
+            // Clock: 147.5
             timings.h_active        := 1920
             timings.h_fp            := 88
             timings.h_sync          := 44
@@ -79,6 +99,23 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
             timings.v_fp            := 4
             timings.v_sync          := 5
             timings.v_bp            := 36
+            timings.v_sync_positive := True
+            timings.v_total_m1      := (timings.v_active + timings.v_fp + timings.v_sync + timings.v_bp -1).resize(timings.v_total_m1.getWidth)
+        }
+        else  {
+            // 1680x1050@60
+            // Clock: 147MHz
+            timings.h_active        := 1680
+            timings.h_fp            := 104
+            timings.h_sync          := 184
+            timings.h_bp            := 288
+            timings.h_sync_positive := True
+            timings.h_total_m1      := (timings.h_active + timings.h_fp + timings.h_sync + timings.h_bp -1).resize(timings.h_total_m1.getWidth)
+
+            timings.v_active        := 1050
+            timings.v_fp            := 1
+            timings.v_sync          := 3
+            timings.v_bp            := 33
             timings.v_sync_positive := True
             timings.v_total_m1      := (timings.v_active + timings.v_fp + timings.v_sync + timings.v_bp -1).resize(timings.v_total_m1.getWidth)
         }
