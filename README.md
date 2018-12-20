@@ -9,6 +9,9 @@ did all the hard work of figuring out connections between the FPGA and periphera
 can also be found on [his wiki page](https://pano-wiki.cyrozap.com/wiki:g2_zero_client), though 
 this GitHub repo should now all have that information as well.
 
+There is a similar effort that focuses, among other things, on expanding the Pano Logic G2 with a break-out board.
+Check [here](https://github.com/twj42/PanoLogicG2_ReverseEngineering) for further information.
+
 The Pano Logic G2 is the successor of the [Pano Logic G1](https://github.com/tomverbeure/panologic). Like the
 G1, it has all the interfaces that are needed to build a small mini-computer with an FPGA.
 
