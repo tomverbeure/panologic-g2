@@ -49,10 +49,12 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
     u_mr1_top.io.test_pattern_nr            <> test_pattern_nr.addTag(crossClockDomain)
     u_mr1_top.io.test_pattern_const_color   <> const_color.addTag(crossClockDomain)
 
+    var cpuDomain = ClockDomain.current
+
     val vo_area = new ClockingArea(voClkDomain) {
 
         val timings = VideoTimings()
-        if (false){
+        if (true){
             // 640x480@60
             timings.h_active        := 640
             timings.h_fp            := 16
@@ -137,11 +139,11 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
 
         val txt_gen_pixel_out = PixelStream()
 
-        val txt_buf_wr      = u_mr1_top.io.txt_buf_wr.addTag(crossClockDomain)
-        val txt_buf_wr_addr = u_mr1_top.io.txt_buf_wr_addr.addTag(crossClockDomain)
-        val txt_buf_wr_data = u_mr1_top.io.txt_buf_wr_data.addTag(crossClockDomain)
+        val txt_buf_wr      = u_mr1_top.io.txt_buf_wr
+        val txt_buf_wr_addr = u_mr1_top.io.txt_buf_wr_addr
+        val txt_buf_wr_data = u_mr1_top.io.txt_buf_wr_data
 
-        val u_txt_gen = new VideoTxtGen()
+        val u_txt_gen = new VideoTxtGen(cpuDomain)
         u_txt_gen.io.pixel_in       <> test_patt_pixel_out
         u_txt_gen.io.pixel_out      <> txt_gen_pixel_out
         u_txt_gen.io.txt_buf_wr      <> txt_buf_wr

@@ -56,7 +56,7 @@ void dvi_ctrl_init()
         {   0x1d,       0x40},              // internal clock delay
         {   0x1f,       0x80},              // input data format. Bit 4: vsp, bit 4: hsp
 
-#if 0
+#if 1
         // clk <= 65Mhz
         {   0x33,       0x08},              // charge pump settings. See table 10
         {   0x34,       0x16},              // charge pump settings. See table 10

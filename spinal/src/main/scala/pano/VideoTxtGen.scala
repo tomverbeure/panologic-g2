@@ -4,7 +4,7 @@ package pano
 import java.nio.file.{Files, Paths}
 import spinal.core._
 
-class VideoTxtGen extends Component {
+class VideoTxtGen(cpuDomain: ClockDomain) extends Component {
 
     val io = new Bundle {
         val pixel_in    = in(PixelStream())
@@ -91,12 +91,14 @@ class VideoTxtGen extends Component {
                         enable  = txt_buf_rd_p0, 
                         address = txt_buf_addr)
 
-    u_txt_buf.readWriteSync(
-                        enable  = io.txt_buf_wr,
-                        address = io.txt_buf_wr_addr,
-                        write   = io.txt_buf_wr,
-                        data    = io.txt_buf_wr_data.asUInt
-                        )
+    var cpu_domain = new ClockingArea(cpuDomain) {
+        u_txt_buf.readWriteSync(
+                            enable  = io.txt_buf_wr,
+                            address = io.txt_buf_wr_addr,
+                            write   = io.txt_buf_wr,
+                            data    = io.txt_buf_wr_data.asUInt
+                            )
+    }
 
     val txt_buf_rd_p1 = RegNext(txt_buf_rd_p0)
     val char_sub_x_p1 = RegNext(char_sub_x)
