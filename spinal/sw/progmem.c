@@ -55,9 +55,19 @@ void dvi_ctrl_init()
         {   0x1c,       0x00},              // 1x DDR clocking
         {   0x1d,       0x40},              // internal clock delay
         {   0x1f,       0x80},              // input data format. Bit 4: vsp, bit 4: hsp
+
+#if 0
+        // clk <= 65Mhz
         {   0x33,       0x08},              // charge pump settings. See table 10
         {   0x34,       0x16},              // charge pump settings. See table 10
         {   0x36,       0x60},              // charge pump settings. See table 10
+#else
+        // clk > 65Mhz
+        {   0x33,       0x06},              // charge pump settings. See table 10
+        {   0x34,       0x26},              // charge pump settings. See table 10
+        {   0x36,       0xa0},              // charge pump settings. See table 10
+#endif
+
         {   0x48,       0x18},              // Test Image: none
 //        {   0x48,       0x19},              // Test Image: color bars
 //        {   0x48,       0x1e},              // Test Image: luminance ramp

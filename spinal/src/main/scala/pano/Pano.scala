@@ -130,32 +130,6 @@ class Pano extends Component {
         val vo = VgaData()
 
         //============================================================
-        // Chrontel Pads DVI
-        //============================================================
-    
-        val u_dvi = new ChrontelPads(includeXClkN = true)
-        u_dvi.io.pads             <> io.dvi
-        u_dvi.io.vsync            <> vo.vsync
-        u_dvi.io.hsync            <> vo.hsync
-        u_dvi.io.de               <> vo.de
-        u_dvi.io.r                <> vo.r
-        u_dvi.io.g                <> vo.g
-        u_dvi.io.b                <> vo.b
-
-        //============================================================
-        // Chrontel Pads HDMI
-        //============================================================
-    
-        val u_hdmi = new ChrontelPads(includeXClkN = false)
-        u_hdmi.io.pads            <> io.hdmi
-        u_hdmi.io.vsync           <> vo.vsync
-        u_hdmi.io.hsync           <> vo.hsync
-        u_hdmi.io.de              <> vo.de
-        u_hdmi.io.r               <> vo.r
-        u_hdmi.io.g               <> vo.g
-        u_hdmi.io.b               <> vo.b
-
-        //============================================================
         // Core logic
         //============================================================
 
@@ -171,6 +145,33 @@ class Pano extends Component {
         u_pano_core.io.dvi_ctrl_sda <> io.dvi_spd
 
         u_pano_core.io.vo           <> vo
+
+        //============================================================
+        // Chrontel Pads DVI
+        //============================================================
+    
+        val u_dvi = new ChrontelPads(voClkDomain, includeXClkN = true)
+        u_dvi.io.pads             <> io.dvi
+        u_dvi.io.vsync            <> vo.vsync
+        u_dvi.io.hsync            <> vo.hsync
+        u_dvi.io.de               <> vo.de
+        u_dvi.io.r                <> vo.r
+        u_dvi.io.g                <> vo.g
+        u_dvi.io.b                <> vo.b
+
+        //============================================================
+        // Chrontel Pads HDMI
+        //============================================================
+    
+        val u_hdmi = new ChrontelPads(voClkDomain, includeXClkN = false)
+        u_hdmi.io.pads            <> io.hdmi
+        u_hdmi.io.vsync           <> vo.vsync
+        u_hdmi.io.hsync           <> vo.hsync
+        u_hdmi.io.de              <> vo.de
+        u_hdmi.io.r               <> vo.r
+        u_hdmi.io.g               <> vo.g
+        u_hdmi.io.b               <> vo.b
+
     }
 
 }
@@ -178,7 +179,7 @@ class Pano extends Component {
 object PanoVerilog{
     def main(args: Array[String]) {
 
-        val config = SpinalConfig()
+        val config = SpinalConfig(anonymSignalUniqueness = true)
         config.generateVerilog({
             val toplevel = new Pano()
             InOutWrapper(toplevel)

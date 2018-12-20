@@ -17,7 +17,7 @@ case class ChrontelIntfc(includeXClkN: Boolean = true) extends Bundle
     val d               = Bits(12 bits)
 }
 
-class ChrontelPads(includeXClkN: Boolean = true) extends Component {
+class ChrontelPads(clkDomain: ClockDomain, includeXClkN: Boolean = true) extends Component {
     
     val io = new Bundle {
         val pads            = out(ChrontelIntfc(includeXClkN))
@@ -30,8 +30,8 @@ class ChrontelPads(includeXClkN: Boolean = true) extends Component {
         val b               = in(UInt(8 bits))
     }
 
-    val clk    = ClockDomain.current.readClockWire
-    val reset_ = ClockDomain.current.readResetWire
+    val clk    = clkDomain.readClockWire
+    val reset_ = clkDomain.readResetWire
 
     io.pads.reset_ := reset_
 
