@@ -54,7 +54,7 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
     val vo_area = new ClockingArea(voClkDomain) {
 
         val timings = VideoTimings()
-        if (true){
+        if (false){
             // 640x480@60
             timings.h_active        := 640
             timings.h_fp            := 16
@@ -68,6 +68,23 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
             timings.v_sync          := 2
             timings.v_bp            := 31
             timings.v_sync_positive := False
+            timings.v_total_m1      := (timings.v_active + timings.v_fp + timings.v_sync + timings.v_bp -1).resize(timings.v_total_m1.getWidth)
+        }
+        else if (true) {
+            // 1024x768@60
+            // Clock: 65MHz
+            timings.h_active        := 1024
+            timings.h_fp            := 24
+            timings.h_sync          := 136
+            timings.h_bp            := 160
+            timings.h_sync_positive := True
+            timings.h_total_m1      := (timings.h_active + timings.h_fp + timings.h_sync + timings.h_bp -1).resize(timings.h_total_m1.getWidth)
+
+            timings.v_active        := 768
+            timings.v_fp            := 3
+            timings.v_sync          := 6
+            timings.v_bp            := 29
+            timings.v_sync_positive := True
             timings.v_total_m1      := (timings.v_active + timings.v_fp + timings.v_sync + timings.v_bp -1).resize(timings.v_total_m1.getWidth)
         }
         else if (false) {
