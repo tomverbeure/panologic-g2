@@ -59,6 +59,51 @@ Instructions on how to get the JTAG going are [here](https://tomverbeure.github.
 
   These were all reverse engineered by cyrozap.
 
+## Board to Board Connector
+
+The Board to Board connector was reverse engineered by twj42.
+The table below is based on 
+[this page](https://github.com/twj42/PanoLogicG2_ReverseEngineering/blob/master/pages/bob.md).
+
+|                    |   |                   | Outside      |  | Inside     |          | 
+|--------------------|---|-------------------|--------------|--|------------|----------| 
+| Pin Nr             |   | FPGA Pin          | Function     |  | Function   | FPGA Pin | 
+|--------------------|---|-------------------|--------------|--|------------|----------| 
+| 1                  |   |                   | GND          |  | GND        |          | 
+| 2                  |   |                   | 3.3V         |  | 3.3V       |          | 
+| 3                  | ` | D17               | DVI_D[0]     |  | DVI_D[1]   | A14      | 
+| 4                  |   | A15               | DVI_D[2]     |  | DVI_D[3]   | A16      | 
+| 5                  |   | A17               | DVI_D[4]     |  | DVI_D[5]   | A18      | 
+| 6                  |   |                   | GND          |  | GND        |          | 
+| 7                  |   | D14               | DVI_D[6]     |  | DVI_D[7]   | B14      | 
+| 8                  |   | B16               | DVI_D[8]     |  | DVI_D[9]   | B18      | 
+| 9                  |   | E16               | DVI_D[10]    |  | DVI_D[11]  | D15      | 
+| 10                 |   |                   | GND          |  | GND        |          | 
+| 11                 |   | H12               | PANO_BUTTON  |  | DVI_XCLK_P | E14      | 
+|                    |   |                   |              |  |            |          | 
+| 12                 |   | F13               | LED_GREEN    |  | DVI_XCLK_N | F15      | 
+| 13                 |   | H13               | LED_BLUE     |  | 5V         |          | 
+| 14                 |   |                   | 5V           |  | ?          |          | 
+| 15                 |   |                   | GND          |  | DVI_SPD    | D9       | 
+| 16                 |   |                   | 5V           |  | 5V         |          | 
+| 17                 |   |                   | ?            |  | 1.8V       |          | 
+| 18                 |   |                   | GND          |  | GND        |          | 
+| 19                 |   |                   | 1.8V         |  | 1.8V       |          | 
+| 20                 |   | C14               | DVI_DDC_SCL  |  | DVI_H      | F12      | 
+| 21                 |   | C17               | DVI_DDC_SDA  |  | DVI_V      | C16      | 
+| 22                 |   |                   | GND          |  | GND        |          | 
+| 23                 |   |                   | ?            |  | DVI_DE     | F14      | 
+| 24                 |   |                   | ?            |  | DVI_RESET_ | C15?     | 
+| 25                 |   |                   | ?            |  | DVI_HPINT  | D13      | 
+| 26                 |   |                   | GND          |  | GND        |          | 
+| 27                 |   |                   | Linked to 28 |  | USB J2     |          | 
+| 28                 |   |                   | Linked to 27 |  | USB J2     |          | 
+| 29                 |   |                   | 1.2V         |  | 1.2V       |          | 
+| 30                 |   |                   | GND          |  | USB J3     |          | 
+| 31                 |   |                   | 1.2V         |  | USB J3     |          | 
+| 32                 |   |                   | GND          |  | GND        |          | 
+
+
 ## Resources
 
 * Xilinx Spartan-6 XC6SLX150 FGG484 speed grade 2 / Spartan-6 XC6SLX100
