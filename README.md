@@ -156,7 +156,91 @@ The table below is based on
 
     While there is no exact datasheet for this chips, there are a number on the web that are of the same product
     family with a close feature match.
-    
+
+    Based on the package size of 72 pins, this Lattice ECP3 Evaluation board seems to use two of these devices.
+    The schematics are [here](https://www.mouser.com/ds/2/225/LatticeECP3VersaEvaluationBoardUsersGuide-311553.pdf),
+    on page 20 and 21.
+
+    Using that schematic, we can derive the following pinout:
+
+    |Pin Nr |Pin Name |
+    |-------|---------|
+    |1      | TXD[3]  |
+    |2      | TXD[4]  |
+    |3      | TXD[5]  |
+    |4      | TXD[6]  |
+    |5      | TXD[7]  |
+    |6      | GTX_CLK |
+    |7      | DVDD    |
+    |8      | COMA_n  |
+    |9      | CLK125  |
+    |10     | LED[0]  |
+    |12     | LED[1]  |
+    |13     | VDDO    |
+    |14     | LED[3]  |
+    |15     | RESET_N |
+    |15     | DIS_REG12 |
+    |16     | DVDD    |
+    |17     | AVDDR   |
+    |18     | AVDDR   |
+    |||
+    |19     | AVDDX   |
+    |20     | CTRL18  |
+    |21     | NC      |
+    |22     | MDIN[3] |
+    |23     | MDIP[3] |
+    |24     | AVDD    |
+    |25     | AVDD    |
+    |26     | MDIN[2] |
+    |27     | MDIP[2] |
+    |28     | MDIN[1] |
+    |29     | MDIP[1] |
+    |30     | AVDD    |
+    |31     | AVDD    |
+    |32     | AVDD    |
+    |33     | MDIN[0] |
+    |34     | MDIP[0] |
+    |35     | TSTPT   |
+    |36     | RSET    |
+    |||
+    |37     | AVDDC  |
+    |38     | HSDACN |
+    |39     | HSDACP |
+    |40     | AVDDC  |
+    |41     | XTAL_IN  |
+    |42     | XTAL_OUT |
+    |43     | DVDD   |
+    |44     | TRST_N |
+    |45     | TMS    |
+    |46     | TCK    |
+    |47     | TDI    |
+    |48     | TDO    |
+    |49     | MDIO   |
+    |50     | VDDO   |
+    |51     | DVDD   |
+    |52     | MDC    |
+    |53     | COL    |
+    |54     | CRS    |
+    |||
+    |55     | RX_ER  |
+    |56     | RX_DV  |
+    |57     | RX_CLK |
+    |58     | VDDOR  |
+    |59     | RXD[0] |
+    |60     | RXD[1] |
+    |61     | RXD[2] |
+    |62     | RXD[3] |
+    |63     | RXD[4] |
+    |64     | RXD[5] |
+    |65     | RXD[6] |
+    |66     | RXD[7] |
+    |67     | TX_CLK |
+    |68     | VDDOR  |
+    |69     | RX_EN  |
+    |70     | TXD[0] |
+    |71     | TXD[1] |
+    |72     | TXD[2] |
+
     [This datasheet of the 1111](https://www.mikrocontroller.net/attachment/139158/88E1111_DS.pdf) is the closest.
     Both the 1111 and then 1119R have a regular GMII interface. Since GMII is a standard, it should be possible to 
     get this working without. 
