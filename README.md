@@ -161,6 +161,8 @@ The table below is based on
     The schematics are [here](https://www.mouser.com/ds/2/225/LatticeECP3VersaEvaluationBoardUsersGuide-311553.pdf),
     on page 20 and 21.
 
+    ![Marvell schematic](./assets/Marvell_schematic.png)
+
     Using that schematic, we can derive the following pinout:
 
     |Pin Nr |Pin Name |
