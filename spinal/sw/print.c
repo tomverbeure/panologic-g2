@@ -9,10 +9,10 @@ int cur_y = 0;
 
 #define TXT_BUF ((volatile uint32_t *)(0x00080000 | TXT_BUF_ADDR))
 int txt_buf_width         = 80;
-int txt_buf_height        = 25;
+int txt_buf_height        = 40;
 
-int txt_buf_active_width  = 50;
-int txt_buf_active_height = 10;
+int txt_buf_active_width  = 80;
+int txt_buf_active_height = 40;
 
 void clear()
 {
