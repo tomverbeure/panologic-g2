@@ -88,6 +88,74 @@ void dvi_ctrl_init()
     }
 }
 
+void mii_mdio_init()
+{
+    // Set all IOs to output
+    REG_WR(MII_SET, 1<<MII_RESET_N_ENA);
+    REG_WR(MII_SET, 1<<MII_MDC_ENA);
+    REG_WR(MII_CLR, 1<<MII_MDIO_ENA);            // MDIO is tri-state while idle
+
+    // Assert reset
+    REG_WR(MII_CLR, 1<<MII_RESET_N_VAL);
+
+    // Initial values 
+    REG_WR(MII_CLR, 1<<MII_MDC_VAL);
+    REG_WR(MII_CLR, 1<<MII_MDIO_VAL);
+
+    // Release reset
+    REG_WR(MII_SET, 1<<MII_RESET_N_VAL);
+}
+
+#define MII_HALF_BIT_WAIT  1
+
+void mii_mdc_toggle()
+{
+    wait(MII_HALF_BIT_WAIT);
+    REG_WR(MII_SET, 1<<MII_MDC_VAL);
+    wait(MII_HALF_BIT_WAIT);
+    REG_WR(MII_CLR, 1<<MII_MDC_VAL);
+}
+
+int mii_mdio_rd(int phy_addr, int reg_addr)
+{
+    for(int i=0;i<32;++i){
+        mii_mdc_toggle();
+    }
+
+    REG_WR(MII_SET, 1<<MII_MDIO_ENA);
+
+    unsigned word =   (1 << 12)                     // Start bits
+                    | (2 << 10)                     // Read
+                    | ((phy_addr & 0x1f) << 5)
+                    | ((reg_addr & 0x1f) << 0);
+
+    for(int i=13; i >= 0; --i){
+        int bit = (word >> i) & 1;
+
+        if (bit) REG_WR(MII_SET, 1<<MII_MDIO_VAL);
+        else     REG_WR(MII_CLR, 1<<MII_MDIO_VAL);
+
+        mii_mdc_toggle();
+    }
+
+    int ta = 0;
+    int rdata = 0;
+
+    REG_WR(MII_CLR, 1<<MII_MDIO_ENA);
+    mii_mdc_toggle();
+
+    ta = (REG_RD(MII_RD) >> MII_MDIO_VAL) & 1;
+    mii_mdc_toggle();
+    ta = (ta<<1) | ((REG_RD(MII_RD) >> MII_MDIO_VAL) & 1);
+
+    for(int i=15;i>=0;--i){
+        rdata = (rdata<<1) | ((REG_RD(MII_RD) >> MII_MDIO_VAL) & 1);
+        mii_mdc_toggle();
+    }
+
+    return rdata;
+}
+
 
 int main() {
 
@@ -123,6 +191,22 @@ int main() {
     print("DVI & HDMI working @ 1080p\n");
     print("\n");
     print("Code at github.com/tomverbeure/panologic-g2\n");
+#endif
+
+    mii_mdio_init();
+
+#if 1
+    while(1){
+    int mii_rdata = mii_mdio_rd(0, 2);
+    print("PHY: ");
+    print_int(mii_rdata, 1);
+    print("\n");
+
+    mii_rdata = mii_mdio_rd(0, 3);
+    print("PHY: ");
+    print_int(mii_rdata, 1);
+    print("\n");
+    }
 #endif
 
     int pattern_nr = 0;

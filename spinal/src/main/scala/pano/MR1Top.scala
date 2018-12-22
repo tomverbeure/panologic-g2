@@ -26,6 +26,9 @@ class MR1Top(config: MR1Config) extends Component {
         val txt_buf_wr      = out(Bool)
         val txt_buf_wr_addr = out(UInt(11 bits))
         val txt_buf_wr_data = out(Bits(8 bits))
+
+        val mii_mdc         = master(TriState(Bool))
+        val mii_mdio        = master(TriState(Bool))
     }
 
     val mr1 = new MR1(config)
@@ -169,14 +172,49 @@ class MR1Top(config: MR1Config) extends Component {
     io.txt_buf_wr_data  <> mr1.io.data_req.data(0, 8 bits)
 
     //============================================================
+    // Ethernet MDIO
+    //============================================================
+
+    val mii_addr     = (mr1.io.data_req.addr === U"32'h00080030")
+    val mii_set_addr = (mr1.io.data_req.addr === U"32'h00080034")
+    val mii_clr_addr = (mr1.io.data_req.addr === U"32'h00080038")
+    val mii_rd_addr  = (mr1.io.data_req.addr === U"32'h0008003c")
+
+    val update_mii     = mr1.io.data_req.valid && mr1.io.data_req.wr && mii_addr
+    val update_mii_set = mr1.io.data_req.valid && mr1.io.data_req.wr && mii_set_addr
+    val update_mii_clr = mr1.io.data_req.valid && mr1.io.data_req.wr && mii_clr_addr
+
+    val mii_vec     = Reg(Bits(6 bits)) init(0)
+
+    mii_vec :=  update_mii     ? (           mr1.io.data_req.data(0, mii_vec.getWidth bits)) |
+               (update_mii_set ? (mii_vec |  mr1.io.data_req.data(0, mii_vec.getWidth bits)) |
+               (update_mii_clr ? (mii_vec & ~mr1.io.data_req.data(0, mii_vec.getWidth bits)) |
+                                  mii_vec    ))
+
+    io.mii_mdc.writeEnable    := mii_vec(2)
+    io.mii_mdc.write          := mii_vec(3)
+
+    io.mii_mdio.writeEnable   := mii_vec(4)
+    io.mii_mdio.write         := mii_vec(5)
+
+    val mii_vec_rd = io.mii_mdio.read ## mii_vec(4) ## io.mii_mdc.read ## mii_vec(2) ## mii_vec(1) ## mii_vec(0)
+
+    //============================================================
     // READ DATA MUX
     //============================================================
 
     reg_rd_data :=  (RegNext(button_addr)       ? (B(0, 31 bits) ## button) |
+
                     (RegNext(dvi_ctrl_addr)     ? (B(0, 30 bits) ## dvi_ctrl_sda ## dvi_ctrl_scl) |
                     (RegNext(dvi_ctrl_set_addr) ? (B(0, 30 bits) ## dvi_ctrl_sda ## dvi_ctrl_scl) |
                     (RegNext(dvi_ctrl_clr_addr) ? (B(0, 30 bits) ## dvi_ctrl_sda ## dvi_ctrl_scl) |
                     (RegNext(dvi_ctrl_rd_addr)  ? (B(0, 30 bits) ## io.dvi_ctrl_sda.read ## io.dvi_ctrl_scl.read) |
-                                                   B(0, 32 bits))))))
+
+                    (RegNext(mii_addr)          ? (B(0, 26 bits) ## mii_vec) |
+                    (RegNext(mii_set_addr)      ? (B(0, 26 bits) ## mii_vec) |
+                    (RegNext(mii_clr_addr)      ? (B(0, 26 bits) ## mii_vec) |
+                    (RegNext(mii_rd_addr)       ? (B(0, 26 bits) ## mii_vec_rd) |
+
+                                                   B(0, 32 bits))))))))))
 }
 
