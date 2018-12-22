@@ -64,7 +64,7 @@ These were all reverse engineered by cyrozap.
 According to the initial reverse engineered pin assignment by cyrozap, there is a fixed 25MHz oscillator input
 into the FPGA on pin `Y13` that will serve all your clocking needs.
 
-The reality is a bit more interesting. The real clocking architecture is as follows:
+The reality is a bit more interesting. The real clocking architecture (with my custom FPGA content) is as follows:
 
 ![FPGA External Clocking Diagram](./assets/clocking_structure.svg)
 
