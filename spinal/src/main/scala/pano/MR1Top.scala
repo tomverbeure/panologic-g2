@@ -24,8 +24,10 @@ class MR1Top(config: MR1Config) extends Component {
         val test_pattern_const_color    = out(Pixel())
 
         val txt_buf_wr      = out(Bool)
-        val txt_buf_wr_addr = out(UInt(11 bits))
+        val txt_buf_rd      = out(Bool)
+        val txt_buf_addr    = out(UInt(13 bits))
         val txt_buf_wr_data = out(Bits(8 bits))
+        val txt_buf_rd_data = in(Bits(8 bits))
 
         val mii_mdc         = master(TriState(Bool))
         val mii_mdio        = master(TriState(Bool))
@@ -165,10 +167,12 @@ class MR1Top(config: MR1Config) extends Component {
 
     val txt_buf_addr = (mr1.io.data_req.addr(15, 17 bits) === U"32'h00088000"(15, 17 bits))
 
-    val update_txt_buf = mr1.io.data_req.valid && mr1.io.data_req.wr && txt_buf_addr
+    val txt_buf_wr = mr1.io.data_req.valid &&  mr1.io.data_req.wr && txt_buf_addr
+    val txt_buf_rd = mr1.io.data_req.valid && ~mr1.io.data_req.wr && txt_buf_addr
 
-    io.txt_buf_wr       <> update_txt_buf
-    io.txt_buf_wr_addr  <> mr1.io.data_req.addr(2, 11 bits)
+    io.txt_buf_wr       <> txt_buf_wr
+    io.txt_buf_rd       <> txt_buf_rd
+    io.txt_buf_addr     <> mr1.io.data_req.addr(2, 13 bits)
     io.txt_buf_wr_data  <> mr1.io.data_req.data(0, 8 bits)
 
     //============================================================
@@ -215,6 +219,8 @@ class MR1Top(config: MR1Config) extends Component {
                     (RegNext(mii_clr_addr)      ? (B(0, 26 bits) ## mii_vec) |
                     (RegNext(mii_rd_addr)       ? (B(0, 26 bits) ## mii_vec_rd) |
 
-                                                   B(0, 32 bits))))))))))
+                    (RegNext(txt_buf_addr)      ? (B(0, 24 bits) ## io.txt_buf_rd_data) |
+
+                                                   B(0, 32 bits)))))))))))
 }
 

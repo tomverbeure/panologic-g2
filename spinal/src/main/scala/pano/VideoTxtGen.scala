@@ -11,18 +11,20 @@ class VideoTxtGen(cpuDomain: ClockDomain) extends Component {
         val pixel_out   = out(PixelStream())
 
         val txt_buf_wr       = in(Bool)
-        val txt_buf_wr_addr  = in(UInt(11 bits))
+        val txt_buf_rd       = in(Bool)
+        val txt_buf_addr     = in(UInt(13 bits))
         val txt_buf_wr_data  = in(Bits(8 bits))
+        val txt_buf_rd_data  = out(Bits(8 bits))
     }
 
     val charWidth       = 9
     val charHeight      = 16
 
     val txtBufWidth     = 80
-    val txtBufHeight    = 25
+    val txtBufHeight    = 40
 
-    var txtBufActiveWidth   = 50
-    var txtBufActiveHeight  = 10
+    var txtBufActiveWidth   = 80
+    var txtBufActiveHeight  = 40
 
     //------------------------------------------------------------
     // pixel x,y coordinates and char coordinates
@@ -37,7 +39,7 @@ class VideoTxtGen(cpuDomain: ClockDomain) extends Component {
     val char_sub_x = Reg(UInt(4 bits)) init(0)
     val char_sub_y = Reg(UInt(4 bits)) init(0)
 
-    var txt_buf_addr_sol = Reg(UInt(11 bits)) init(0)
+    var txt_buf_addr_sol = Reg(UInt(13 bits)) init(0)
 
     when(io.pixel_in.vsync || (io.pixel_in.req && io.pixel_in.eof)){
         pix_x   := 0
@@ -85,19 +87,19 @@ class VideoTxtGen(cpuDomain: ClockDomain) extends Component {
     // Fetch character to render
     val txt_buf_addr    = txt_buf_addr_sol + char_x.resize(txt_buf_addr_sol.getWidth)
     val txt_buf_rd_p0   = (char_x < txtBufActiveWidth) && (char_y < txtBufActiveHeight) && io.pixel_in.req
-    val u_txt_buf       = Mem(UInt(8 bits), 2048)
+    val u_txt_buf       = Mem(UInt(8 bits), 4096)
 
     val cur_char = u_txt_buf.readSync(
                         enable  = txt_buf_rd_p0, 
-                        address = txt_buf_addr)
+                        address = txt_buf_addr.resize(12))
 
     var cpu_domain = new ClockingArea(cpuDomain) {
-        u_txt_buf.readWriteSync(
-                            enable  = io.txt_buf_wr,
-                            address = io.txt_buf_wr_addr,
+        io.txt_buf_rd_data := u_txt_buf.readWriteSync(
+                            enable  = (io.txt_buf_wr || io.txt_buf_rd),
+                            address = io.txt_buf_addr.resize(12),
                             write   = io.txt_buf_wr,
                             data    = io.txt_buf_wr_data.asUInt
-                            )
+                            ).asBits
     }
 
     val txt_buf_rd_p1 = RegNext(txt_buf_rd_p0)
