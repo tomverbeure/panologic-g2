@@ -55,9 +55,45 @@ Instructions on how to get the JTAG going are [here](https://tomverbeure.github.
 
 ## FPGA Connections
 
-  See the [Pano.ucf](Pano.ucf) file for all the FPGA connections.
+See the [Pano.ucf](Pano.ucf) file for all the FPGA connections.
 
-  These were all reverse engineered by cyrozap.
+These were all reverse engineered by cyrozap.
+
+## FPGA External Clocking Architecture
+
+According to the initial reverse engineered pin assignment by cyrozap, there is a fixed 25MHz oscillator input
+into the FPGA on pin `Y13` that will serve all your clocking needs.
+
+The reality is a bit more interesting. The real clocking architecture is as follows:
+
+![FPGA External Clocking Diagram](./assets/clocking_structure.svg)
+
+There is indeed a 25MHz clock oscillator on the PCB, but instead of going straight to the FPGA, it goes to the Marvell Ethernet PHY instead.
+
+The PHY has a fixed ratio 25MHz to 125MHz PLL. That 125MHz clock is used internally, but also brought out to the `125CLK` pin which is
+in turn connected to pin `Y13` of the FPGA.
+
+However, when the `RESET_` pin of the PHY is asserted, this PLL is disabled and pin `125CLK` carries the original 25MHz instead!
+
+When you don't use the PHY, it's natural to not assign any value to the FPGA pin that drives the PHY `RESET_` pin, so without knowning this
+quirk of the design, one gets tricked into assuming that pin `Y13` *always* carries a clock of 25MHz.
+
+But as soon as you want to use the PHY and deassert its reset, the clock switches to 125MHz!
+
+For designs with Ethernet support, there are 2 options:
+
+1. Always have the FPGA deassert (drive to 1) the reset pin of the PHY.
+
+    In this case, pin `Y13` will always carry 125MHz and you can design your logic with that clock in mind.
+    It has the disadvantage that you'll never be able to toggle the reset pin of the PHY at will.
+
+2. Make you design capable of dealing with both 25MHz and 125MHz.
+
+    This is a bit more complicated, but it will allow you to toggle the reset pin.
+
+It's usually not necessary to reset a PHY which makes the first option the most attractive one.
+
+(Since I wasn't aware of this clocking arrangement at first, my initial choice was of course the second one...)
 
 ## Board to Board Connector
 
