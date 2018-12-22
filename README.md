@@ -102,10 +102,10 @@ The Board to Board connector was reverse engineered by twj42.
 The table below is based on 
 [this page](https://github.com/twj42/PanoLogicG2_ReverseEngineering/blob/master/pages/bob.md).
 
-|                    |   |                   | Outside      |  | Inside     |          | 
-|--------------------|---|-------------------|--------------|--|------------|----------| 
 | Pin Nr             |   | FPGA Pin          | Function     |  | Function   | FPGA Pin | 
 |--------------------|---|-------------------|--------------|--|------------|----------| 
+|                    |   |                   | Outside      |  | Inside     |          | 
+|                    |   |                   |              |  |            |          | 
 | 1                  |   |                   | GND          |  | GND        |          | 
 | 2                  |   |                   | 3.3V         |  | 3.3V       |          | 
 | 3                  | ` | D17               | DVI_D[0]     |  | DVI_D[1]   | A14      | 
