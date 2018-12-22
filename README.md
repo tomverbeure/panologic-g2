@@ -73,7 +73,7 @@ There is indeed a 25MHz clock oscillator on the PCB, but instead of going straig
 The PHY has a fixed ratio 25MHz to 125MHz PLL. That 125MHz clock is used internally, but also brought out to the `125CLK` pin which is
 in turn connected to pin `Y13` of the FPGA.
 
-However, when the `RESET_` pin of the PHY is asserted, this PLL is disabled and pin `125CLK` carries the original 25MHz instead! (This
+However, when the PHY is in reset, this PLL is disabled and pin `125CLK` carries the original 25MHz instead! (This
 is not documented in the datasheet of the close cousin of this PHY.)
 
 When you don't use the PHY, it's natural to not assign any value to the FPGA pin that drives the PHY `RESET_` pin, so without knowning this
