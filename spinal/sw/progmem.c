@@ -214,10 +214,24 @@ int main() {
     print("\n");
 
 #if 1
+    int had_data = 0;
+
     while(1){
         unsigned int rx_data = REG_RD(MII_RX_FIFO);
-        if ((rx_data>>9) == 0)
+        if ((rx_data>>9) == 0){
+            if (had_data){
+                print_int(had_data, 1);
+                print("\n");
+            }
+            had_data = 0;
             continue;
+        }
+
+        if (!had_data){
+            print(".");
+        }
+
+        had_data += 1;
 
 //        print_byte(rx_data>>8, 1);
 //        print(" ");

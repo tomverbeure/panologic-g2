@@ -29,8 +29,9 @@ class MR1Top(config: MR1Config) extends Component {
         val txt_buf_wr_data = out(Bits(8 bits))
         val txt_buf_rd_data = in(Bits(8 bits))
 
-        val mii_mdio        = master(GmiiMdio())
-        val mii_rx_fifo_rd  = slave(Stream(Bits(10 bits)))
+        val mii_mdio                = master(GmiiMdio())
+        val mii_rx_fifo_rd          = slave(Stream(Bits(10 bits)))
+        val mii_rx_fifo_rd_count    = in(UInt(16 bits))
     }
 
     val mr1 = new MR1(config)
@@ -222,7 +223,7 @@ class MR1Top(config: MR1Config) extends Component {
                     (RegNext(mii_set_addr)      ? (B(0, 26 bits) ## mii_vec) |
                     (RegNext(mii_clr_addr)      ? (B(0, 26 bits) ## mii_vec) |
                     (RegNext(mii_rd_addr)       ? (B(0, 26 bits) ## mii_vec_rd) |
-                    (RegNext(mii_rx_fifo_addr)  ? (B(0, 22 bits) ## io.mii_rx_fifo_rd.payload) |
+                    (RegNext(mii_rx_fifo_addr)  ? (B(0, 22 bits) ## (io.mii_rx_fifo_rd.valid ? io.mii_rx_fifo_rd.payload | B(0, 10 bits))) |
 
                     (RegNext(txt_buf_addr)      ? (B(0, 24 bits) ## io.txt_buf_rd_data) |
 

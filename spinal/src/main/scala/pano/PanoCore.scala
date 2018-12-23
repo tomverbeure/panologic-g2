@@ -41,8 +41,9 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
     val test_pattern_nr = UInt(4 bits)
     val const_color     = Pixel()
 
-    val cpu_mdio        = GmiiMdio()
-    val cpu_rx_fifo_rd  = Stream(Bits(10 bits))
+    val cpu_mdio                = GmiiMdio()
+    val cpu_rx_fifo_rd          = Stream(Bits(10 bits))
+    val cpu_rx_fifo_rd_count    = UInt(16 bits)
 
     val mr1Config = MR1Config()
     val u_mr1_top = new MR1Top(mr1Config)
@@ -52,8 +53,9 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
     u_mr1_top.io.dvi_ctrl_scl    <> io.dvi_ctrl_scl
     u_mr1_top.io.dvi_ctrl_sda    <> io.dvi_ctrl_sda
 
-    u_mr1_top.io.mii_mdio           <> cpu_mdio
-    u_mr1_top.io.mii_rx_fifo_rd     <> cpu_rx_fifo_rd
+    u_mr1_top.io.mii_mdio               <> cpu_mdio
+    u_mr1_top.io.mii_rx_fifo_rd         <> cpu_rx_fifo_rd
+    u_mr1_top.io.mii_rx_fifo_rd_count   <> cpu_rx_fifo_rd_count
 
     u_mr1_top.io.test_pattern_nr            <> test_pattern_nr.addTag(crossClockDomain)
     u_mr1_top.io.test_pattern_const_color   <> const_color.addTag(crossClockDomain)
