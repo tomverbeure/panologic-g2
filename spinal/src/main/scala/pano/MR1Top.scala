@@ -30,6 +30,7 @@ class MR1Top(config: MR1Config) extends Component {
         val txt_buf_rd_data = in(Bits(8 bits))
 
         val mii_mdio        = master(GmiiMdio())
+        val mii_rx_fifo_rd  = slave(Stream(Bits(10 bits)))
     }
 
     val mr1 = new MR1(config)
@@ -175,17 +176,20 @@ class MR1Top(config: MR1Config) extends Component {
     io.txt_buf_wr_data  <> mr1.io.data_req.data(0, 8 bits)
 
     //============================================================
-    // Ethernet MDIO
+    // Ethernet MII
     //============================================================
 
-    val mii_addr     = (mr1.io.data_req.addr === U"32'h00080030")
-    val mii_set_addr = (mr1.io.data_req.addr === U"32'h00080034")
-    val mii_clr_addr = (mr1.io.data_req.addr === U"32'h00080038")
-    val mii_rd_addr  = (mr1.io.data_req.addr === U"32'h0008003c")
+    val mii_addr            = (mr1.io.data_req.addr === U"32'h00080030")
+    val mii_set_addr        = (mr1.io.data_req.addr === U"32'h00080034")
+    val mii_clr_addr        = (mr1.io.data_req.addr === U"32'h00080038")
+    val mii_rd_addr         = (mr1.io.data_req.addr === U"32'h0008003c")
+    val mii_rx_fifo_addr    = (mr1.io.data_req.addr === U"32'h00080040")
 
     val update_mii     = mr1.io.data_req.valid && mr1.io.data_req.wr && mii_addr
     val update_mii_set = mr1.io.data_req.valid && mr1.io.data_req.wr && mii_set_addr
     val update_mii_clr = mr1.io.data_req.valid && mr1.io.data_req.wr && mii_clr_addr
+
+    val fetch_mii_rx_fifo = mr1.io.data_req.valid && ~mr1.io.data_req.wr && mii_rx_fifo_addr
 
     val mii_vec     = Reg(Bits(6 bits)) init(0)
 
@@ -200,6 +204,8 @@ class MR1Top(config: MR1Config) extends Component {
     io.mii_mdio.mdio.write         := mii_vec(5)
 
     val mii_vec_rd = io.mii_mdio.mdio.read ## mii_vec(4 downto 0)
+
+    io.mii_rx_fifo_rd.ready := io.mii_rx_fifo_rd.valid && fetch_mii_rx_fifo
 
     //============================================================
     // READ DATA MUX
@@ -216,9 +222,10 @@ class MR1Top(config: MR1Config) extends Component {
                     (RegNext(mii_set_addr)      ? (B(0, 26 bits) ## mii_vec) |
                     (RegNext(mii_clr_addr)      ? (B(0, 26 bits) ## mii_vec) |
                     (RegNext(mii_rd_addr)       ? (B(0, 26 bits) ## mii_vec_rd) |
+                    (RegNext(mii_rx_fifo_addr)  ? (B(0, 22 bits) ## io.mii_rx_fifo_rd.payload) |
 
                     (RegNext(txt_buf_addr)      ? (B(0, 24 bits) ## io.txt_buf_rd_data) |
 
-                                                   B(0, 32 bits)))))))))))
+                                                   B(0, 32 bits))))))))))))
 }
 

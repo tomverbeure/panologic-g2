@@ -49,13 +49,15 @@ case class GmiiCtrl() extends Component {
     val io = new Bundle {
         val gmii        = master(Gmii())
 
-        val cpu_mdio    = slave(GmiiMdio())
+        val cpu_mdio        = slave(GmiiMdio())
+        val cpu_rx_fifo_rd  = master(Stream(Bits(10 bits)))
     }
 
     io.gmii.mdio    <> io.cpu_mdio
 
     val u_gmii_rx = GmiiRxCtrl()
-    u_gmii_rx.io.rx         <> io.gmii.rx
+    u_gmii_rx.io.rx             <> io.gmii.rx
+    u_gmii_rx.io.rx_fifo_rd     <> io.cpu_rx_fifo_rd
 
     val u_gmii_tx = GmiiTxCtrl()
     u_gmii_tx.io.tx         <> io.gmii.tx

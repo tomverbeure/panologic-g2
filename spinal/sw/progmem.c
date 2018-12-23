@@ -213,6 +213,20 @@ int main() {
     print_int(rev_nr, 1);
     print("\n");
 
+#if 1
+    while(1){
+        unsigned int rx_data = REG_RD(MII_RX_FIFO);
+        if ((rx_data>>9) == 0)
+            continue;
+
+//        print_byte(rx_data>>8, 1);
+//        print(" ");
+        print_byte(rx_data, 1);
+        print(",");
+    }
+    
+#endif
+
 #if 0
     while(1){
     int mii_rdata = mii_mdio_rd(0, 2);
