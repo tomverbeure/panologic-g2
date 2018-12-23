@@ -8,11 +8,14 @@ NET "osc_clk"               LOC = Y13 | IOSTANDARD = LVCMOS33;
 TIMESPEC TS_OSC_CLK = PERIOD "osc_clk" 125 MHz HIGH 50%;
 NET "osc_clk" TNM_NET = osc_clk;
 
-TIMESPEC TS_MAIN_CLK = PERIOD "_zz_Pano_29_" 25 MHz HIGH 50%;
-NET "_zz_Pano_29_" TNM_NET = _zz_Pano_29_;
+TIMESPEC TS_GMII_RX_CLK = PERIOD "gmii_rx_clk" 125 MHz HIGH 50%;
+NET "gmii_rx_clk" TNM_NET = gmii_rx_clk;
 
-TIMESPEC TS_VO_CLK = PERIOD "_zz_Pano_34_" 150 MHz HIGH 50%;
-NET "_zz_Pano_34_" TNM_NET = _zz_Pano_34_;
+#TIMESPEC TS_MAIN_CLK = PERIOD "_zz_Pano_25_" 25 MHz HIGH 50%;
+#NET "_zz_Pano_25_" TNM_NET = _zz_Pano_25_;
+#
+#TIMESPEC TS_VO_CLK = PERIOD "_zz_Pano_30_" 150 MHz HIGH 50%;
+#NET "_zz_Pano_30_" TNM_NET = _zz_Pano_30_;
 
 # Reset Signals
 #NET "SYSRST_N" LOC = AB14 | IOSTANDARD = LVCMOS33;
@@ -109,35 +112,39 @@ NET "hdmi_d[11]"            LOC = T17  | IOSTANDARD = LVCMOS33 | SLEW = FAST | D
 #NET "ADC_SDIN" LOC = AB17 | IOSTANDARD = LVCMOS33;
 
 # Ethernet PHY
-NET "gmii_rst_"             LOC = R11  | IOSTANDARD = LVCMOS33;
-NET "gmii_mdio"             LOC = AA2  | IOSTANDARD = LVCMOS33;
-NET "gmii_mdc"              LOC = AB6  | IOSTANDARD = LVCMOS33;
-NET "gmii_rx_clk"           LOC = AB11 | IOSTANDARD = LVCMOS33;
-#NET "gmii_gtx_clk"          LOC = AA12 | IOSTANDARD = LVCMOS33;
+NET "gmii_rst_"             LOC = R11   | IOSTANDARD = LVCMOS33;
+NET "gmii_mdio_mdc"         LOC = AB6   | IOSTANDARD = LVCMOS33;
+NET "gmii_mdio_mdio"        LOC = AA2   | IOSTANDARD = LVCMOS33;
 
-#NET "GMII_TX_DATA[7]" LOC = Y10 | IOSTANDARD = LVCMOS33;
-#NET "GMII_TX_DATA[6]" LOC = T7 | IOSTANDARD = LVCMOS33;
-#NET "GMII_TX_DATA[5]" LOC = AB10 | IOSTANDARD = LVCMOS33;
-#NET "GMII_TX_DATA[4]" LOC = AB9 | IOSTANDARD = LVCMOS33;
-#NET "GMII_TX_DATA[3]" LOC = AB7 | IOSTANDARD = LVCMOS33;
-#NET "GMII_TX_DATA[2]" LOC = AB4 | IOSTANDARD = LVCMOS33;
-#NET "GMII_TX_DATA[1]" LOC = AB3 | IOSTANDARD = LVCMOS33;
-#NET "GMII_TX_DATA[0]" LOC = AB2 | IOSTANDARD = LVCMOS33;
-#NET "GMII_TX_CLK" LOC = Y11 | IOSTANDARD = LVCMOS33;
-#NET "GMII_TX_ER" LOC = AB8 | IOSTANDARD = LVCMOS33; # NC
-#NET "GMII_TX_EN" LOC = AA8 | IOSTANDARD = LVCMOS33;
-#NET "GMII_RX_DATA[7]" LOC = Y9 | IOSTANDARD = LVCMOS33;
-#NET "GMII_RX_DATA[6]" LOC = U9 | IOSTANDARD = LVCMOS33;
-#NET "GMII_RX_DATA[5]" LOC = R8 | IOSTANDARD = LVCMOS33;
-#NET "GMII_RX_DATA[4]" LOC = V9 | IOSTANDARD = LVCMOS33;
-#NET "GMII_RX_DATA[3]" LOC = R7 | IOSTANDARD = LVCMOS33;
-#NET "GMII_RX_DATA[2]" LOC = R9 | IOSTANDARD = LVCMOS33;
-#NET "GMII_RX_DATA[1]" LOC = Y4 | IOSTANDARD = LVCMOS33;
-#NET "GMII_RX_DATA[0]" LOC = Y3 | IOSTANDARD = LVCMOS33;
-#NET "GMII_RX_ER" LOC = Y8 | IOSTANDARD = LVCMOS33;
-#NET "GMII_RX_DV" LOC = Y7 | IOSTANDARD = LVCMOS33;
-#NET "GMII_COL" LOC = V7 | IOSTANDARD = LVCMOS33;
-#NET "GMII_CRS" LOC = W4 | IOSTANDARD = LVCMOS33;
+NET "gmii_rx_clk"           LOC = AB11  | IOSTANDARD = LVCMOS33;
+NET "gmii_rx_dv"            LOC = Y7    | IOSTANDARD = LVCMOS33;
+NET "gmii_rx_er"            LOC = Y8    | IOSTANDARD = LVCMOS33;
+NET "gmii_rx_d[7]"          LOC = Y9    | IOSTANDARD = LVCMOS33;
+NET "gmii_rx_d[6]"          LOC = U9    | IOSTANDARD = LVCMOS33;
+NET "gmii_rx_d[5]"          LOC = R8    | IOSTANDARD = LVCMOS33;
+NET "gmii_rx_d[4]"          LOC = V9    | IOSTANDARD = LVCMOS33;
+NET "gmii_rx_d[3]"          LOC = R7    | IOSTANDARD = LVCMOS33;
+NET "gmii_rx_d[2]"          LOC = R9    | IOSTANDARD = LVCMOS33;
+NET "gmii_rx_d[1]"          LOC = Y4    | IOSTANDARD = LVCMOS33;
+NET "gmii_rx_d[0]"          LOC = Y3    | IOSTANDARD = LVCMOS33;
+
+
+NET "gmii_tx_gclk"          LOC = AA12  | IOSTANDARD = LVCMOS33;
+NET "gmii_tx_clk"           LOC = Y11   | IOSTANDARD = LVCMOS33;
+NET "gmii_tx_en"            LOC = AA8   | IOSTANDARD = LVCMOS33;
+NET "gmii_tx_er"            LOC = AB8   | IOSTANDARD = LVCMOS33; # NC
+NET "gmii_tx_d[7]"          LOC = Y10   | IOSTANDARD = LVCMOS33;
+NET "gmii_tx_d[6]"          LOC = T7    | IOSTANDARD = LVCMOS33;
+NET "gmii_tx_d[5]"          LOC = AB10  | IOSTANDARD = LVCMOS33;
+NET "gmii_tx_d[4]"          LOC = AB9   | IOSTANDARD = LVCMOS33;
+NET "gmii_tx_d[3]"          LOC = AB7   | IOSTANDARD = LVCMOS33;
+NET "gmii_tx_d[2]"          LOC = AB4   | IOSTANDARD = LVCMOS33;
+NET "gmii_tx_d[1]"          LOC = AB3   | IOSTANDARD = LVCMOS33;
+NET "gmii_tx_d[0]"          LOC = AB2   | IOSTANDARD = LVCMOS33;
+
+NET "gmii_col"              LOC = V7    | IOSTANDARD = LVCMOS33;
+NET "gmii_crs"              LOC = W4    | IOSTANDARD = LVCMOS33;
+
 #NET "ENET_LINK_ACTIVE_N" LOC = AA4 | IOSTANDARD = LVCMOS33;
 
 # DDR2 SDRAM Interface A

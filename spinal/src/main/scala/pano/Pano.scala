@@ -28,10 +28,7 @@ class Pano extends Component {
 
         // MII interfacce
         val gmii_rst_           = out(Bool)
-        val gmii_mdc            = master(TriState(Bool))
-        val gmii_mdio           = master(TriState(Bool))
-
-        val gmii_rx_clk         = in(Bool)
+        val gmii                = master(Gmii())
     }
 
     noIoPrefix()
@@ -165,7 +162,7 @@ class Pano extends Component {
     //============================================================
 
     val gmiiRxClkDomain = ClockDomain(
-            clock = io.gmii_rx_clk,
+            clock = io.gmii.rx.clk,
             config = ClockDomainConfig(
                 resetKind = BOOT
             )
@@ -204,8 +201,7 @@ class Pano extends Component {
         u_pano_core.io.dvi_ctrl_scl <> io.dvi_spc
         u_pano_core.io.dvi_ctrl_sda <> io.dvi_spd
 
-        u_pano_core.io.mii_mdc      <> io.gmii_mdc
-        u_pano_core.io.mii_mdio     <> io.gmii_mdio
+        u_pano_core.io.gmii         <> io.gmii
 
         u_pano_core.io.vo           <> vo
 

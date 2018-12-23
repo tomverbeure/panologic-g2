@@ -29,8 +29,7 @@ class MR1Top(config: MR1Config) extends Component {
         val txt_buf_wr_data = out(Bits(8 bits))
         val txt_buf_rd_data = in(Bits(8 bits))
 
-        val mii_mdc         = master(TriState(Bool))
-        val mii_mdio        = master(TriState(Bool))
+        val mii_mdio        = master(GmiiMdio())
     }
 
     val mr1 = new MR1(config)
@@ -195,13 +194,12 @@ class MR1Top(config: MR1Config) extends Component {
                (update_mii_clr ? (mii_vec & ~mr1.io.data_req.data(0, mii_vec.getWidth bits)) |
                                   mii_vec    ))
 
-    io.mii_mdc.writeEnable    := mii_vec(2)
-    io.mii_mdc.write          := mii_vec(3)
+    io.mii_mdio.mdc           := mii_vec(3)
 
-    io.mii_mdio.writeEnable   := mii_vec(4)
-    io.mii_mdio.write         := mii_vec(5)
+    io.mii_mdio.mdio.writeEnable   := mii_vec(4)
+    io.mii_mdio.mdio.write         := mii_vec(5)
 
-    val mii_vec_rd = io.mii_mdio.read ## mii_vec(4) ## io.mii_mdc.read ## mii_vec(2) ## mii_vec(1) ## mii_vec(0)
+    val mii_vec_rd = io.mii_mdio.mdio.read ## mii_vec(4 downto 0)
 
     //============================================================
     // READ DATA MUX
