@@ -8,11 +8,11 @@ int cur_x = 0;
 int cur_y = 0;
 
 #define TXT_BUF ((volatile uint32_t *)(0x00080000 | TXT_BUF_ADDR))
-int txt_buf_width         = 80;
-int txt_buf_height        = 40;
+int txt_buf_width         = 130;
+int txt_buf_height        = 60;
 
-int txt_buf_active_width  = 80;
-int txt_buf_active_height = 40;
+int txt_buf_active_width  = 130;
+int txt_buf_active_height = 60;
 
 void clear()
 {

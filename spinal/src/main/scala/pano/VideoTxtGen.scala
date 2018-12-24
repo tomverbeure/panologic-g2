@@ -20,11 +20,11 @@ class VideoTxtGen(cpuDomain: ClockDomain) extends Component {
     val charWidth       = 9
     val charHeight      = 16
 
-    val txtBufWidth     = 80
-    val txtBufHeight    = 40
+    val txtBufWidth     = 130
+    val txtBufHeight    = 60
 
-    var txtBufActiveWidth   = 80
-    var txtBufActiveHeight  = 40
+    var txtBufActiveWidth   = 130
+    var txtBufActiveHeight  = 60
 
     //------------------------------------------------------------
     // pixel x,y coordinates and char coordinates
@@ -87,16 +87,16 @@ class VideoTxtGen(cpuDomain: ClockDomain) extends Component {
     // Fetch character to render
     val txt_buf_addr    = txt_buf_addr_sol + char_x.resize(txt_buf_addr_sol.getWidth)
     val txt_buf_rd_p0   = (char_x < txtBufActiveWidth) && (char_y < txtBufActiveHeight) && io.pixel_in.req
-    val u_txt_buf       = Mem(UInt(8 bits), 4096)
+    val u_txt_buf       = Mem(UInt(8 bits), 8192)
 
     val cur_char = u_txt_buf.readSync(
                         enable  = txt_buf_rd_p0, 
-                        address = txt_buf_addr.resize(12))
+                        address = txt_buf_addr.resize(13))
 
     var cpu_domain = new ClockingArea(cpuDomain) {
         io.txt_buf_rd_data := u_txt_buf.readWriteSync(
                             enable  = (io.txt_buf_wr || io.txt_buf_rd),
-                            address = io.txt_buf_addr.resize(12),
+                            address = io.txt_buf_addr.resize(13),
                             write   = io.txt_buf_wr,
                             data    = io.txt_buf_wr_data.asUInt
                             ).asBits
