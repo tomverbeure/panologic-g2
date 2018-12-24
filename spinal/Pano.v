@@ -1,5 +1,5 @@
 // Generator : SpinalHDL v1.2.2    git head : 3159d9865a8de00378e0b0405c338a97c2f5a601
-// Date      : 22/12/2018, 23:04:10
+// Date      : 23/12/2018, 21:01:50
 // Component : Pano
 
 
@@ -5360,10 +5360,10 @@ module MR1Top (
   assign ram_cpuRamContent_1123 = (32'b00000000000000000000000000000000);
   assign ram_cpuRamContent_1124 = (32'b00000000000000000000000000000000);
   assign ram_cpuRamContent_1125 = (32'b00000000000000000000000000000000);
-  assign ram_cpuRamContent_1126 = (32'b00000000000000000000000000101000);
-  assign ram_cpuRamContent_1127 = (32'b00000000000000000000000001010000);
-  assign ram_cpuRamContent_1128 = (32'b00000000000000000000000000101000);
-  assign ram_cpuRamContent_1129 = (32'b00000000000000000000000001010000);
+  assign ram_cpuRamContent_1126 = (32'b00000000000000000000000000111100);
+  assign ram_cpuRamContent_1127 = (32'b00000000000000000000000010000010);
+  assign ram_cpuRamContent_1128 = (32'b00000000000000000000000000111100);
+  assign ram_cpuRamContent_1129 = (32'b00000000000000000000000010000010);
   assign ram_cpuRamContent_1130 = (32'b00000000000000000000000000000000);
   assign ram_cpuRamContent_1131 = (32'b00000000000000000000000000000000);
   assign ram_cpuRamContent_1132 = (32'b00000000000000000000000000000000);
@@ -6717,10 +6717,10 @@ module VideoTxtGen (
   reg [12:0] txt_buf_addr_sol;
   wire [12:0] txt_buf_addr;
   wire  txt_buf_rd_p0;
-  wire [11:0] _zz_VideoTxtGen_1_;
+  wire [12:0] _zz_VideoTxtGen_1_;
   wire [7:0] cur_char;
   wire  _zz_VideoTxtGen_2_;
-  wire [11:0] _zz_VideoTxtGen_3_;
+  wire [12:0] _zz_VideoTxtGen_3_;
   wire [7:0] _zz_VideoTxtGen_4_;
   reg  txt_buf_rd_p1;
   reg [3:0] char_sub_x_p1;
@@ -10841,7 +10841,7 @@ module VideoTxtGen (
   reg [7:0] pixel_in_p2_pixel_r;
   reg [7:0] pixel_in_p2_pixel_g;
   reg [7:0] pixel_in_p2_pixel_b;
-  reg [7:0] u_txt_buf [0:4095];
+  reg [7:0] u_txt_buf [0:8191];
   reg [7:0] u_font_bitmap_ram [0:4095];
   assign _zz_VideoTxtGen_8_ = {5'd0, char_x};
   assign _zz_VideoTxtGen_9_ = (cur_char & (8'b00001111));
@@ -10876,11 +10876,11 @@ module VideoTxtGen (
   end
 
   assign txt_buf_addr = (txt_buf_addr_sol + _zz_VideoTxtGen_8_);
-  assign txt_buf_rd_p0 = (((char_x < (8'b01010000)) && (char_y < (7'b0101000))) && io_pixel_in_req);
-  assign _zz_VideoTxtGen_1_ = txt_buf_addr[11:0];
+  assign txt_buf_rd_p0 = (((char_x < (8'b10000010)) && (char_y < (7'b0111100))) && io_pixel_in_req);
+  assign _zz_VideoTxtGen_1_ = txt_buf_addr;
   assign cur_char = _zz_VideoTxtGen_5_;
   assign _zz_VideoTxtGen_2_ = (io_txt_buf_wr || io_txt_buf_rd);
-  assign _zz_VideoTxtGen_3_ = io_txt_buf_addr[11:0];
+  assign _zz_VideoTxtGen_3_ = io_txt_buf_addr;
   assign _zz_VideoTxtGen_4_ = io_txt_buf_wr_data;
   assign io_txt_buf_rd_data = _zz_VideoTxtGen_6_;
   assign bitmap_lsb_addr = (_zz_VideoTxtGen_10_ + _zz_VideoTxtGen_12_);
@@ -15027,7 +15027,7 @@ module VideoTxtGen (
             if((char_sub_y == (4'b1111)))begin
               char_y <= (char_y + (7'b0000001));
               char_sub_y <= (4'b0000);
-              txt_buf_addr_sol <= (txt_buf_addr_sol + (13'b0000001010000));
+              txt_buf_addr_sol <= (txt_buf_addr_sol + (13'b0000010000010));
             end else begin
               char_sub_y <= (char_sub_y + (4'b0001));
             end

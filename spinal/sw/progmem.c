@@ -257,6 +257,7 @@ int main() {
     print_int(rev_nr, 1);
     print("\n");
 
+#if 0
     int prev_rdata = mii_mdio_rd(0, 17);
     while(1){
         int rdata = mii_mdio_rd(0, 17);
@@ -266,6 +267,7 @@ int main() {
             prev_rdata = rdata;
         }
     }
+#endif
 
 #if 1
     int had_data = 0;
@@ -275,7 +277,7 @@ int main() {
         if ((rx_data>>9) == 0){
             if (had_data){
                 print_int(had_data, 1);
-                print("\n");
+                print("\n\n");
             }
             had_data = 0;
             continue;
