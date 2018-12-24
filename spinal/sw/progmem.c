@@ -94,7 +94,7 @@ void mii_mdio_init()
     REG_WR(MII_SET, 1<<MII_MDC_ENA);
     REG_WR(MII_CLR, 1<<MII_MDIO_ENA);            // MDIO is tri-state while idle
 
-    // Initial values 
+    // Initial values
     REG_WR(MII_CLR, 1<<MII_MDC_VAL);
     REG_WR(MII_CLR, 1<<MII_MDIO_VAL);
 }
@@ -155,11 +155,51 @@ void mii_phy_identifier(int phy_addr, uint32_t *oui, uint32_t *model_nr, uint32_
     int rdata2 = mii_mdio_rd(phy_addr, 2);
     int rdata3 = mii_mdio_rd(phy_addr, 3);
 
-//    *oui      = (((rdata3 >> 10) & ((1<<6)-1))<< 19) | (rdata2 << 2);
     *oui      = (((rdata3 >> 10) & ((1<<6)-1))<< 0) | (rdata2 << 6);
 
     *model_nr = (rdata3 >> 4) & ((1<<6)-1);
     *rev_nr   = (rdata3 >> 0) & ((1<<4)-1);
+}
+
+void mii_reg_dump(int phy_addr)
+{
+    int rdata;
+
+    rdata = mii_mdio_rd(phy_addr, 0);
+    print("Reg  0: Control               : "); print_int(rdata, 1); print("\n");
+
+    rdata = mii_mdio_rd(phy_addr, 1);
+    print("Reg  1: Status                : "); print_int(rdata, 1); print("\n");
+
+    rdata = mii_mdio_rd(phy_addr, 2);
+    print("Reg  2: PHY ID                : "); print_int(rdata, 1); print("\n");
+
+    rdata = mii_mdio_rd(phy_addr, 3);
+    print("Reg  3: PHY ID                : "); print_int(rdata, 1); print("\n");
+
+    rdata = mii_mdio_rd(phy_addr, 4);
+    print("Reg  4: Auto-Neg Advertisement: "); print_int(rdata, 1); print("\n");
+
+    rdata = mii_mdio_rd(phy_addr, 5);
+    print("Reg  5: Link Partner Ability  : "); print_int(rdata, 1); print("\n");
+
+    rdata = mii_mdio_rd(phy_addr, 6);
+    print("Reg  6: Auto-Neg Expansion    : "); print_int(rdata, 1); print("\n");
+
+    rdata = mii_mdio_rd(phy_addr, 16);
+    print("Reg 16: PHY Specific Control  : "); print_int(rdata, 1); print("\n");
+
+    rdata = mii_mdio_rd(phy_addr, 17);
+    print("Reg 17: PHY Specific Status   : "); print_int(rdata, 1); print("\n");
+}
+
+void mii_wait_auto_neg_complete(int phy_addr)
+{
+    int rdata;
+
+    do{
+        rdata = mii_mdio_rd(phy_addr, 1);
+    } while(!(rdata & (1<<5)));
 }
 
 int main() {
@@ -200,6 +240,10 @@ int main() {
 
     mii_mdio_init();
 
+    mii_wait_auto_neg_complete(0);
+
+    mii_reg_dump(0);
+
     uint32_t oui, model_nr, rev_nr;
 
     mii_phy_identifier(0, &oui, &model_nr, &rev_nr);
@@ -212,6 +256,16 @@ int main() {
     print("rev_nr   :");
     print_int(rev_nr, 1);
     print("\n");
+
+    int prev_rdata = mii_mdio_rd(0, 17);
+    while(1){
+        int rdata = mii_mdio_rd(0, 17);
+
+        if (rdata != prev_rdata){
+            mii_reg_dump(0);
+            prev_rdata = rdata;
+        }
+    }
 
 #if 1
     int had_data = 0;
@@ -238,7 +292,7 @@ int main() {
         print_byte(rx_data, 1);
         print(",");
     }
-    
+
 #endif
 
 #if 0
