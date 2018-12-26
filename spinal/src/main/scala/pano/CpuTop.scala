@@ -40,6 +40,7 @@ case class CpuTop() extends Component {
     }
 
     val u_cpu = CpuComplex(CpuComplexConfig.default)
+    u_cpu.io.externalInterrupt <> False
 
     val apbMapping = ArrayBuffer[(Apb3, SizeMapping)]()
 
@@ -48,9 +49,12 @@ case class CpuTop() extends Component {
     //============================================================
 
     val u_led_ctrl = Apb3Gpio(3)
-    io.led1 <> u_led_ctrl.io.gpio.write(0)
-    io.led2 <> u_led_ctrl.io.gpio.write(1)
-    io.led3 <> u_led_ctrl.io.gpio.write(2)
+    u_led_ctrl.io.gpio.write(0)             <> io.led1
+    u_led_ctrl.io.gpio.write(1)             <> io.led2
+    u_led_ctrl.io.gpio.write(2)             <> io.led3
+    u_led_ctrl.io.gpio.read(0)              := io.led1
+    u_led_ctrl.io.gpio.read(1)              := io.led2
+    u_led_ctrl.io.gpio.read(2)              := io.led3
 
     apbMapping += u_led_ctrl.io.apb -> (0x00000, 4 kB)
 
@@ -67,7 +71,7 @@ case class CpuTop() extends Component {
     io.dvi_ctrl_sda.write           <> u_dvi_ctrl.io.gpio.write(1)
     io.dvi_ctrl_sda.read            <> u_dvi_ctrl.io.gpio.read(1)
 
-    apbMapping += u_led_ctrl.io.apb -> (0x10000, 4 kB)
+    apbMapping += u_dvi_ctrl.io.apb -> (0x10000, 4 kB)
 
     //============================================================
     // Timer

@@ -14,7 +14,8 @@ lazy val root = (project in file(".")).
     ),
     name := "panologic-g2"
   ).dependsOn(vexRiscv)
-lazy val vexRiscv = RootProject(uri("git://github.com/SpinalHDL/VexRiscv.git"))
+//lazy val vexRiscv = RootProject(uri("git://github.com/SpinalHDL/VexRiscv.git"))
+lazy val vexRiscv = RootProject(file("../../VexRiscv"))
 
 //If you want a specific git commit : 
 //lazy val vexRiscv = RootProject(uri("git://github.com/SpinalHDL/VexRiscv.git#commitHash"))

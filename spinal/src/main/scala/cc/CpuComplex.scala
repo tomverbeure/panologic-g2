@@ -7,8 +7,7 @@ import spinal.lib.bus.amba3.apb._
 import spinal.lib.bus.misc.SizeMapping
 
 import scala.collection.mutable.ArrayBuffer
-
-import vexriscv.plugin._
+import vexriscv.plugin.{NONE, _}
 import vexriscv.{VexRiscv, VexRiscvConfig, plugin}
 import vexriscv.demo._
 
@@ -32,10 +31,11 @@ object CpuComplexConfig{
         pipelineDBus          = true,
         pipelineMainBus       = false,
         pipelineApbBridge     = true,
-        cpuPlugins = ArrayBuffer( //DebugPlugin added by the toplevel
+        cpuPlugins = ArrayBuffer(
             new IBusSimplePlugin(
-                resetVector = 0x80000000l,
-                relaxedPcCalculation = true,
+                resetVector = 0x00000000l,
+                cmdForkOnSecondStage = true,
+                cmdForkPersistence = false,
                 prediction = NONE,
                 catchAccessFault = false,
                 compressedGen = false
@@ -45,7 +45,7 @@ object CpuComplexConfig{
                 catchAccessFault = false,
                 earlyInjection = false
             ),
-            new CsrPlugin(CsrPluginConfig.smallest(mtvecInit = 0x80000020l)),
+            new CsrPlugin(CsrPluginConfig.smallest(mtvecInit = 0x00000020l)),
             new DecoderSimplePlugin(
                 catchIllegalInstruction = false
             ),
