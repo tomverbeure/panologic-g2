@@ -39,6 +39,7 @@ case class CpuTop() extends Component {
         val mii_rx_fifo_rd_count    = in(UInt(16 bits))
     }
 
+//    val u_cpu = CpuComplex(CpuComplexConfig.default.copy(onChipRamSize = 8 kB, onChipRamHexFile = "sw/progmem.hex"))
     val u_cpu = CpuComplex(CpuComplexConfig.default)
     u_cpu.io.externalInterrupt <> False
 
