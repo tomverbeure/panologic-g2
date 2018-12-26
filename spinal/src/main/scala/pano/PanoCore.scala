@@ -45,20 +45,20 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
     val cpu_rx_fifo_rd          = Stream(Bits(10 bits))
     val cpu_rx_fifo_rd_count    = UInt(16 bits)
 
-    val mr1Config = MR1Config()
-    val u_mr1_top = new MR1Top(mr1Config)
-    u_mr1_top.io.led1       <> io.led_green
-    u_mr1_top.io.led2       <> io.led_blue
-    u_mr1_top.io.switch_    <> io.switch_
-    u_mr1_top.io.dvi_ctrl_scl    <> io.dvi_ctrl_scl
-    u_mr1_top.io.dvi_ctrl_sda    <> io.dvi_ctrl_sda
+    val u_cpu_top = CpuTop()
+    u_cpu_top.io.led1                   <> io.led_green
+    u_cpu_top.io.led2                   <> io.led_blue
+    u_cpu_top.io.switch_                <> io.switch_
 
-    u_mr1_top.io.mii_mdio               <> cpu_mdio
-    u_mr1_top.io.mii_rx_fifo_rd         <> cpu_rx_fifo_rd
-    u_mr1_top.io.mii_rx_fifo_rd_count   <> cpu_rx_fifo_rd_count
+    u_cpu_top.io.dvi_ctrl_scl           <> io.dvi_ctrl_scl
+    u_cpu_top.io.dvi_ctrl_sda           <> io.dvi_ctrl_sda
 
-    u_mr1_top.io.test_pattern_nr            <> test_pattern_nr.addTag(crossClockDomain)
-    u_mr1_top.io.test_pattern_const_color   <> const_color.addTag(crossClockDomain)
+    u_cpu_top.io.mii_mdio               <> cpu_mdio
+    u_cpu_top.io.mii_rx_fifo_rd         <> cpu_rx_fifo_rd
+    u_cpu_top.io.mii_rx_fifo_rd_count   <> cpu_rx_fifo_rd_count
+
+    u_cpu_top.io.test_pattern_nr            <> test_pattern_nr.addTag(crossClockDomain)
+    u_cpu_top.io.test_pattern_const_color   <> const_color.addTag(crossClockDomain)
 
     var cpuDomain = ClockDomain.current
 
@@ -187,12 +187,12 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
 
         val txt_buf_rd_data = Bits(8 bits)
 
-        val txt_buf_wr      = u_mr1_top.io.txt_buf_wr
-        val txt_buf_rd      = u_mr1_top.io.txt_buf_rd
-        val txt_buf_addr    = u_mr1_top.io.txt_buf_addr
-        val txt_buf_wr_data = u_mr1_top.io.txt_buf_wr_data
+        val txt_buf_wr      = u_cpu_top.io.txt_buf_wr
+        val txt_buf_rd      = u_cpu_top.io.txt_buf_rd
+        val txt_buf_addr    = u_cpu_top.io.txt_buf_addr
+        val txt_buf_wr_data = u_cpu_top.io.txt_buf_wr_data
 
-        u_mr1_top.io.txt_buf_rd_data := txt_buf_rd_data
+        u_cpu_top.io.txt_buf_rd_data := txt_buf_rd_data
 
         val u_txt_gen = new VideoTxtGen(cpuDomain)
         u_txt_gen.io.pixel_in       <> test_patt_pixel_out
