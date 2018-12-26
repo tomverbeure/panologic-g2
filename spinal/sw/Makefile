@@ -19,10 +19,13 @@ OBJDUMP         = $(TARGET)-objdump
 .PHONY: all clean syntax time stat flash
 
 #all: progmem.dis progmem.bin progmem0.coe progmem0.mif progmem0.hex progmem.mem
-all: progmem.dis progmem.bin progmem8k.bin progmem.mem 
+all: progmem.dis progmem.bin progmem8k.bin progmem.mem progmem.hex
 
 progmem.dis: progmem_dis.elf
 	$(OBJDUMP) -s -D $< > $@
+
+progmem.hex: progmem8k.bin
+	$(OBJCOPY) -O ihex -I binary $< $@
 
 progmem0.hex: progmem.bin
 	../misc/create_mif.rb -f hex -d $(MEM_WORDS) -w 8 -o 0 -i 4 $< > progmem0.hex
