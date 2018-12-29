@@ -32,30 +32,24 @@ case class CCGpio(gpioWidth: Int) extends Component {
     // Straight read and write
     ctrl.readAndWrite(value, 4)
 
-/*
     // Set bit when corresponding value is set
+    val wrBits = ctrl.nonStopWrite(Bits(gpioWidth bits), 0)
     ctrl.onWrite(8){
-        val bitSets = Bits(gpioWidth bits)
-        bitSets := ctrl.nonStopWrite(Bits(gpioWidth bits), 0)
         for(i <- 0 until gpioWidth){
-            when(bitSets(i)){
+            when(wrBits(i)){
                 value(i) := True
             }
         }
     }
-*/
 
     // Clear bit when corresponding value is set
-/*
     ctrl.onWrite(12){
-        val bitSets = ctrl.nonStopWrite(Bits(gpioWidth bits), 0)
         for(i <- 0 until gpioWidth){
-            when(bitSets(i)){
+            when(wrBits(i)){
                 value(i) := False
             }
         }
     }
-*/
 
     ctrl.read(io.gpio.read, 0x0010)
 
