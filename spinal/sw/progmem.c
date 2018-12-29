@@ -5,6 +5,7 @@
 #include "top_defines.h"
 #include "print.h"
 #include "i2c.h"
+#include "gmii.h"
 
 static inline uint32_t rdcycle(void) {
     uint32_t cycle;
@@ -88,120 +89,6 @@ void dvi_ctrl_init()
     }
 }
 
-void mii_mdio_init()
-{
-    // Set all IOs to output
-    REG_WR(MII_SET, 1<<MII_MDC_ENA);
-    REG_WR(MII_CLR, 1<<MII_MDIO_ENA);            // MDIO is tri-state while idle
-
-    // Initial values
-    REG_WR(MII_CLR, 1<<MII_MDC_VAL);
-    REG_WR(MII_CLR, 1<<MII_MDIO_VAL);
-}
-
-#define MII_HALF_BIT_WAIT  1
-
-void mii_mdc_toggle()
-{
-    wait(MII_HALF_BIT_WAIT);
-    REG_WR(MII_SET, 1<<MII_MDC_VAL);
-    wait(MII_HALF_BIT_WAIT);
-    REG_WR(MII_CLR, 1<<MII_MDC_VAL);
-}
-
-int mii_mdio_rd(int phy_addr, int reg_addr)
-{
-    for(int i=0;i<32;++i){
-        mii_mdc_toggle();
-    }
-
-    REG_WR(MII_SET, 1<<MII_MDIO_ENA);
-
-    unsigned word =   (1 << 12)                     // Start bits
-                    | (2 << 10)                     // Read
-                    | ((phy_addr & 0x1f) << 5)
-                    | ((reg_addr & 0x1f) << 0);
-
-    for(int i=13; i >= 0; --i){
-        int bit = (word >> i) & 1;
-
-        if (bit) REG_WR(MII_SET, 1<<MII_MDIO_VAL);
-        else     REG_WR(MII_CLR, 1<<MII_MDIO_VAL);
-
-        mii_mdc_toggle();
-    }
-
-    int ta = 0;
-    int rdata = 0;
-
-    REG_WR(MII_CLR, 1<<MII_MDIO_ENA);
-    mii_mdc_toggle();
-
-    ta = (REG_RD(MII_RD) >> MII_MDIO_VAL) & 1;
-    mii_mdc_toggle();
-    ta = (ta<<1) | ((REG_RD(MII_RD) >> MII_MDIO_VAL) & 1);
-
-    for(int i=15;i>=0;--i){
-        rdata = (rdata<<1) | ((REG_RD(MII_RD) >> MII_MDIO_VAL) & 1);
-        mii_mdc_toggle();
-    }
-
-    return rdata;
-}
-
-
-void mii_phy_identifier(int phy_addr, uint32_t *oui, uint32_t *model_nr, uint32_t *rev_nr)
-{
-    int rdata2 = mii_mdio_rd(phy_addr, 2);
-    int rdata3 = mii_mdio_rd(phy_addr, 3);
-
-    *oui      = (((rdata3 >> 10) & ((1<<6)-1))<< 0) | (rdata2 << 6);
-
-    *model_nr = (rdata3 >> 4) & ((1<<6)-1);
-    *rev_nr   = (rdata3 >> 0) & ((1<<4)-1);
-}
-
-void mii_reg_dump(int phy_addr)
-{
-    int rdata;
-
-    rdata = mii_mdio_rd(phy_addr, 0);
-    print("Reg  0: Control               : "); print_int(rdata, 1); print("\n");
-
-    rdata = mii_mdio_rd(phy_addr, 1);
-    print("Reg  1: Status                : "); print_int(rdata, 1); print("\n");
-
-    rdata = mii_mdio_rd(phy_addr, 2);
-    print("Reg  2: PHY ID                : "); print_int(rdata, 1); print("\n");
-
-    rdata = mii_mdio_rd(phy_addr, 3);
-    print("Reg  3: PHY ID                : "); print_int(rdata, 1); print("\n");
-
-    rdata = mii_mdio_rd(phy_addr, 4);
-    print("Reg  4: Auto-Neg Advertisement: "); print_int(rdata, 1); print("\n");
-
-    rdata = mii_mdio_rd(phy_addr, 5);
-    print("Reg  5: Link Partner Ability  : "); print_int(rdata, 1); print("\n");
-
-    rdata = mii_mdio_rd(phy_addr, 6);
-    print("Reg  6: Auto-Neg Expansion    : "); print_int(rdata, 1); print("\n");
-
-    rdata = mii_mdio_rd(phy_addr, 16);
-    print("Reg 16: PHY Specific Control  : "); print_int(rdata, 1); print("\n");
-
-    rdata = mii_mdio_rd(phy_addr, 17);
-    print("Reg 17: PHY Specific Status   : "); print_int(rdata, 1); print("\n");
-}
-
-void mii_wait_auto_neg_complete(int phy_addr)
-{
-    int rdata;
-
-    do{
-        rdata = mii_mdio_rd(phy_addr, 1);
-    } while(!(rdata & (1<<5)));
-}
-
 int main() {
 
     REG_WR(LED_DIR, 0xff);
@@ -249,80 +136,18 @@ int main() {
 #endif
 
 #if 0
-    mii_mdio_init();
-
-    mii_wait_auto_neg_complete(0);
-
-    mii_reg_dump(0);
-
-    uint32_t oui, model_nr, rev_nr;
-
-    mii_phy_identifier(0, &oui, &model_nr, &rev_nr);
-    print("oui      :");
-    print_int(oui, 1);
-    print("\n");
-    print("model_nr :");
-    print_int(model_nr, 1);
-    print("\n");
-    print("rev_nr   :");
-    print_int(rev_nr, 1);
-    print("\n");
+    gmii_mdio_init();
+    gmii_wait_auto_neg_complete(0);
+    gmii_reg_dump(0);
 #endif
-
 #if 0
-    int prev_rdata = mii_mdio_rd(0, 17);
-    while(1){
-        int rdata = mii_mdio_rd(0, 17);
-
-        if (rdata != prev_rdata){
-            mii_reg_dump(0);
-            prev_rdata = rdata;
-        }
-    }
+    gmii_print_phy_id(0);
 #endif
-
 #if 0
-    int had_data = 0;
-
-    while(1){
-        unsigned int rx_data = REG_RD(MII_RX_FIFO);
-        if ((rx_data>>9) == 0){
-            if (had_data){
-                print_int(had_data, 1);
-                print("\n\n");
-            }
-            had_data = 0;
-            continue;
-        }
-
-        if (!had_data){
-            print(".");
-        }
-
-        had_data += 1;
-
-//        print_byte(rx_data>>8, 1);
-//        print(" ");
-        print_byte(rx_data, 1);
-        print(",");
-    }
-
+    gmii_monitor_regs(0 phy_addr);
 #endif
-
 #if 0
-    while(1){
-    int mii_rdata = mii_mdio_rd(0, 2);
-    print("PHY 2: ");
-    print_int(mii_rdata, 1);
-    print("\n");
-
-    mii_rdata = mii_mdio_rd(0, 3);
-    print("PHY 3: ");
-    print_int(mii_rdata, 1);
-    print("\n");
-
-    wait(1000000);
-    }
+    gmii_dump_packets(0);
 #endif
 
     int pattern_nr = 0;
