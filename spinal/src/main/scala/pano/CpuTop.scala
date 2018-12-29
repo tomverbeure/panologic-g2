@@ -20,11 +20,9 @@ case class CpuTop() extends Component {
         val led_ctrl_apb        = master(Apb3(Apb3Gpio.getApb3Config()))
         val dvi_ctrl_apb        = master(Apb3(CCGpio.getApb3Config()))
         val gmii_ctrl_apb       = master(Apb3(GmiiCtrl.getApb3Config()))
+        val test_patt_apb       = master(Apb3(VideoTestPattern.getApb3Config()))
 
         val switch_             = in(Bool)
-
-        val test_pattern_nr             = out(UInt(4 bits))
-        val test_pattern_const_color    = out(Pixel())
 
         val txt_buf_wr      = out(Bool)
         val txt_buf_rd      = out(Bool)
@@ -40,9 +38,10 @@ case class CpuTop() extends Component {
 
     val apbMapping = ArrayBuffer[(Apb3, SizeMapping)]()
 
-    apbMapping += io.led_ctrl_apb  -> (0x00000, 256 Byte)
-    apbMapping += io.dvi_ctrl_apb  -> (0x00100, 256 Byte)
-    apbMapping += io.gmii_ctrl_apb -> (0x10000, 4 kB)
+    apbMapping += io.led_ctrl_apb       -> (0x00000, 256 Byte)
+    apbMapping += io.dvi_ctrl_apb       -> (0x00100, 256 Byte)
+    apbMapping += io.test_patt_apb      -> (0x00200, 256 Byte)
+    apbMapping += io.gmii_ctrl_apb      -> (0x10000, 4 kB)
 
     //============================================================
     // Timer
@@ -51,11 +50,6 @@ case class CpuTop() extends Component {
     val u_timer = new MuraxApb3Timer()
     u_timer.io.interrupt        <> u_cpu.io.timerInterrupt
     apbMapping += u_timer.io.apb -> (0x20000, 4 kB)
-
-    io.test_pattern_nr              := 5
-    io.test_pattern_const_color.r   := 0
-    io.test_pattern_const_color.g   := 0
-    io.test_pattern_const_color.b   := 128
 
     io.txt_buf_wr                   := False
     io.txt_buf_rd                   := False

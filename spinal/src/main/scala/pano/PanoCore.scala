@@ -41,14 +41,8 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
         io.led_red  := led_cntr.msb
     }
 
-    val test_pattern_nr = UInt(4 bits)
-    val const_color     = Pixel()
-
     val u_cpu_top = CpuTop()
     u_cpu_top.io.switch_                <> io.switch_
-
-    u_cpu_top.io.test_pattern_nr            <> test_pattern_nr.addTag(crossClockDomain)
-    u_cpu_top.io.test_pattern_const_color   <> const_color.addTag(crossClockDomain)
 
     var cpuDomain = ClockDomain.current
 
@@ -170,8 +164,12 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
         u_test_patt.io.timings      <> timings
         u_test_patt.io.pixel_in     <> vi_gen_pixel_out
         u_test_patt.io.pixel_out    <> test_patt_pixel_out
-        u_test_patt.io.pattern_nr   <> test_pattern_nr
-        u_test_patt.io.const_color  <> const_color
+
+        val test_patt_ctrl = new ClockingArea(cpuDomain) {
+            val busCtrl = Apb3SlaveFactory(u_cpu_top.io.test_patt_apb)
+
+            val apb_regs = u_test_patt.driveFrom(busCtrl, 0x0)
+        }
 
         val txt_gen_pixel_out = PixelStream()
 
