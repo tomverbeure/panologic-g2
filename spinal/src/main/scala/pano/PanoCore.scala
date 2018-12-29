@@ -44,16 +44,8 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
     val test_pattern_nr = UInt(4 bits)
     val const_color     = Pixel()
 
-    val cpu_mdio                = GmiiMdio()
-    val cpu_rx_fifo_rd          = Stream(Bits(10 bits))
-    val cpu_rx_fifo_rd_count    = UInt(16 bits)
-
     val u_cpu_top = CpuTop()
     u_cpu_top.io.switch_                <> io.switch_
-
-    u_cpu_top.io.mii_mdio               <> cpu_mdio
-    u_cpu_top.io.mii_rx_fifo_rd         <> cpu_rx_fifo_rd
-    u_cpu_top.io.mii_rx_fifo_rd_count   <> cpu_rx_fifo_rd_count
 
     u_cpu_top.io.test_pattern_nr            <> test_pattern_nr.addTag(crossClockDomain)
     u_cpu_top.io.test_pattern_const_color   <> const_color.addTag(crossClockDomain)
@@ -207,10 +199,13 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
         u_vo.io.vga_out             <> io.vo
     }
 
-    val u_gmii = GmiiCtrl()
-    u_gmii.io.gmii              <> io.gmii
-    u_gmii.io.cpu_mdio          <> cpu_mdio
-    u_gmii.io.cpu_rx_fifo_rd    <> cpu_rx_fifo_rd
+    //============================================================
+    // GMII
+    //============================================================
+
+    val u_gmii_ctrl = GmiiCtrl()
+    u_gmii_ctrl.io.apb                  <> u_cpu_top.io.gmii_ctrl_apb
+    u_gmii_ctrl.io.gmii                 <> io.gmii
 
     //============================================================
     // LED control

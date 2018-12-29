@@ -17,10 +17,11 @@ case class CpuTop() extends Component {
 
     val io = new Bundle {
 
-        val led_ctrl_apb  = master(Apb3(Apb3Gpio.getApb3Config()))
-        val dvi_ctrl_apb  = master(Apb3(CCGpio.getApb3Config()))
+        val led_ctrl_apb        = master(Apb3(Apb3Gpio.getApb3Config()))
+        val dvi_ctrl_apb        = master(Apb3(CCGpio.getApb3Config()))
+        val gmii_ctrl_apb       = master(Apb3(GmiiCtrl.getApb3Config()))
 
-        val switch_     = in(Bool)
+        val switch_             = in(Bool)
 
         val test_pattern_nr             = out(UInt(4 bits))
         val test_pattern_const_color    = out(Pixel())
@@ -31,9 +32,6 @@ case class CpuTop() extends Component {
         val txt_buf_wr_data = out(Bits(8 bits))
         val txt_buf_rd_data = in(Bits(8 bits))
 
-        val mii_mdio                = master(GmiiMdio())
-        val mii_rx_fifo_rd          = slave(Stream(Bits(10 bits)))
-        val mii_rx_fifo_rd_count    = in(UInt(16 bits))
     }
 
 //    val u_cpu = CpuComplex(CpuComplexConfig.default.copy(onChipRamSize = 8 kB, onChipRamHexFile = "sw/progmem.hex"))
@@ -42,8 +40,9 @@ case class CpuTop() extends Component {
 
     val apbMapping = ArrayBuffer[(Apb3, SizeMapping)]()
 
-    apbMapping += io.led_ctrl_apb -> (0x00000, 4 kB)
-    apbMapping += io.dvi_ctrl_apb -> (0x10000, 4 kB)
+    apbMapping += io.led_ctrl_apb  -> (0x00000, 256 Byte)
+    apbMapping += io.dvi_ctrl_apb  -> (0x00100, 256 Byte)
+    apbMapping += io.gmii_ctrl_apb -> (0x10000, 4 kB)
 
     //============================================================
     // Timer
@@ -62,11 +61,6 @@ case class CpuTop() extends Component {
     io.txt_buf_rd                   := False
     io.txt_buf_addr                 := 0
     io.txt_buf_wr_data              := 0
-
-    io.mii_mdio.mdc                 := False
-    io.mii_mdio.mdio.writeEnable    := False
-    io.mii_mdio.mdio.write          := False
-
 
     //============================================================
     // Local APB decoder
