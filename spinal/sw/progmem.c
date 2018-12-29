@@ -34,7 +34,7 @@ void wait(int cycles)
 }
 
 
-#define WAIT_CYCLES 1000000
+#define WAIT_CYCLES 500000
 
 int button_pressed()
 {
@@ -204,7 +204,14 @@ void mii_wait_auto_neg_complete(int phy_addr)
 
 int main() {
 
-    REG_WR(LED_CONFIG, 0x00);
+    REG_WR(LED_DIR, 0xff);
+
+    while(1){
+        REG_WR(LED_WRITE, 0x01);
+        wait(WAIT_CYCLES);
+        REG_WR(LED_WRITE, 0x02);
+        wait(WAIT_CYCLES);
+    }
 
     dvi_ctrl_init();
 
@@ -214,11 +221,11 @@ int main() {
         {
             bool ack = i2c_write_reg_nr(&dvi_ctrl_i2c_ctx, (addr & 0x7f)<<1, 0x5a);
             if (ack){
-                REG_WR(LED_CONFIG, 0xff);
+                REG_WR(LED_WRITE, 0xff);
                 wait(10000);
             }
             else{
-                REG_WR(LED_CONFIG, 0x00);
+                REG_WR(LED_WRITE, 0x00);
             }
             wait(250);
         }
@@ -336,13 +343,13 @@ int main() {
 
     while(1){
         if (!button_pressed()){
-            REG_WR(LED_CONFIG, 0xff);
+            REG_WR(LED_WRITE, 0xff);
             wait(WAIT_CYCLES);
-            REG_WR(LED_CONFIG, 0x0);
+            REG_WR(LED_WRITE, 0x0);
             wait(WAIT_CYCLES);
         }
         else{
-            REG_WR(LED_CONFIG, 0x00);
+            REG_WR(LED_WRITE, 0x00);
         }
     }
 }

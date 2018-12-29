@@ -12,3 +12,7 @@ start:
 	/* trap */
 	ebreak
 
+.org 0x20
+irq: 
+    j irq
+
