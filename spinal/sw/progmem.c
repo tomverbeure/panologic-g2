@@ -206,14 +206,17 @@ int main() {
 
     REG_WR(LED_DIR, 0xff);
 
+    dvi_ctrl_init();
+
+#if 1
     while(1){
         REG_WR(LED_WRITE, 0x01);
         wait(WAIT_CYCLES);
         REG_WR(LED_WRITE, 0x02);
         wait(WAIT_CYCLES);
     }
+#endif
 
-    dvi_ctrl_init();
 
 #if 0
     int addr = 0x75;
@@ -234,7 +237,7 @@ int main() {
     }
 #endif
 
-#if 1
+#if 0
     clear();
     print("Pano Logic G2 Reverse Engineering\n");
     print("---------------------------------\n");
@@ -245,6 +248,7 @@ int main() {
     print("Code at github.com/tomverbeure/panologic-g2\n");
 #endif
 
+#if 0
     mii_mdio_init();
 
     mii_wait_auto_neg_complete(0);
@@ -263,6 +267,7 @@ int main() {
     print("rev_nr   :");
     print_int(rev_nr, 1);
     print("\n");
+#endif
 
 #if 0
     int prev_rdata = mii_mdio_rd(0, 17);
@@ -276,7 +281,7 @@ int main() {
     }
 #endif
 
-#if 1
+#if 0
     int had_data = 0;
 
     while(1){

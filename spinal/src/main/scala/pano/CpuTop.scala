@@ -63,12 +63,13 @@ case class CpuTop() extends Component {
     // DVI Config I2C control
     //============================================================
 
-    val u_dvi_ctrl = Apb3Gpio(2)
-    io.dvi_ctrl_scl.writeEnable     <> u_dvi_ctrl.io.gpio.writeEnable(0)
+    //val u_dvi_ctrl = Apb3Gpio(2)
+    val u_dvi_ctrl = CCGpio(2)
+    io.dvi_ctrl_scl.writeEnable     <> !u_dvi_ctrl.io.gpio.write(0)
     io.dvi_ctrl_scl.write           <> u_dvi_ctrl.io.gpio.write(0)
     io.dvi_ctrl_scl.read            <> u_dvi_ctrl.io.gpio.read(0)
 
-    io.dvi_ctrl_sda.writeEnable     <> u_dvi_ctrl.io.gpio.writeEnable(1)
+    io.dvi_ctrl_sda.writeEnable     <> !u_dvi_ctrl.io.gpio.write(1)
     io.dvi_ctrl_sda.write           <> u_dvi_ctrl.io.gpio.write(1)
     io.dvi_ctrl_sda.read            <> u_dvi_ctrl.io.gpio.read(1)
 
