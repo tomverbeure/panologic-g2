@@ -29,7 +29,7 @@ object CpuComplexConfig{
         onChipRamSize         = 8 kB,
         onChipRamHexFile      = null,
         pipelineDBus          = true,
-        pipelineMainBus       = false,
+        pipelineMainBus       = true,
         pipelineApbBridge     = true,
         cpuPlugins = ArrayBuffer(
             new IBusSimplePlugin(
