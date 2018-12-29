@@ -4,12 +4,8 @@
 #include "i2c.h"
 #include "reg.h"
 
-//#define IOWR_ALTERA_AVALON_PIO_SET_BITS(addr, bits)     (REG_WR(DVI_CTRL_SET, bits))
-//#define IOWR_ALTERA_AVALON_PIO_CLEAR_BITS(addr, bits)   (REG_WR(DVI_CTRL_CLR, bits))
-//#define IORD_ALTERA_AVALON_PIO_DATA(addr)               (REG_RD(DVI_CTRL_RD))
-
-#define IOWR_ALTERA_AVALON_PIO_SET_BITS(addr, bits)     (REG_WR(DVI_CTRL_WR, REG_RD(DVI_CTRL_WR) |  (bits)))
-#define IOWR_ALTERA_AVALON_PIO_CLEAR_BITS(addr, bits)   (REG_WR(DVI_CTRL_WR, REG_RD(DVI_CTRL_WR) & ~(bits)))
+#define IOWR_ALTERA_AVALON_PIO_SET_BITS(addr, bits)     (REG_WR(DVI_CTRL_SET, (bits)))
+#define IOWR_ALTERA_AVALON_PIO_CLEAR_BITS(addr, bits)   (REG_WR(DVI_CTRL_CLR, (bits)))
 #define IORD_ALTERA_AVALON_PIO_DATA(addr)               (REG_RD(DVI_CTRL_RD))
 
 void i2c_set_scl(i2c_ctx_t *ctx, int bit)
