@@ -49,7 +49,7 @@ int main() {
 
     dvi_ctrl_init();
 
-#if 1
+#if 0
     while(1){
         REG_WR(LED_WRITE, 0x01);
         wait(WAIT_CYCLES);

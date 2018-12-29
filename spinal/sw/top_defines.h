@@ -21,8 +21,8 @@
 #define GMII_RX_FIFO_RD_ADDR        0x00010004
 #define GMII_RX_FIFO_RD_COUNT_ADDR  0x00010008
 
-#define TEST_PATTERN_NR_ADDR                    0x00000020
-#define TEST_PATTERN_CONST_COLOR_ADDR           0x00000024
+#define TEST_PATTERN_NR_ADDR                    0x00000200
+#define TEST_PATTERN_CONST_COLOR_ADDR           0x00000204
 
 #define TXT_BUF_ADDR                0x00008000
 
