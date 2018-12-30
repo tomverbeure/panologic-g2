@@ -30,6 +30,10 @@ class Pano extends Component {
         val gmii_rst_           = out(Bool)
         val gmii                = master(Gmii())
 
+        // USB clock and reset
+        val usb_reset_          = out(Bool)
+        val usb_clk             = out(Bool)
+
         // ULPI Interface
         //val ulpi                = slave(Ulpi())
         val ulpi_clk            = in(Bool)
@@ -47,6 +51,8 @@ class Pano extends Component {
     // When False, you get 25MHz instead.
     // https://github.com/tomverbeure/panologic-g2#fpga-external-clocking-architecture
     io.gmii_rst_    := True
+
+    io.usb_reset_   := True
 
     //============================================================
     // Create osc_clk clock domain
@@ -182,6 +188,25 @@ class Pano extends Component {
         green_counter     := green_counter + 1
         //io.led_green      := green_counter.msb
     }
+
+    //============================================================
+    // USB 24MHz clock
+    //============================================================
+
+    val u_usb_clk_gen = new DCM_CLKGEN(
+            clkfx_divide    = 125,
+            clkfx_multiply  = 24,
+            clkin_period    = "8.0"
+        )
+
+    u_usb_clk_gen.io.CLKIN      <> io.osc_clk
+    u_usb_clk_gen.io.CLKFX      <> io.usb_clk
+    u_usb_clk_gen.io.RST        <> False
+    u_usb_clk_gen.io.FREEZEDCM  <> False
+    u_usb_clk_gen.io.PROGCLK    <> False
+    u_usb_clk_gen.io.PROGDATA   <> False
+    u_usb_clk_gen.io.PROGEN     <> False
+
 
     //============================================================
     // Core logic

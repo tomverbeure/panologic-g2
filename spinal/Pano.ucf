@@ -29,8 +29,8 @@ NET "ulpi_clk" TNM_NET = ulpi_clk;
 #NET "POWER_SLEEP" LOC = C10 | IOSTANDARD = LVCMOS33;
 
 # USB Clock Generation
-#NET "USB_RST_N" LOC = W11 | IOSTANDARD = LVCMOS33;
-#NET "USB_CLK" LOC = W12 | IOSTANDARD = LVCMOS33;
+NET "usb_reset_"            LOC = W11 | IOSTANDARD = LVCMOS33;
+NET "usb_clk"               LOC = W12 | IOSTANDARD = LVCMOS33;
 
 # Pano Button LED Output, Active High
 NET "led_red"               LOC = E12 | IOSTANDARD = LVCMOS33;
