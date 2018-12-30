@@ -68,7 +68,7 @@ int gmii_mdio_rd(int phy_addr, int reg_addr)
         gmii_mdc_toggle();
     }
 
-    GMII_MDIO_SET();
+    GMII_MDIO_ENA();
 
     unsigned word =   (1 << 12)                     // Start bits
                     | (2 << 10)                     // Read

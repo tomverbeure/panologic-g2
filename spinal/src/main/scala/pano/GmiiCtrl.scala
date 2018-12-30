@@ -58,8 +58,6 @@ case class GmiiCtrl() extends Component {
         val apb             = slave(Apb3(GmiiCtrl.getApb3Config()))
 
         val gmii            = master(Gmii())
-
-        val cpu_rx_fifo_rd  = master(Stream(Bits(10 bits)))
     }
 
     //============================================================

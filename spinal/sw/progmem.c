@@ -60,7 +60,6 @@ int main() {
 
 #if 1
     clear();
-while(1){
     print("Pano Logic G2 Reverse Engineering\n");
     print("---------------------------------\n");
     print("\n");
@@ -68,23 +67,21 @@ while(1){
     print("DVI & HDMI working @ 1080p\n");
     print("\n");
     print("Code at github.com/tomverbeure/panologic-g2\n");
-
-    wait(1000000);
-}
 #endif
 
-#if 0
+#if 1
     gmii_mdio_init();
-    gmii_wait_auto_neg_complete(0);
     gmii_reg_dump(0);
-#endif
-#if 0
     gmii_print_phy_id(0);
+    gmii_wait_auto_neg_complete(0);
+#endif
+#if 1
+    gmii_reg_dump(0);
 #endif
 #if 0
     gmii_monitor_regs(0);
 #endif
-#if 0
+#if 1
     gmii_dump_packets(0);
 #endif
 
