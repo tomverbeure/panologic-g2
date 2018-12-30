@@ -181,23 +181,9 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
 
         val txt_gen_pixel_out = PixelStream()
 
-//        val txt_buf_rd_data = Bits(8 bits)
-//
-//        val txt_buf_wr      = u_cpu_top.io.txt_buf_wr
-//        val txt_buf_rd      = u_cpu_top.io.txt_buf_rd
-//        val txt_buf_addr    = u_cpu_top.io.txt_buf_addr
-//        val txt_buf_wr_data = u_cpu_top.io.txt_buf_wr_data
-//
-//        u_cpu_top.io.txt_buf_rd_data := txt_buf_rd_data
-
         val u_txt_gen = new VideoTxtGen(cpuDomain)
         u_txt_gen.io.pixel_in       <> test_patt_pixel_out
         u_txt_gen.io.pixel_out      <> txt_gen_pixel_out
-//        u_txt_gen.io.txt_buf_wr      <> txt_buf_wr
-//        u_txt_gen.io.txt_buf_rd      <> txt_buf_rd
-//        u_txt_gen.io.txt_buf_addr    <> txt_buf_addr
-//        u_txt_gen.io.txt_buf_wr_data <> txt_buf_wr_data
-//        u_txt_gen.io.txt_buf_rd_data <> txt_buf_rd_data
 
         val txt_gen_ctrl = new ClockingArea(cpuDomain) {
             val busCtrl = Apb3SlaveFactory(u_cpu_top.io.txt_gen_apb)

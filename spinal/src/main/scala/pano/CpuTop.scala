@@ -24,13 +24,6 @@ case class CpuTop() extends Component {
         val txt_gen_apb         = master(Apb3(VideoTxtGen.getApb3Config()))
 
         val switch_             = in(Bool)
-
-//        val txt_buf_wr      = out(Bool)
-//        val txt_buf_rd      = out(Bool)
-//        val txt_buf_addr    = out(UInt(13 bits))
-//        val txt_buf_wr_data = out(Bits(8 bits))
-//        val txt_buf_rd_data = in(Bits(8 bits))
-
     }
 
 //    val u_cpu = CpuComplex(CpuComplexConfig.default.copy(onChipRamSize = 8 kB, onChipRamHexFile = "sw/progmem.hex"))
@@ -52,11 +45,6 @@ case class CpuTop() extends Component {
     val u_timer = new MuraxApb3Timer()
     u_timer.io.interrupt        <> u_cpu.io.timerInterrupt
     apbMapping += u_timer.io.apb -> (0x30000, 4 kB)
-
-//    io.txt_buf_wr                   := False
-//    io.txt_buf_rd                   := False
-//    io.txt_buf_addr                 := 0
-//    io.txt_buf_wr_data              := 0
 
     //============================================================
     // Local APB decoder
