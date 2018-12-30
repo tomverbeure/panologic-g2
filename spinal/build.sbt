@@ -4,7 +4,7 @@ lazy val root = (project in file(".")).
     inThisBuild(List(
       organization := "com.github.spinalhdl",
       scalaVersion := "2.11.6",
-      version      := "0.1.0-SNAPSHOT"
+      version      := "1.0.0"
     )),
     libraryDependencies ++= Seq(
         "com.github.spinalhdl" % "spinalhdl-core_2.11" % "1.2.2",
@@ -14,7 +14,8 @@ lazy val root = (project in file(".")).
     ),
     name := "panologic-g2"
   ).dependsOn(vexRiscv)
-lazy val vexRiscv = RootProject(uri("git://github.com/SpinalHDL/VexRiscv.git"))
+//lazy val vexRiscv = RootProject(uri("git://github.com/SpinalHDL/VexRiscv.git"))
+lazy val vexRiscv = RootProject(file("../../VexRiscv"))
 
 //If you want a specific git commit : 
 //lazy val vexRiscv = RootProject(uri("git://github.com/SpinalHDL/VexRiscv.git#commitHash"))

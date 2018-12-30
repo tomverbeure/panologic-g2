@@ -2,6 +2,12 @@
 package pano
 
 import spinal.core._
+import spinal.lib.bus.misc.BusSlaveFactory
+import spinal.lib.bus.amba3.apb._
+
+object VideoTestPattern {
+    def getApb3Config() = Apb3Config(addressWidth = 5,dataWidth = 32)
+}
 
 class VideoTestPattern extends Component {
 
@@ -130,6 +136,14 @@ class VideoTestPattern extends Component {
             io.pixel_out.pixel.g        := (line_cntr |<< 3)(7 downto 0)
             io.pixel_out.pixel.b        := (col_cntr |<<3)(7 downto 0)
         }
+    }
+
+    def driveFrom(busCtrl : BusSlaveFactory, baseAddress : BigInt) = new Area {
+        val pattern_nr  = busCtrl.createReadAndWrite(io.pattern_nr, 0x0000) init(0)
+        val const_color = busCtrl.createReadAndWrite(io.const_color, 0x0004)
+
+        io.pattern_nr  := pattern_nr.addTag(crossClockDomain)
+        io.const_color := const_color.addTag(crossClockDomain)
     }
 
 }

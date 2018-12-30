@@ -171,7 +171,7 @@ class Pano extends Component {
     val gmii_rx = new ClockingArea(gmiiRxClkDomain) {
         val green_counter   = Reg(UInt(24 bits))
         green_counter     := green_counter + 1
-        io.led_green      := green_counter.msb
+        //io.led_green      := green_counter.msb
     }
 
     //============================================================
@@ -182,7 +182,7 @@ class Pano extends Component {
 
         val red_counter   = Reg(UInt(24 bits))
         red_counter     := red_counter + 1
-        io.led_red      := red_counter.msb
+        //io.led_red      := red_counter.msb
 
         val vo = VgaData()
 
@@ -192,8 +192,8 @@ class Pano extends Component {
 
         val u_pano_core = new PanoCore(voClkDomain)
 
-//        u_pano_core.io.led_red      <> io.led_red
-//        u_pano_core.io.led_green    <> io.led_green
+        u_pano_core.io.led_red      <> io.led_red
+        u_pano_core.io.led_green    <> io.led_green
         u_pano_core.io.led_blue     <> io.led_blue
 
         u_pano_core.io.switch_      <> io.pano_button
