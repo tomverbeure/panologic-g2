@@ -58,7 +58,8 @@ int main() {
     }
 #endif
 
-#if 0
+#if 1
+while(1){
     clear();
     print("Pano Logic G2 Reverse Engineering\n");
     print("---------------------------------\n");
@@ -67,6 +68,9 @@ int main() {
     print("DVI & HDMI working @ 1080p\n");
     print("\n");
     print("Code at github.com/tomverbeure/panologic-g2\n");
+
+    wait(1000000);
+}
 #endif
 
 #if 0
@@ -78,7 +82,7 @@ int main() {
     gmii_print_phy_id(0);
 #endif
 #if 0
-    gmii_monitor_regs(0 phy_addr);
+    gmii_monitor_regs(0);
 #endif
 #if 0
     gmii_dump_packets(0);

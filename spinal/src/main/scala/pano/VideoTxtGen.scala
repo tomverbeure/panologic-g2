@@ -2,7 +2,14 @@
 package pano
 
 import java.nio.file.{Files, Paths}
+
 import spinal.core._
+import spinal.lib.bus.misc._
+import spinal.lib.bus.amba3.apb._
+
+object VideoTxtGen {
+    def getApb3Config() = Apb3Config(addressWidth = 16,dataWidth = 32)
+}
 
 class VideoTxtGen(cpuDomain: ClockDomain) extends Component {
 
@@ -162,4 +169,28 @@ class VideoTxtGen(cpuDomain: ClockDomain) extends Component {
         io.pixel_out.pixel.g := 0xff
         io.pixel_out.pixel.b := 0xff
     }
+
+    def driveFrom(busCtrl: BusSlaveFactory, baseAddress: BigInt) = new Area {
+        val mapping = SizeMapping(0x0, (1<<13)*4)
+        val txt_buf_rd_addr = busCtrl.readAddress(mapping) >> 2
+        val txt_buf_wr_addr = busCtrl.writeAddress(mapping) >> 2
+
+        io.txt_buf_wr           := False
+        io.txt_buf_rd           := False
+        io.txt_buf_addr         := txt_buf_wr_addr
+
+        busCtrl.onWritePrimitive(mapping, true, null){
+            io.txt_buf_wr   := True
+            io.txt_buf_addr := txt_buf_wr_addr
+        }
+        busCtrl.nonStopWrite(io.txt_buf_wr_data, 0)
+
+        busCtrl.multiCycleRead(mapping, 2)
+        busCtrl.onReadPrimitive(mapping, true, null){
+            io.txt_buf_rd   := True
+            io.txt_buf_addr := txt_buf_rd_addr
+        }
+        busCtrl.readPrimitive(io.txt_buf_rd_data, mapping, 0, null)
+    }
 }
+
