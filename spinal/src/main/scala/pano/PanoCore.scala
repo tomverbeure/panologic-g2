@@ -24,6 +24,8 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
 
         val gmii                = master(Gmii())
 
+        val ulpi                = slave(Ulpi())
+
         val vo                  = out(VgaData())
     }
 
@@ -206,8 +208,21 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
     //============================================================
 
     val u_gmii_ctrl = GmiiCtrl()
-    u_gmii_ctrl.io.apb                  <> u_cpu_top.io.gmii_ctrl_apb
-    u_gmii_ctrl.io.gmii                 <> io.gmii
+    u_gmii_ctrl.io.apb              <> u_cpu_top.io.gmii_ctrl_apb
+    u_gmii_ctrl.io.gmii             <> io.gmii
+
+    //============================================================
+    // ULPI
+    //============================================================
+
+    val u_ulpi_ctrl = UlpiCtrl()
+    u_ulpi_ctrl.io.ulpi             <> io.ulpi
+
+    val ulpi_ctrl = new ClockingArea(cpuDomain) {
+        val busCtrl = Apb3SlaveFactory(u_cpu_top.io.ulpi_apb)
+
+        val apb_regs = u_ulpi_ctrl.driveFrom(busCtrl, 0x0)
+    }
 
     //============================================================
     // LED control

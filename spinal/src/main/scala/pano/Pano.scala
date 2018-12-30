@@ -26,9 +26,12 @@ class Pano extends Component {
         val dvi                 = out(ChrontelIntfc(includeXClkN = true))
         val hdmi                = out(ChrontelIntfc(includeXClkN = false))
 
-        // MII interfacce
+        // MII interface
         val gmii_rst_           = out(Bool)
         val gmii                = master(Gmii())
+
+        // ULPI Interface
+        val ulpi                = slave(Ulpi())
     }
 
     noIoPrefix()
@@ -202,6 +205,8 @@ class Pano extends Component {
         u_pano_core.io.dvi_ctrl_sda <> io.dvi_spd
 
         u_pano_core.io.gmii         <> io.gmii
+
+        u_pano_core.io.ulpi         <> io.ulpi
 
         u_pano_core.io.vo           <> vo
 

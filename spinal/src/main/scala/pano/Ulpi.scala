@@ -17,7 +17,7 @@ case class Ulpi() extends Bundle with IMasterSlave
     // Master = Phy, since that's how it's defined in the spec.
     override def asMaster: Unit = {
         out(clk)
-        master(data)            // Does this matter for a tri-state?
+        slave(data)
         out(direction)
         in(stp)
         out(nxt)

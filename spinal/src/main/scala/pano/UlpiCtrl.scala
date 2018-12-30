@@ -8,10 +8,10 @@ import spinal.lib.bus.misc._
 import spinal.lib.bus.amba3.apb._
 
 object UlpiCtrl {
-    def getApb3Config() = Apb3Config(addressWidth = 16,dataWidth = 32)
+    def getApb3Config() = Apb3Config(addressWidth = 6,dataWidth = 32)
 }
 
-class UlpiCtrl(cpuDomain: ClockDomain) extends Component {
+case class UlpiCtrl() extends Component {
 
     val io = new Bundle {
         val ulpi        = slave(Ulpi())
@@ -26,8 +26,7 @@ class UlpiCtrl(cpuDomain: ClockDomain) extends Component {
         val reg_addr    = in(UInt(6 bits))
         val reg_wr_data = in(Bits(8 bits))
         val reg_rd_data = out(Bits(8 bits))
-        val reg_wr_done = out(Bool)
-        val reg_rd_done = out(Bool)
+        val reg_done    = out(Bool)
     }
 
     val ulpiDomain = ClockDomain(
@@ -74,8 +73,7 @@ class UlpiCtrl(cpuDomain: ClockDomain) extends Component {
         val direction_d = RegNext(io.ulpi.direction) init(True)
         val turn_around = (direction_d != io.ulpi.direction)
 
-        io.reg_wr_done      := False
-        io.reg_rd_done      := False
+        io.reg_done         := False
         io.reg_rd_data      := 0
 
         io.rx_data.valid    := False
@@ -206,7 +204,7 @@ class UlpiCtrl(cpuDomain: ClockDomain) extends Component {
                 .otherwise{
                     ulpi_data_out   := 0
                     ulpi_stp        := False
-                    io.reg_wr_done  := True
+                    io.reg_done     := True
 
                     cur_state       := UlpiState.Idle
                 }
@@ -230,13 +228,44 @@ class UlpiCtrl(cpuDomain: ClockDomain) extends Component {
             }
 
             is(UlpiState.RegRdData){
-                io.reg_rd_done  := True
+                io.reg_done     := True
                 io.reg_rd_data  := io.ulpi.data.read
 
                 cur_state       := UlpiState.Idle
             }
         }
 
+    }
+
+    def driveFrom(busCtrl: BusSlaveFactory, baseAddress: BigInt) = new Area {
+
+        val reg_addr    = busCtrl.createReadAndWrite(UInt(6 bits), 0x0000,  0) init(0)
+        val reg_wr_data = busCtrl.createReadAndWrite(Bits(8 bits), 0x0000,  8) init(0)
+        val reg_wr      = busCtrl.createReadAndWrite(Bool,         0x0000, 31) init(False)
+
+        io.reg_addr     := reg_addr.addTag(crossClockDomain)
+        io.reg_wr_data  := reg_wr_data.addTag(crossClockDomain)
+
+        val reg_cmd_fifo_wr, reg_cmd_fifo_rd = Stream(Bool)
+        reg_cmd_fifo_wr.valid   := RegNext(busCtrl.isWriting(0x0000)) init(False)
+        reg_cmd_fifo_wr.payload := reg_wr
+
+        val u_reg_cmd_fifo = StreamFifoCC(Bool, 2, ClockDomain.current, ulpiDomain)
+        u_reg_cmd_fifo.io.push  << reg_cmd_fifo_wr
+        u_reg_cmd_fifo.io.pop   >> reg_cmd_fifo_rd
+
+        io.reg_wr   := reg_cmd_fifo_rd.valid &&  reg_cmd_fifo_rd.payload
+        io.reg_rd   := reg_cmd_fifo_rd.valid && !reg_cmd_fifo_rd.payload
+
+        reg_cmd_fifo_rd.ready   := io.reg_done
+
+        val status = reg_cmd_fifo_wr.valid ## io.reg_rd_data.addTag(crossClockDomain)
+
+        busCtrl.read(status, 0x0004)
+
+        io.tx_start         := False
+        io.tx_data.valid    := False
+        io.tx_data.payload  := 0
     }
 }
 
@@ -245,7 +274,7 @@ object UlpiCtrlVerilog{
 
         val config = SpinalConfig(anonymSignalUniqueness = true)
         config.generateVerilog({
-            val toplevel = new UlpiCtrl(ClockDomain.current)
+            val toplevel = new UlpiCtrl()
             InOutWrapper(toplevel)
         })
         println("DONE")
