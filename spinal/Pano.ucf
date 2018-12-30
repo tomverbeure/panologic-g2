@@ -2,7 +2,7 @@
 # VCCAUX is 2.5 Volts
 CONFIG VCCAUX = "2.5";
 
-# 25 MHz System Clock
+# 125 MHz System Clock (25 MHz when GMII chip is in reset)
 NET "osc_clk"               LOC = Y13 | IOSTANDARD = LVCMOS33;
 
 TIMESPEC TS_OSC_CLK = PERIOD "osc_clk" 125 MHz HIGH 50%;
@@ -10,6 +10,9 @@ NET "osc_clk" TNM_NET = osc_clk;
 
 TIMESPEC TS_GMII_RX_CLK = PERIOD "gmii_rx_clk" 125 MHz HIGH 50%;
 NET "gmii_rx_clk" TNM_NET = gmii_rx_clk;
+
+TIMESPEC TS_ULPI_CLK = PERIOD "ulpi_clk" 60 MHz HIGH 50%;
+NET "ulpi_clk" TNM_NET = ulpi_clk;
 
 #TIMESPEC TS_MAIN_CLK = PERIOD "_zz_Pano_25_" 25 MHz HIGH 50%;
 #NET "_zz_Pano_25_" TNM_NET = _zz_Pano_25_;
@@ -86,20 +89,21 @@ NET "hdmi_d[11]"            LOC = T17  | IOSTANDARD = LVCMOS33 | SLEW = FAST | D
 #NET "DDC2_SCK" LOC = AA21 | IOSTANDARD = LVCMOS33; # Display data channel clock
 #NET "DDC2_SDA" LOC = AB19 | IOSTANDARD = LVCMOS33; # Display data channel data
 #NET "V2_HPINT" LOC = AB18 | IOSTANDARD = LVCMOS33; # Hot-plug detect interrupt input, active low
+
 # USB PHY
-#NET "ULPI_DATA[7]" LOC = A4 | IOSTANDARD = LVCMOS33;
-#NET "ULPI_DATA[6]" LOC = A6 | IOSTANDARD = LVCMOS33;
-#NET "ULPI_DATA[5]" LOC = B6 | IOSTANDARD = LVCMOS33;
-#NET "ULPI_DATA[4]" LOC = C6 | IOSTANDARD = LVCMOS33;
-#NET "ULPI_DATA[3]" LOC = D6 | IOSTANDARD = LVCMOS33;
-#NET "ULPI_DATA[2]" LOC = A8 | IOSTANDARD = LVCMOS33;
-#NET "ULPI_DATA[1]" LOC = B8 | IOSTANDARD = LVCMOS33;
-#NET "ULPI_DATA[0]" LOC = A7 | IOSTANDARD = LVCMOS33;
-#NET "ULPI_NXT" LOC = C5 | IOSTANDARD = LVCMOS33;
-#NET "ULPI_DIR" LOC = C7 | IOSTANDARD = LVCMOS33;
-#NET "ULPI_STP" LOC = A5 | IOSTANDARD = LVCMOS33;
-#NET "ULPI_60M_CLK" LOC = C12 | IOSTANDARD = LVCMOS33;
-#NET "USB3300_RESET" LOC = C9 | IOSTANDARD = LVCMOS33;
+NET "ulpi_clk"              LOC = C12  | IOSTANDARD = LVCMOS33;
+NET "ulpi_data[7]"          LOC = A4   | IOSTANDARD = LVCMOS33;
+NET "ulpi_data[6]"          LOC = A6   | IOSTANDARD = LVCMOS33;
+NET "ulpi_data[5]"          LOC = B6   | IOSTANDARD = LVCMOS33;
+NET "ulpi_data[4]"          LOC = C6   | IOSTANDARD = LVCMOS33;
+NET "ulpi_data[3]"          LOC = D6   | IOSTANDARD = LVCMOS33;
+NET "ulpi_data[2]"          LOC = A8   | IOSTANDARD = LVCMOS33;
+NET "ulpi_data[1]"          LOC = B8   | IOSTANDARD = LVCMOS33;
+NET "ulpi_data[0]"          LOC = A7   | IOSTANDARD = LVCMOS33;
+NET "ulpi_nxt"              LOC = C5   | IOSTANDARD = LVCMOS33;
+NET "ulpi_direction"        LOC = C7   | IOSTANDARD = LVCMOS33;
+NET "ulpi_stp"              LOC = A5   | IOSTANDARD = LVCMOS33;
+NET "ulpi_reset"            LOC = C9   | IOSTANDARD = LVCMOS33;
 
 # Audio interface
 #NET "ADC_BCLK" LOC = AB13 | IOSTANDARD = LVCMOS33;
