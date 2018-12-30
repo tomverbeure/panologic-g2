@@ -31,7 +31,13 @@ class Pano extends Component {
         val gmii                = master(Gmii())
 
         // ULPI Interface
-        val ulpi                = slave(Ulpi())
+        //val ulpi                = slave(Ulpi())
+        val ulpi_clk            = in(Bool)
+        val ulpi_data           = master(TriStateArray(8))
+        val ulpi_direction      = in(Bool)
+        val ulpi_stp            = out(Bool)
+        val ulpi_nxt            = in(Bool)
+        val ulpi_reset          = out(Bool)
     }
 
     noIoPrefix()
@@ -206,7 +212,13 @@ class Pano extends Component {
 
         u_pano_core.io.gmii         <> io.gmii
 
-        u_pano_core.io.ulpi         <> io.ulpi
+        //u_pano_core.io.ulpi         <> io.ulpi
+        u_pano_core.io.ulpi.clk         <> io.ulpi_clk
+        u_pano_core.io.ulpi.data        <> io.ulpi_data
+        u_pano_core.io.ulpi.direction   <> io.ulpi_direction
+        u_pano_core.io.ulpi.stp         <> io.ulpi_stp
+        u_pano_core.io.ulpi.nxt         <> io.ulpi_nxt
+        u_pano_core.io.ulpi.reset       <> io.ulpi_reset
 
         u_pano_core.io.vo           <> vo
 
