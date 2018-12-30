@@ -11,7 +11,7 @@ it has no knowledge about USB packet framing, inter-packet timings, or anything 
 It is thus up to the FPGA to implement a USB host to take care of all that.
 
 The USB PHY chip is an [SMSC 3300-EKZ](https://www.microchip.com/wwwproducts/en/USB3300). It has an industry standard
-ULPI interface to connect to the FPGA.
+ULPI interface to connect to the FPGA. The data sheet itself is [here](http://ww1.microchip.com/downloads/en/DeviceDoc/00001783C.pdf).
 
 ## ULPI
 
