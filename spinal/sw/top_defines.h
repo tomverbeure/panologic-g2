@@ -26,3 +26,5 @@
 
 #define TXT_BUF_ADDR                0x00020000
 
+#define ULPI_REG_ACTION_ADDR        0x00000300
+#define ULPI_REG_STATUS_ADDR        0x00000304

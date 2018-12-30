@@ -70,18 +70,43 @@ int main() {
 #endif
 
 #if 1
+    while(1){
+        int addr;
+        int wr_data  = 0;
+
+        for(addr = 0; addr < 4; ++addr){
+            REG_WR(ULPI_REG_ACTION,   (0<<31)
+                                    | (wr_data << 8)
+                                    | (addr));
+
+            int rd_data = 0;
+            do{
+                rd_data = REG_RD(ULPI_REG_STATUS);
+            }
+            while(rd_data & (1<<8));
+
+            print_int(addr, 1);
+            print(":");
+            print_int(rd_data, 1);
+            print("\n");
+        }
+        wait(1000000);
+    }
+#endif
+
+#if 0
     gmii_mdio_init();
     gmii_reg_dump(0);
     gmii_print_phy_id(0);
     gmii_wait_auto_neg_complete(0);
 #endif
-#if 1
+#if 0
     gmii_reg_dump(0);
 #endif
 #if 0
     gmii_monitor_regs(0);
 #endif
-#if 1
+#if 0
     gmii_dump_packets(0);
 #endif
 
