@@ -3,6 +3,7 @@ package pano
 
 import spinal.core._
 import spinal.lib._
+import spinal.lib.io._
 import spinal.lib.bus.misc._
 import spinal.lib.bus.amba3.apb._
 
@@ -75,6 +76,7 @@ class UlpiCtrl(cpuDomain: ClockDomain) extends Component {
 
         io.reg_wr_done      := False
         io.reg_rd_done      := False
+        io.reg_rd_data      := 0
 
         io.rx_data.valid    := False
         io.rx_data.payload  := 0
@@ -164,7 +166,7 @@ class UlpiCtrl(cpuDomain: ClockDomain) extends Component {
                 .otherwise{
                     rx_data_seen       := True
                     io.rx_data.valid   := True
-                    io.rx_data.payload := io.ulpi.data.read
+                    io.rx_data.payload := False ## io.ulpi.data.read
                 }
             }
 
@@ -235,6 +237,18 @@ class UlpiCtrl(cpuDomain: ClockDomain) extends Component {
             }
         }
 
+    }
+}
+
+object UlpiCtrlVerilog{
+    def main(args: Array[String]) {
+
+        val config = SpinalConfig(anonymSignalUniqueness = true)
+        config.generateVerilog({
+            val toplevel = new UlpiCtrl(ClockDomain.current)
+            InOutWrapper(toplevel)
+        })
+        println("DONE")
     }
 }
 
