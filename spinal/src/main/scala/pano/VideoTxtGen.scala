@@ -186,7 +186,7 @@ class VideoTxtGen(cpuDomain: ClockDomain) extends Component {
         busCtrl.nonStopWrite(io.txt_buf_wr_data, 0)
 
         busCtrl.multiCycleRead(mapping, 2)
-        busCtrl.onReadPrimitive(mapping, true, null){
+        busCtrl.onReadPrimitive(mapping, false, null){
             io.txt_buf_rd   := True
             io.txt_buf_addr := txt_buf_rd_addr
         }
