@@ -4,6 +4,7 @@
 *.map
 *.mif
 *.mem
+*.hex
 *.o
 create_sin_table
 fpxx_sin_table.h

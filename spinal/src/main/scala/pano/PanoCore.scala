@@ -4,8 +4,11 @@ package pano
 import spinal.core._
 import spinal.lib._
 import spinal.lib.io._
+import spinal.lib.bus.amba3.apb._
+import spinal.lib.bus.misc.SizeMapping
+import scala.collection.mutable.ArrayBuffer
 
-import mr1._
+import cc._
 
 class PanoCore(voClkDomain: ClockDomain) extends Component {
 
@@ -38,27 +41,8 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
         io.led_red  := led_cntr.msb
     }
 
-    val test_pattern_nr = UInt(4 bits)
-    val const_color     = Pixel()
-
-    val cpu_mdio                = GmiiMdio()
-    val cpu_rx_fifo_rd          = Stream(Bits(10 bits))
-    val cpu_rx_fifo_rd_count    = UInt(16 bits)
-
-    val mr1Config = MR1Config()
-    val u_mr1_top = new MR1Top(mr1Config)
-    u_mr1_top.io.led1       <> io.led_green
-    u_mr1_top.io.led2       <> io.led_blue
-    u_mr1_top.io.switch_    <> io.switch_
-    u_mr1_top.io.dvi_ctrl_scl    <> io.dvi_ctrl_scl
-    u_mr1_top.io.dvi_ctrl_sda    <> io.dvi_ctrl_sda
-
-    u_mr1_top.io.mii_mdio               <> cpu_mdio
-    u_mr1_top.io.mii_rx_fifo_rd         <> cpu_rx_fifo_rd
-    u_mr1_top.io.mii_rx_fifo_rd_count   <> cpu_rx_fifo_rd_count
-
-    u_mr1_top.io.test_pattern_nr            <> test_pattern_nr.addTag(crossClockDomain)
-    u_mr1_top.io.test_pattern_const_color   <> const_color.addTag(crossClockDomain)
+    val u_cpu_top = CpuTop()
+    u_cpu_top.io.switch_                <> io.switch_
 
     var cpuDomain = ClockDomain.current
 
@@ -174,34 +158,42 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
         u_vi_gen.io.timings         <> timings
         u_vi_gen.io.pixel_out       <> vi_gen_pixel_out
 
+        //============================================================
+        // Test pattern
+        //============================================================
+
         val test_patt_pixel_out = PixelStream()
 
         val u_test_patt = new VideoTestPattern()
         u_test_patt.io.timings      <> timings
         u_test_patt.io.pixel_in     <> vi_gen_pixel_out
         u_test_patt.io.pixel_out    <> test_patt_pixel_out
-        u_test_patt.io.pattern_nr   <> test_pattern_nr
-        u_test_patt.io.const_color  <> const_color
+
+        val test_patt_ctrl = new ClockingArea(cpuDomain) {
+            val busCtrl = Apb3SlaveFactory(u_cpu_top.io.test_patt_apb)
+
+            val apb_regs = u_test_patt.driveFrom(busCtrl, 0x0)
+        }
+
+        //============================================================
+        // Text Gen
+        //============================================================
 
         val txt_gen_pixel_out = PixelStream()
-
-        val txt_buf_rd_data = Bits(8 bits)
-
-        val txt_buf_wr      = u_mr1_top.io.txt_buf_wr
-        val txt_buf_rd      = u_mr1_top.io.txt_buf_rd
-        val txt_buf_addr    = u_mr1_top.io.txt_buf_addr
-        val txt_buf_wr_data = u_mr1_top.io.txt_buf_wr_data
-
-        u_mr1_top.io.txt_buf_rd_data := txt_buf_rd_data
 
         val u_txt_gen = new VideoTxtGen(cpuDomain)
         u_txt_gen.io.pixel_in       <> test_patt_pixel_out
         u_txt_gen.io.pixel_out      <> txt_gen_pixel_out
-        u_txt_gen.io.txt_buf_wr      <> txt_buf_wr
-        u_txt_gen.io.txt_buf_rd      <> txt_buf_rd
-        u_txt_gen.io.txt_buf_addr    <> txt_buf_addr
-        u_txt_gen.io.txt_buf_wr_data <> txt_buf_wr_data
-        u_txt_gen.io.txt_buf_rd_data <> txt_buf_rd_data
+
+        val txt_gen_ctrl = new ClockingArea(cpuDomain) {
+            val busCtrl = Apb3SlaveFactory(u_cpu_top.io.txt_gen_apb)
+
+            val apb_regs = u_txt_gen.driveFrom(busCtrl, 0x0)
+        }
+
+        //============================================================
+        // Video Out
+        //============================================================
 
         val u_vo = new VideoOut()
         u_vo.io.timings             <> timings
@@ -209,10 +201,40 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
         u_vo.io.vga_out             <> io.vo
     }
 
-    val u_gmii = GmiiCtrl()
-    u_gmii.io.gmii              <> io.gmii
-    u_gmii.io.cpu_mdio          <> cpu_mdio
-    u_gmii.io.cpu_rx_fifo_rd    <> cpu_rx_fifo_rd
+    //============================================================
+    // GMII
+    //============================================================
+
+    val u_gmii_ctrl = GmiiCtrl()
+    u_gmii_ctrl.io.apb                  <> u_cpu_top.io.gmii_ctrl_apb
+    u_gmii_ctrl.io.gmii                 <> io.gmii
+
+    //============================================================
+    // LED control
+    //============================================================
+
+    val u_led_ctrl = Apb3Gpio(3)
+    u_led_ctrl.io.apb                       <> u_cpu_top.io.led_ctrl_apb
+    u_led_ctrl.io.gpio.write(0)             <> io.led_green
+    u_led_ctrl.io.gpio.write(1)             <> io.led_blue
+    u_led_ctrl.io.gpio.read(0)              := io.led_green
+    u_led_ctrl.io.gpio.read(1)              := io.led_blue
+    u_led_ctrl.io.gpio.read(2)              := False
+
+    //============================================================
+    // DVI Config I2C control
+    //============================================================
+
+    val u_dvi_ctrl = CCGpio(2)
+    u_dvi_ctrl.io.apb               <> u_cpu_top.io.dvi_ctrl_apb
+
+    io.dvi_ctrl_scl.writeEnable     <> !u_dvi_ctrl.io.gpio.write(0)
+    io.dvi_ctrl_scl.write           <> u_dvi_ctrl.io.gpio.write(0)
+    io.dvi_ctrl_scl.read            <> u_dvi_ctrl.io.gpio.read(0)
+
+    io.dvi_ctrl_sda.writeEnable     <> !u_dvi_ctrl.io.gpio.write(1)
+    io.dvi_ctrl_sda.write           <> u_dvi_ctrl.io.gpio.write(1)
+    io.dvi_ctrl_sda.read            <> u_dvi_ctrl.io.gpio.read(1)
 
 }
 
