@@ -59,8 +59,8 @@ int main() {
 #endif
 
 #if 1
-while(1){
     clear();
+while(1){
     print("Pano Logic G2 Reverse Engineering\n");
     print("---------------------------------\n");
     print("\n");
