@@ -288,13 +288,57 @@ case class UlpiCtrlTop() extends Component
 
 }
 
+case class UlpiCtrlFormalTb() extends Component
+{
+    import spinal.core.GenerationFlags._
+
+    val io = new Bundle {
+        val apb     = slave(Apb3(UlpiCtrl.getApb3Config()))
+
+        val ulpi    = slave(Ulpi())
+    }
+
+    val rawClkDomain = ClockDomain(
+        clock = io.ulpi.clk,
+        frequency = FixedFrequency(100 MHz),
+        config = ClockDomainConfig(
+                    resetKind = BOOT
+        )
+    )
+
+    val reset_ = rawClkDomain(RegNext(True) init(False))
+
+    val clkDomain = ClockDomain(
+        clock = io.ulpi.clk,
+        reset = reset_,
+        config = ClockDomainConfig(
+                    resetKind = SYNC,
+                    resetActiveLevel = LOW
+        )
+    )
+
+    val core = new ClockingArea(clkDomain) {
+
+        val u_ulpi_ctrl = new UlpiCtrl()
+        u_ulpi_ctrl.io.ulpi             <> io.ulpi
+
+        val ulpi_ctrl_regs = new ClockingArea(ClockDomain.current) {
+            val busCtrl = Apb3SlaveFactory(io.apb)
+
+            val apb_regs = u_ulpi_ctrl.driveFrom(busCtrl, 0x0)
+        }
+
+        cover(u_ulpi_ctrl.io.reg_done === True)
+    }
+}
+
 
 object UlpiCtrlVerilog{
     def main(args: Array[String]) {
 
         val config = SpinalConfig(anonymSignalUniqueness = true)
-        config.generateVerilog({
-            val toplevel = new UlpiCtrlTop()
+        config.includeFormal.generateSystemVerilog({
+            val toplevel = new UlpiCtrlFormalTb()
             toplevel
         })
         println("DONE")
