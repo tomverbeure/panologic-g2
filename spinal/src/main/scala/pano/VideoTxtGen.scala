@@ -148,9 +148,9 @@ class VideoTxtGen(cpuDomain: ClockDomain) extends Component {
     bitmap_addr := bitmap_msb_addr + bitmap_lsb_addr
 
     val byteArray = Files.readAllBytes(Paths.get(bitmap_font_file))
-    val fontBitmapRamContent = for(i <- 0 until byteArray.length) yield { B(byteArray(i).toLong & 0xff, 8 bits) }
+    val fontBitmapRamContent = for(i <- 0 until byteArray.length) yield { BigInt(byteArray(i).toLong & 0xff) }
 
-    val u_font_bitmap_ram = Mem(Bits(8 bits), initialContent = fontBitmapRamContent)
+    val u_font_bitmap_ram = Mem(Bits(8 bits), byteArray.length) initBigInt(fontBitmapRamContent)
 
     val bitmap_byte = u_font_bitmap_ram.readSync(
                         enable  = txt_buf_rd_p1, 
