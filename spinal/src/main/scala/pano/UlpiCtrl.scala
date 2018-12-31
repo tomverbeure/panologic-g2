@@ -14,19 +14,22 @@ object UlpiCtrl {
 case class UlpiCtrl() extends Component {
 
     val io = new Bundle {
-        val ulpi        = slave(Ulpi())
+        val ulpi            = slave(Ulpi())
 
-        val tx_start    = in(Bool)
-        val tx_data     = slave(Stream(Bits(8 bits)))
+        val tx_start        = in(Bool)
+        val tx_data         = slave(Stream(Bits(8 bits)))
 
-        val rx_data     = master(Flow(Bits(9 bits)))
+        val rx_data         = master(Flow(Bits(9 bits)))
 
-        val reg_rd      = in(Bool)
-        val reg_wr      = in(Bool)
-        val reg_addr    = in(UInt(6 bits))
-        val reg_wr_data = in(Bits(8 bits))
-        val reg_rd_data = out(Bits(8 bits))
-        val reg_done    = out(Bool)
+        val rx_cmd_changed  = out(Bool)
+        val rx_cmd          = out(Bits(8 bits))
+
+        val reg_rd          = in(Bool)
+        val reg_wr          = in(Bool)
+        val reg_addr        = in(UInt(6 bits))
+        val reg_wr_data     = in(Bits(8 bits))
+        val reg_rd_data     = out(Bits(8 bits))
+        val reg_done        = out(Bool)
     }
 
     val rawUlpiDomain = ClockDomain(
@@ -79,7 +82,11 @@ case class UlpiCtrl() extends Component {
         io.ulpi.data.write  := ulpi_data_out
 
         // RX CMD
-        val rx_cmd  = Reg(Bits(8 bits)) init(0)
+        val rx_cmd_changed  = Reg(Bool) init(False)
+        val rx_cmd          = Reg(Bits(8 bits)) init(0)
+
+        io.rx_cmd_changed := rx_cmd_changed
+        io.rx_cmd         := rx_cmd
 
         val direction_d = RegNext(io.ulpi.direction) init(True)
         val turn_around = (direction_d != io.ulpi.direction)
@@ -96,6 +103,9 @@ case class UlpiCtrl() extends Component {
         io.tx_data.ready    := False
 
         val rx_data_seen    = Reg(Bool) init(False)
+
+        reg_done        := False
+        rx_cmd_changed  := False
 
         switch(cur_state){
             is(UlpiState.WaitIdle){
@@ -167,6 +177,7 @@ case class UlpiCtrl() extends Component {
                     io.rx_data.payload := rx_data_seen ## B"00000000"
                 }
                 .elsewhen(!io.ulpi.nxt){
+                    rx_cmd_changed  := True
                     rx_cmd          := io.ulpi.data.read
 
                     when(io.ulpi.data.read(5 downto 0) === 0){
@@ -287,7 +298,7 @@ case class UlpiCtrl() extends Component {
     }
 }
 
-case class UlpiCtrlTop() extends Component 
+case class UlpiCtrlTop() extends Component
 {
     val io = new Bundle {
         val apb         = slave(Apb3(UlpiCtrl.getApb3Config()))
@@ -356,7 +367,12 @@ case class UlpiCtrlFormalTb() extends Component
             assume(ulpi_ctrl_regs.apb_regs.u_reg_cmd_fifo.io.pushOccupancy <= 1)
             assume(ulpi_ctrl_regs.apb_regs.u_reg_cmd_fifo.io.popOccupancy  <= 1)
 
-            cover(!initstate() && reset_ && u_ulpi_ctrl.io.reg_done === True && io.apb.PRDATA(31 downto 0) === 0x55)
+            cover(!initstate() && reset_
+                        && u_ulpi_ctrl.io.reg_done === True && io.apb.PRDATA(31 downto 0) === 0x55
+                )
+            cover(!initstate() && reset_
+                        && u_ulpi_ctrl.io.rx_cmd_changed && u_ulpi_ctrl.io.rx_cmd === 0xaa
+                )
         }
     }
 }
