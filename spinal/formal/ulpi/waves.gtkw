@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.90 (w)1999-2018 BSI
-[*] Mon Dec 31 08:44:33 2018
+[*] Mon Dec 31 17:56:25 2018
 [*]
 [dumpfile] "/home/tom/projects/panologic-g2/spinal/formal/ulpi/cover/engine_0/trace0.vcd"
-[dumpfile_mtime] "Mon Dec 31 08:41:01 2018"
-[dumpfile_size] 17473
+[dumpfile_mtime] "Mon Dec 31 17:53:42 2018"
+[dumpfile_size] 24760
 [savefile] "/home/tom/projects/panologic-g2/spinal/formal/ulpi/waves.gtkw"
 [timestart] 0
 [size] 2653 1058
 [pos] -1 -1
-*-4.429469 45 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-4.429469 134 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] UlpiCtrlFormalTb.
 [sst_width] 506
 [signals_width] 477
@@ -31,25 +31,11 @@ UlpiCtrlFormalTb.io_apb_PRDATA[31:0]
 @200
 -
 @28
-UlpiCtrlFormalTb.core_ulpi_ctrl_regs_apb_regs_reg_wr
-@22
-UlpiCtrlFormalTb.core_ulpi_ctrl_regs_apb_regs_reg_wr_data[7:0]
-@200
--
-@28
-UlpiCtrlFormalTb.core_ulpi_ctrl_regs_apb_regs_u_reg_cmd_fifo.io_push_valid
-UlpiCtrlFormalTb.core_ulpi_ctrl_regs_apb_regs_u_reg_cmd_fifo.io_push_ready
-UlpiCtrlFormalTb.core_ulpi_ctrl_regs_apb_regs_u_reg_cmd_fifo.io_push_payload
+UlpiCtrlFormalTb.apb_regs_u_reg_cmd_fifo.io_push_valid
+UlpiCtrlFormalTb.apb_regs_u_reg_cmd_fifo.io_push_ready
+UlpiCtrlFormalTb.apb_regs_u_reg_cmd_fifo.io_push_payload
 @24
-UlpiCtrlFormalTb.core_ulpi_ctrl_regs_apb_regs_u_reg_cmd_fifo.io_pushOccupancy[1:0]
-@200
--
-@28
-UlpiCtrlFormalTb.core_ulpi_ctrl_regs_apb_regs_u_reg_cmd_fifo.io_pop_valid
-UlpiCtrlFormalTb.core_ulpi_ctrl_regs_apb_regs_u_reg_cmd_fifo.io_pop_ready
-UlpiCtrlFormalTb.core_ulpi_ctrl_regs_apb_regs_u_reg_cmd_fifo.io_pop_payload
-@24
-UlpiCtrlFormalTb.core_ulpi_ctrl_regs_apb_regs_u_reg_cmd_fifo.io_popOccupancy[1:0]
+UlpiCtrlFormalTb.apb_regs_u_reg_cmd_fifo.io_pushOccupancy[1:0]
 @200
 -
 @28
@@ -66,6 +52,14 @@ UlpiCtrlFormalTb.core_u_ulpi_ctrl.io_reg_rd_data[7:0]
 @200
 -
 @28
+UlpiCtrlFormalTb.apb_regs_u_reg_cmd_fifo.io_pop_valid
+UlpiCtrlFormalTb.apb_regs_u_reg_cmd_fifo.io_pop_ready
+UlpiCtrlFormalTb.apb_regs_u_reg_cmd_fifo.io_pop_payload
+@24
+UlpiCtrlFormalTb.apb_regs_u_reg_cmd_fifo.io_popOccupancy[1:0]
+@200
+-
+@28
 UlpiCtrlFormalTb.io_ulpi_clk
 @200
 -
@@ -77,9 +71,8 @@ UlpiCtrlFormalTb.core_u_ulpi_ctrl.ulpi_domain_cur_state[3:0]
 UlpiCtrlFormalTb.io_ulpi_direction
 UlpiCtrlFormalTb.io_ulpi_nxt
 UlpiCtrlFormalTb.io_ulpi_stp
-@23
-UlpiCtrlFormalTb.io_ulpi_data_writeEnable[7:0]
 @22
+UlpiCtrlFormalTb.io_ulpi_data_writeEnable[7:0]
 UlpiCtrlFormalTb.io_ulpi_data_write[7:0]
 UlpiCtrlFormalTb.io_ulpi_data_read[7:0]
 @200
