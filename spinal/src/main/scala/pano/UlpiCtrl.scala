@@ -29,11 +29,22 @@ case class UlpiCtrl() extends Component {
         val reg_done    = out(Bool)
     }
 
-    val ulpiDomain = ClockDomain(
+    val rawUlpiDomain = ClockDomain(
         clock       = io.ulpi.clk,
         frequency   = FixedFrequency(60 MHz),
         config      = ClockDomainConfig(
                         resetKind = BOOT
+        )
+    )
+
+    val ulpi_reset_ = rawUlpiDomain(RegNext(True) init(False))
+
+    val ulpiDomain = ClockDomain(
+        clock = io.ulpi.clk,
+        reset = ulpi_reset_,
+        config = ClockDomainConfig(
+                    resetKind = SYNC,
+                    resetActiveLevel = LOW
         )
     )
 
@@ -290,7 +301,6 @@ case class UlpiCtrlTop() extends Component
 
 case class UlpiCtrlFormalTb() extends Component
 {
-    import spinal.core.GenerationFlags._
 
     val io = new Bundle {
         val apb     = slave(Apb3(UlpiCtrl.getApb3Config()))
@@ -328,7 +338,19 @@ case class UlpiCtrlFormalTb() extends Component
             val apb_regs = u_ulpi_ctrl.driveFrom(busCtrl, 0x0)
         }
 
-        cover(u_ulpi_ctrl.io.reg_done === True)
+        import spinal.core.GenerationFlags._
+        import spinal.core.Formal._
+
+        GenerationFlags.formal{
+            assume(!(stable(io.apb.PENABLE) && !stable(io.apb.PSEL)))
+            assume(!(stable(io.apb.PENABLE) && !stable(io.apb.PADDR)))
+            assume(!(stable(io.apb.PENABLE) && !stable(io.apb.PWDATA)))
+            assume(io.apb.PADDR(1 downto 0) === 0)
+            assume(ulpi_ctrl_regs.apb_regs.u_reg_cmd_fifo.io.pushOccupancy <= 1)
+            assume(ulpi_ctrl_regs.apb_regs.u_reg_cmd_fifo.io.popOccupancy  <= 1)
+
+            cover(reset_ && u_ulpi_ctrl.io.reg_done === True)
+        }
     }
 }
 
