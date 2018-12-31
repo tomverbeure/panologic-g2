@@ -268,6 +268,10 @@ case class UlpiCtrl() extends Component {
 
     def driveFrom(busCtrl: BusSlaveFactory, baseAddress: BigInt) = new Area {
 
+        //============================================================
+        // RX_REG_ACTION
+        //============================================================
+
         val reg_addr    = busCtrl.createReadAndWrite(UInt(6 bits), 0x0000,  0) init(0)
         val reg_wr_data = busCtrl.createReadAndWrite(Bits(8 bits), 0x0000,  8) init(0)
         val reg_wr      = busCtrl.createReadAndWrite(Bool,         0x0000, 31) init(False)
@@ -288,9 +292,33 @@ case class UlpiCtrl() extends Component {
 
         reg_cmd_fifo_rd.ready   := io.reg_done
 
+        //============================================================
+        // RX_REG_STATUS
+        //============================================================
+
         val status = reg_cmd_fifo_rd.valid.addTag(crossClockDomain) ## io.reg_rd_data.addTag(crossClockDomain)
 
-        busCtrl.read(status, 0x0004)
+        val reg_pending = (u_reg_cmd_fifo.io.pushOccupancy > 0)
+        val reg_rd_data = io.reg_rd_data.addTag(crossClockDomain)
+
+        busCtrl.read(reg_rd_data, 0x0004, 0)
+        busCtrl.read(reg_pending, 0x0004, 8)
+
+        //============================================================
+        // RX_CMD
+        //============================================================
+
+        val rx_cmd_changed_sync = Bool
+        val u_sync_pulse_rx_cmd_changed = new PulseCCByToggle(ulpiDomain, ClockDomain.current)
+        u_sync_pulse_rx_cmd_changed.io.pulseIn      <> io.rx_cmd_changed
+        u_sync_pulse_rx_cmd_changed.io.pulseOut     <> rx_cmd_changed_sync
+
+        val rx_cmd_changed_sticky = RegInit(False) clearWhen(busCtrl.isReading(0x0008)) setWhen(rx_cmd_changed_sync)
+
+        val rx_cmd      = io.rx_cmd.addTag(crossClockDomain)
+
+        busCtrl.read(rx_cmd,                0x0008, 0)
+        busCtrl.read(rx_cmd_changed_sticky, 0x0008, 8)
 
         io.tx_start         := False
         io.tx_data.valid    := False
@@ -367,11 +395,16 @@ case class UlpiCtrlFormalTb() extends Component
             assume(ulpi_ctrl_regs.apb_regs.u_reg_cmd_fifo.io.pushOccupancy <= 1)
             assume(ulpi_ctrl_regs.apb_regs.u_reg_cmd_fifo.io.popOccupancy  <= 1)
 
+            val apb_rd_active = io.apb.PENABLE && io.apb.PSEL(0) && !io.apb.PWRITE
+
+            // RxRegRd
             cover(!initstate() && reset_
-                        && u_ulpi_ctrl.io.reg_done === True && io.apb.PRDATA(31 downto 0) === 0x55
+                        && apb_rd_active && io.apb.PADDR === 0x0004 && io.apb.PRDATA === 0x55
                 )
+
+            // RxCmd
             cover(!initstate() && reset_
-                        && u_ulpi_ctrl.io.rx_cmd_changed && u_ulpi_ctrl.io.rx_cmd === 0xaa
+                        && apb_rd_active && io.apb.PADDR === 0x0008 && io.apb.PRDATA === 0x1aa
                 )
         }
     }
