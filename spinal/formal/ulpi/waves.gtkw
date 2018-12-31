@@ -1,10 +1,10 @@
 [*]
 [*] GTKWave Analyzer v3.3.90 (w)1999-2018 BSI
-[*] Mon Dec 31 17:56:25 2018
+[*] Mon Dec 31 18:03:49 2018
 [*]
 [dumpfile] "/home/tom/projects/panologic-g2/spinal/formal/ulpi/cover/engine_0/trace0.vcd"
-[dumpfile_mtime] "Mon Dec 31 17:53:42 2018"
-[dumpfile_size] 24760
+[dumpfile_mtime] "Mon Dec 31 18:00:29 2018"
+[dumpfile_size] 13337
 [savefile] "/home/tom/projects/panologic-g2/spinal/formal/ulpi/waves.gtkw"
 [timestart] 0
 [size] 2653 1058
@@ -14,7 +14,7 @@
 [sst_width] 506
 [signals_width] 477
 [sst_expanded] 1
-[sst_vpaned_height] 320
+[sst_vpaned_height] 309
 @28
 UlpiCtrlFormalTb.io_ulpi_clk
 @200
@@ -49,6 +49,12 @@ UlpiCtrlFormalTb.core_u_ulpi_ctrl.io_reg_wr_data[7:0]
 -
 @22
 UlpiCtrlFormalTb.core_u_ulpi_ctrl.io_reg_rd_data[7:0]
+@200
+-
+@28
+UlpiCtrlFormalTb.core_u_ulpi_ctrl.io_rx_cmd_changed
+@22
+UlpiCtrlFormalTb.core_u_ulpi_ctrl.io_rx_cmd[7:0]
 @200
 -
 @28
