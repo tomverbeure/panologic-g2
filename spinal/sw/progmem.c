@@ -84,6 +84,7 @@ int main() {
                 rd_data = REG_RD(ULPI_REG_STATUS);
             }
             while(rd_data & (1<<8));
+            rd_data = REG_RD(ULPI_REG_STATUS);
 
             print_int(addr, 1);
             print(":");
