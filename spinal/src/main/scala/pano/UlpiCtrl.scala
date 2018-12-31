@@ -269,13 +269,33 @@ case class UlpiCtrl() extends Component {
     }
 }
 
+case class UlpiCtrlTop() extends Component 
+{
+    val io = new Bundle {
+        val apb         = slave(Apb3(UlpiCtrl.getApb3Config()))
+
+        val ulpi        = slave(Ulpi())
+    }
+
+    val u_ulpi_ctrl = UlpiCtrl()
+    u_ulpi_ctrl.io.ulpi             <> io.ulpi
+
+    val ulpi_ctrl = new ClockingArea(ClockDomain.current) {
+        val busCtrl = Apb3SlaveFactory(io.apb)
+
+        val apb_regs = u_ulpi_ctrl.driveFrom(busCtrl, 0x0)
+    }
+
+}
+
+
 object UlpiCtrlVerilog{
     def main(args: Array[String]) {
 
         val config = SpinalConfig(anonymSignalUniqueness = true)
         config.generateVerilog({
-            val toplevel = new UlpiCtrl()
-            InOutWrapper(toplevel)
+            val toplevel = new UlpiCtrlTop()
+            toplevel
         })
         println("DONE")
     }
