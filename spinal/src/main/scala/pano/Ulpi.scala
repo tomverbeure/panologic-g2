@@ -17,11 +17,16 @@ case class Ulpi() extends Bundle with IMasterSlave
     // Master = Phy, since that's how it's defined in the spec.
     override def asMaster: Unit = {
         out(clk)
-        slave(data)
+        master(data)
         out(direction)
         in(stp)
         out(nxt)
         in(reset)
+    }
+
+    override def asSlave: Unit = {
+        super.asSlave()
+        master(data)        // Tri-state signals should always be master
     }
 }
 
