@@ -84,8 +84,11 @@ case class UlpiCtrl() extends Component {
         val direction_d = RegNext(io.ulpi.direction) init(True)
         val turn_around = (direction_d != io.ulpi.direction)
 
-        io.reg_done         := False
-        io.reg_rd_data      := 0
+        val reg_done        = Reg(Bool) init(False)
+        val reg_rd_data     = Reg(Bits(8 bits)) init(0)
+
+        io.reg_done    := reg_done
+        io.reg_rd_data := reg_rd_data
 
         io.rx_data.valid    := False
         io.rx_data.payload  := 0
@@ -215,7 +218,7 @@ case class UlpiCtrl() extends Component {
                 .otherwise{
                     ulpi_data_out   := 0
                     ulpi_stp        := False
-                    io.reg_done     := True
+                    reg_done        := True
 
                     cur_state       := UlpiState.Idle
                 }
@@ -235,14 +238,18 @@ case class UlpiCtrl() extends Component {
             }
 
             is (UlpiState.RegRdTurn){
-                cur_state       := UlpiState.RegRdData
+                //when(io.ulpi.direction){          // This shouldn't be needed?
+                    cur_state       := UlpiState.RegRdData
+                //}
             }
 
             is(UlpiState.RegRdData){
-                io.reg_done     := True
-                io.reg_rd_data  := io.ulpi.data.read
+                //when(io.ulpi.direction){          // This shouldn't be needed?
+                    reg_done        := True
+                    reg_rd_data     := io.ulpi.data.read
 
-                cur_state       := UlpiState.Idle
+                    cur_state       := UlpiState.Idle
+                //}
             }
         }
 
@@ -270,7 +277,7 @@ case class UlpiCtrl() extends Component {
 
         reg_cmd_fifo_rd.ready   := io.reg_done
 
-        val status = reg_cmd_fifo_wr.valid ## io.reg_rd_data.addTag(crossClockDomain)
+        val status = reg_cmd_fifo_rd.valid.addTag(crossClockDomain) ## io.reg_rd_data.addTag(crossClockDomain)
 
         busCtrl.read(status, 0x0004)
 
@@ -349,7 +356,7 @@ case class UlpiCtrlFormalTb() extends Component
             assume(ulpi_ctrl_regs.apb_regs.u_reg_cmd_fifo.io.pushOccupancy <= 1)
             assume(ulpi_ctrl_regs.apb_regs.u_reg_cmd_fifo.io.popOccupancy  <= 1)
 
-            cover(reset_ && u_ulpi_ctrl.io.reg_done === True)
+            cover(!initstate() && reset_ && u_ulpi_ctrl.io.reg_done === True && io.apb.PRDATA(31 downto 0) === 0x55)
         }
     }
 }
