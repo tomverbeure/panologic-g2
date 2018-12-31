@@ -343,7 +343,7 @@ case class UlpiCtrlFormalTb() extends Component
             val busCtrl = Apb3SlaveFactory(io.apb)
 
             val apb_regs = u_ulpi_ctrl.driveFrom(busCtrl, 0x0)
-        }
+        }.setName("")
 
         import spinal.core.GenerationFlags._
         import spinal.core.Formal._
