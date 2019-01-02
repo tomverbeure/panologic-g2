@@ -7,6 +7,7 @@
 #include "i2c.h"
 #include "gmii.h"
 #include "dvi.h"
+#include "usb.h"
 
 static inline uint32_t rdcycle(void) {
     uint32_t cycle;
@@ -71,26 +72,13 @@ int main() {
 
 #if 1
     while(1){
-        int addr;
-        int wr_data  = 0;
-
-        for(addr = 0; addr < 4; ++addr){
-            REG_WR(ULPI_REG_ACTION,   (0<<31)
-                                    | (wr_data << 8)
-                                    | (addr));
-
-            int rd_data = 0;
-            do{
-                rd_data = REG_RD(ULPI_REG_STATUS);
-            }
-            while(rd_data & (1<<8));
-            rd_data = REG_RD(ULPI_REG_STATUS);
-
-            print_int(addr, 1);
-            print(":");
-            print_int(rd_data, 1);
-            print("\n");
-        }
+        int vendor_id, product_id;
+        ulpi_get_vendor_id_product_id(&vendor_id, &product_id);
+        print("vendor_id:");
+        print_int(vendor_id, 1);
+        print("   product_id:");
+        print_int(product_id, 1);
+        print("\n");
         wait(1000000);
     }
 #endif

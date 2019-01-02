@@ -12,11 +12,10 @@
 #define DVI_CTRL_RD_ADDR            0x00000110
 
 #define GMII_MDIO_ADDR              0x00010000
-
-#define GMII_MDC_VAL_BIT         0
-#define GMII_MDIO_WR_BIT         1
-#define GMII_MDIO_ENA_BIT        2
-#define GMII_MDIO_RD_BIT         3
+#define GMII_MDC_VAL_BIT                0
+#define GMII_MDIO_WR_BIT                1
+#define GMII_MDIO_ENA_BIT               2
+#define GMII_MDIO_RD_BIT                3
 
 #define GMII_RX_FIFO_RD_ADDR        0x00010004
 #define GMII_RX_FIFO_RD_COUNT_ADDR  0x00010008
@@ -27,4 +26,13 @@
 #define TXT_BUF_ADDR                0x00020000
 
 #define ULPI_REG_ACTION_ADDR        0x00000300
+#define ULPI_REG_ACTION_ADDR_BIT        0
+#define ULPI_REG_ACTION_WR_DATA_BIT     8
+#define ULPI_REG_ACTION_WR_BIT          31
+
 #define ULPI_REG_STATUS_ADDR        0x00000304
+
+#define ULPI_REG_STATUS_RD_DATA_BIT     0
+#define ULPI_REG_STATUS_PENDING_BIT     8
+
+
