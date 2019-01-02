@@ -1,20 +1,20 @@
 [*]
 [*] GTKWave Analyzer v3.3.90 (w)1999-2018 BSI
-[*] Mon Dec 31 19:03:59 2018
+[*] Wed Jan  2 05:05:37 2019
 [*]
 [dumpfile] "/home/tom/projects/panologic-g2/spinal/formal/ulpi/cover/engine_0/trace0.vcd"
-[dumpfile_mtime] "Mon Dec 31 18:59:04 2018"
-[dumpfile_size] 21679
+[dumpfile_mtime] "Wed Jan  2 05:01:27 2019"
+[dumpfile_size] 140457
 [savefile] "/home/tom/projects/panologic-g2/spinal/formal/ulpi/waves.gtkw"
 [timestart] 0
-[size] 2653 1058
-[pos] -1 -1
-*-4.429469 4 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[size] 2464 1402
+[pos] -2185 255
+*-6.429469 200 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] UlpiCtrlFormalTb.
 [sst_width] 506
-[signals_width] 477
+[signals_width] 421
 [sst_expanded] 1
-[sst_vpaned_height] 309
+[sst_vpaned_height] 855
 @28
 UlpiCtrlFormalTb.io_ulpi_clk
 @200
@@ -30,6 +30,8 @@ UlpiCtrlFormalTb.io_apb_PWDATA[31:0]
 UlpiCtrlFormalTb.io_apb_PRDATA[31:0]
 @200
 -
+@800200
+-regs
 @28
 UlpiCtrlFormalTb.apb_regs_u_reg_cmd_fifo.io_push_valid
 UlpiCtrlFormalTb.apb_regs_u_reg_cmd_fifo.io_push_ready
@@ -64,12 +66,43 @@ UlpiCtrlFormalTb.apb_regs_u_reg_cmd_fifo.io_pop_ready
 UlpiCtrlFormalTb.apb_regs_u_reg_cmd_fifo.io_pop_payload
 @24
 UlpiCtrlFormalTb.apb_regs_u_reg_cmd_fifo.io_popOccupancy[1:0]
+@1000200
+-regs
+@200
+-
+@800200
+-rx_cmd
+@28
+UlpiCtrlFormalTb.apb_regs_rx_cmd_changed_sticky
+UlpiCtrlFormalTb.apb_regs_rx_cmd_changed_sync
+@1000200
+-rx_cmd
+@200
+-
+@800200
+-TX
+@28
+UlpiCtrlFormalTb.apb_regs_u_tx_data_fifo.io_push_valid
+UlpiCtrlFormalTb.apb_regs_u_tx_data_fifo.io_push_ready
+@22
+UlpiCtrlFormalTb.apb_regs_u_tx_data_fifo.io_push_payload[7:0]
+@24
+UlpiCtrlFormalTb.apb_regs_u_tx_data_fifo.io_pushOccupancy[10:0]
 @200
 -
 @28
-UlpiCtrlFormalTb.apb_regs_rx_cmd_changed_sticky
-@29
-UlpiCtrlFormalTb.apb_regs_rx_cmd_changed_sync
+UlpiCtrlFormalTb.apb_regs_u_tx_data_fifo.io_pop_valid
+UlpiCtrlFormalTb.apb_regs_u_tx_data_fifo.io_pop_ready
+@22
+UlpiCtrlFormalTb.apb_regs_u_tx_data_fifo.io_pop_payload[7:0]
+@24
+UlpiCtrlFormalTb.apb_regs_u_tx_data_fifo.io_popOccupancy[10:0]
+@200
+-
+@28
+UlpiCtrlFormalTb.apb_regs_tx_data_fifo_empty
+@1000200
+-TX
 @200
 -
 @28
