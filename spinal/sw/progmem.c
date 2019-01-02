@@ -70,18 +70,8 @@ int main() {
     print("Code at github.com/tomverbeure/panologic-g2\n");
 #endif
 
-#if 1
-    while(1){
-        int vendor_id, product_id;
-        ulpi_get_vendor_id_product_id(&vendor_id, &product_id);
-        print("vendor_id:");
-        print_int(vendor_id, 1);
-        print("   product_id:");
-        print_int(product_id, 1);
-        print("\n");
-        wait(1000000);
-    }
-#endif
+    ulpi_print_id();
+    ulpi_monitor_rx_cmd();
 
 #if 0
     gmii_mdio_init();

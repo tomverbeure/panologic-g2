@@ -31,8 +31,13 @@
 #define ULPI_REG_ACTION_WR_BIT          31
 
 #define ULPI_REG_STATUS_ADDR        0x00000304
-
 #define ULPI_REG_STATUS_RD_DATA_BIT     0
 #define ULPI_REG_STATUS_PENDING_BIT     8
+
+#define ULPI_RX_CMD_ADDR            0x00000308
+#define ULPI_RX_CMD_VALUE_BIT           0
+#define ULPI_RX_CMD_CHANGED_BIT         8
+
+
 
 
