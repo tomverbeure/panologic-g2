@@ -320,9 +320,34 @@ case class UlpiCtrl() extends Component {
         busCtrl.read(rx_cmd,                0x0008, 0)
         busCtrl.read(rx_cmd_changed_sticky, 0x0008, 8)
 
-        io.tx_start         := False
-        io.tx_data.valid    := False
-        io.tx_data.payload  := 0
+
+        //============================================================
+        // TX DATA
+        //============================================================
+
+        val tx_data_reg = busCtrl.createAndDriveFlow(io.tx_data, 0x000c, 0)
+
+        val u_tx_data_fifo = StreamFifoCC(Bits(8 bits), 1024, ClockDomain.current, ulpiDomain)
+        u_tx_data_fifo.io.push          << tx_data_reg.toStream
+        u_tx_data_fifo.io.pop           >> io.tx_data
+
+        //============================================================
+        // TX DATA ACTION
+        //============================================================
+
+        val tx_start_reg = busCtrl.createAndDriveFlow(Bool, 0x0010, 0)
+
+        val u_sync_pulse_tx_start = new PulseCCByToggle(ClockDomain.current, ulpiDomain)
+        u_sync_pulse_tx_start.io.pulseIn        <> (tx_start_reg.valid && tx_start_reg.payload)
+        u_sync_pulse_tx_start.io.pulseOut       <> io.tx_start
+
+        //============================================================
+        // TX DATA STATUS
+        //============================================================
+
+        busCtrl.read(u_tx_data_fifo.io.pushOccupancy, 0x0014, 0)
+        busCtrl.read(u_tx_data_fifo.io.push.ready,    0x0014, 16)       // FIFO full or not
+
     }
 }
 
