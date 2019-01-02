@@ -54,8 +54,8 @@ case class UlpiCtrl() extends Component {
     object UlpiState extends SpinalEnum {
         val WaitIdle        = newElement()
         val Idle            = newElement()
-        val Rx              = newElement()
         val Tx              = newElement()
+        val Rx              = newElement()
         val RegWrAddr       = newElement()
         val RegWrData       = newElement()
         val RegWrStp        = newElement()
@@ -345,8 +345,11 @@ case class UlpiCtrl() extends Component {
         // TX DATA STATUS
         //============================================================
 
+        val tx_data_fifo_empty = !BufferCC(u_tx_data_fifo.io.pop.valid, False)
+
         busCtrl.read(u_tx_data_fifo.io.pushOccupancy, 0x0014, 0)
-        busCtrl.read(u_tx_data_fifo.io.push.ready,    0x0014, 16)       // FIFO full or not
+        busCtrl.read(u_tx_data_fifo.io.push.ready,    0x0014, 16)       // FIFO full
+        busCtrl.read(tx_data_fifo_empty,              0x0014, 17)       // FIFO empty
 
     }
 }
@@ -422,15 +425,29 @@ case class UlpiCtrlFormalTb() extends Component
 
             val apb_rd_active = io.apb.PENABLE && io.apb.PSEL(0) && !io.apb.PWRITE
 
-            // RxRegRd
-            cover(!initstate() && reset_
-                        && apb_rd_active && io.apb.PADDR === 0x0004 && io.apb.PRDATA === 0x55
-                )
+            if (false){
+                // RxRegRd
+                cover(!initstate() && reset_
+                            && apb_rd_active && io.apb.PADDR === 0x0004 && io.apb.PRDATA === 0x55
+                    )
+            }
 
-            // RxCmd
-            cover(!initstate() && reset_
-                        && apb_rd_active && io.apb.PADDR === 0x0008 && io.apb.PRDATA === 0x1aa
-                )
+            if (false){
+                // RxCmd
+                cover(!initstate() && reset_
+                            && apb_rd_active && io.apb.PADDR === 0x0008 && io.apb.PRDATA === 0x1aa
+                    )
+            }
+
+            val tx_data_fifo_level_reached = RegInit(False) setWhen(ulpi_ctrl_regs.apb_regs.u_tx_data_fifo.io.pushOccupancy === 20)
+            val tx_data_fifo_empty = ulpi_ctrl_regs.apb_regs.tx_data_fifo_empty
+
+            if (true){
+                cover(!initstate() && reset_
+                            && tx_data_fifo_level_reached
+                            && tx_data_fifo_empty
+                    )
+            }
         }
     }
 }
