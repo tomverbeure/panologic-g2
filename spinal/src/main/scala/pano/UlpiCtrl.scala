@@ -325,7 +325,7 @@ case class UlpiCtrl() extends Component {
         // TX DATA
         //============================================================
 
-        val tx_data_reg = busCtrl.createAndDriveFlow(io.tx_data, 0x000c, 0)
+        val tx_data_reg = busCtrl.createAndDriveFlow(io.tx_data.payload, 0x000c, 0)
 
         val u_tx_data_fifo = StreamFifoCC(Bits(8 bits), 1024, ClockDomain.current, ulpiDomain)
         u_tx_data_fifo.io.push          << tx_data_reg.toStream
@@ -446,6 +446,7 @@ case class UlpiCtrlFormalTb() extends Component
                 cover(!initstate() && reset_
                             && tx_data_fifo_level_reached
                             && tx_data_fifo_empty
+                            && (ulpi_ctrl_regs.apb_regs.u_tx_data_fifo.io.pushOccupancy === 0)
                     )
             }
         }
