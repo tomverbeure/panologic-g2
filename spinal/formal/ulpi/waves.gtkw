@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.90 (w)1999-2018 BSI
-[*] Mon Dec 31 18:03:49 2018
+[*] Mon Dec 31 19:03:59 2018
 [*]
 [dumpfile] "/home/tom/projects/panologic-g2/spinal/formal/ulpi/cover/engine_0/trace0.vcd"
-[dumpfile_mtime] "Mon Dec 31 18:00:29 2018"
-[dumpfile_size] 13337
+[dumpfile_mtime] "Mon Dec 31 18:59:04 2018"
+[dumpfile_size] 21679
 [savefile] "/home/tom/projects/panologic-g2/spinal/formal/ulpi/waves.gtkw"
 [timestart] 0
 [size] 2653 1058
 [pos] -1 -1
-*-4.429469 134 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-4.429469 4 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] UlpiCtrlFormalTb.
 [sst_width] 506
 [signals_width] 477
@@ -57,12 +57,19 @@ UlpiCtrlFormalTb.core_u_ulpi_ctrl.io_rx_cmd_changed
 UlpiCtrlFormalTb.core_u_ulpi_ctrl.io_rx_cmd[7:0]
 @200
 -
+-
 @28
 UlpiCtrlFormalTb.apb_regs_u_reg_cmd_fifo.io_pop_valid
 UlpiCtrlFormalTb.apb_regs_u_reg_cmd_fifo.io_pop_ready
 UlpiCtrlFormalTb.apb_regs_u_reg_cmd_fifo.io_pop_payload
 @24
 UlpiCtrlFormalTb.apb_regs_u_reg_cmd_fifo.io_popOccupancy[1:0]
+@200
+-
+@28
+UlpiCtrlFormalTb.apb_regs_rx_cmd_changed_sticky
+@29
+UlpiCtrlFormalTb.apb_regs_rx_cmd_changed_sync
 @200
 -
 @28
