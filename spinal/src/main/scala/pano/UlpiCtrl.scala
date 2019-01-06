@@ -439,13 +439,13 @@ case class UlpiCtrlFormalTb() extends Component
                     )
             }
 
-            val tx_data_fifo_level_reached = RegInit(False) setWhen(ulpi_ctrl_regs.apb_regs.u_tx_data_fifo.io.pushOccupancy === 20)
-            val tx_data_fifo_empty = ulpi_ctrl_regs.apb_regs.tx_data_fifo_empty
+            val tx_data_fifo_rd_empty = ulpi_ctrl_regs.apb_regs.tx_data_fifo_empty
+
+            val tx_data_fifo_level_reached = RegInit(False) setWhen(ulpi_ctrl_regs.apb_regs.u_tx_data_fifo.io.pushOccupancy === 10)
 
             if (true){
                 cover(!initstate() && reset_
                             && tx_data_fifo_level_reached
-                            && tx_data_fifo_empty
                             && (ulpi_ctrl_regs.apb_regs.u_tx_data_fifo.io.pushOccupancy === 0)
                     )
             }
