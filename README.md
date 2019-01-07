@@ -76,7 +76,7 @@ in turn connected to pin `Y13` of the FPGA.
 However, when the PHY is in reset, this PLL is disabled and pin `125CLK` carries the original 25MHz instead! (This
 is not documented in the datasheet of the close cousin of this PHY.)
 
-When you don't use the PHY, it's natural to not assign any value to the FPGA pin that drives the PHY `RESET_` pin, so without knowning this
+When you don't use the PHY, it's natural to not assign any value to the FPGA pin that drives the PHY `RESET_` pin, so without knowing this
 quirk of the design, one gets tricked into assuming that pin `Y13` *always* carries a clock of 25MHz.
 
 But as soon as you want to use the PHY and deassert its reset, the clock switches to 125MHz!
