@@ -7,6 +7,8 @@ import spinal.lib.io._
 import spinal.lib.bus.misc._
 import spinal.lib.bus.amba3.apb._
 
+import pano.lib._
+
 object UlpiCtrl {
     def getApb3Config() = Apb3Config(addressWidth = 6,dataWidth = 32)
 }
@@ -416,12 +418,45 @@ case class UlpiCtrlFormalTb() extends Component
         import spinal.core.Formal._
 
         GenerationFlags.formal{
+            // APB Checks
             assume(!(stable(io.apb.PENABLE) && !stable(io.apb.PSEL)))
             assume(!(stable(io.apb.PENABLE) && !stable(io.apb.PADDR)))
             assume(!(stable(io.apb.PENABLE) && !stable(io.apb.PWDATA)))
             assume(io.apb.PADDR(1 downto 0) === 0)
+
             assume(ulpi_ctrl_regs.apb_regs.u_reg_cmd_fifo.io.pushOccupancy <= 1)
             assume(ulpi_ctrl_regs.apb_regs.u_reg_cmd_fifo.io.popOccupancy  <= 1)
+
+            //============================================================
+            // Ulpi Protocol Checks
+            //============================================================
+            var ulpi_direction_d = RegNext(io.ulpi.direction)
+
+            val ulpi_turn_around    = io.ulpi.direction =/= ulpi_direction_d
+            val ulpi_phy_driven     =  io.ulpi.direction && !ulpi_turn_around
+            val ulpi_link_driven    = !io.ulpi.direction && !ulpi_turn_around
+
+            when(!initstate()){
+
+                // Link should not drive the bus when PHY has ownership
+                assert( (io.ulpi.direction) |-> (!io.ulpi.data.writeEnable.orR) )
+
+                // Link should drive the bus when ulpi_dir is 0 and no turn around
+                assert( (!ulpi_turn_around && ulpi_link_driven) |-> (io.ulpi.data.writeEnable.orR) )
+
+                // When link is transmitting and nxt is deasserted by phy, data and stp must be stable
+                // Need sequence for this because nxt will be low for the first byte of a transmit
+                //assert( !stable(reset_) || !(ulpi_link_driven && !io.ulpi.nxt && !ulpi_turn_around) || (stable(io.ulpi.data.write) && stable(io.ulpi.stp)) )
+
+                // When the PHY is sending data to the LINK, and the link asserts STP, then the PHY should
+                // deassert DIR to give control to the LINK.
+                assume( (ulpi_phy_driven && io.ulpi.stp) |-> (!io.ulpi.direction) )
+
+                // When ulpi_stp is asserted, the link should be driving or there's a turn-around (due to an abort)
+                assert( (io.ulpi.stp) |-> (ulpi_link_driven || ulpi_turn_around) )
+            }
+
+            //============================================================
 
             val apb_rd_active = io.apb.PENABLE && io.apb.PSEL(0) && !io.apb.PWRITE
 

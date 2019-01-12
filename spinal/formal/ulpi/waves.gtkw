@@ -1,20 +1,20 @@
 [*]
-[*] GTKWave Analyzer v3.3.90 (w)1999-2018 BSI
-[*] Wed Jan  2 05:05:37 2019
+[*] GTKWave Analyzer v3.3.66 (w)1999-2015 BSI
+[*] Sat Jan 12 05:23:24 2019
 [*]
-[dumpfile] "/home/tom/projects/panologic-g2/spinal/formal/ulpi/cover/engine_0/trace0.vcd"
-[dumpfile_mtime] "Wed Jan  2 05:01:27 2019"
-[dumpfile_size] 140457
-[savefile] "/home/tom/projects/panologic-g2/spinal/formal/ulpi/waves.gtkw"
+[dumpfile] "/home/ubuntu/projects/panologic-g2/spinal/formal/ulpi/check/engine_0/trace.vcd"
+[dumpfile_mtime] "Sat Jan 12 05:22:33 2019"
+[dumpfile_size] 39108
+[savefile] "/home/ubuntu/projects/panologic-g2/spinal/formal/ulpi/waves.gtkw"
 [timestart] 0
-[size] 2464 1402
-[pos] -2185 255
-*-6.429469 200 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[size] 1920 1151
+[pos] -1 -1
+*-4.935745 200 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] UlpiCtrlFormalTb.
-[sst_width] 506
-[signals_width] 421
+[sst_width] 358
+[signals_width] 395
 [sst_expanded] 1
-[sst_vpaned_height] 855
+[sst_vpaned_height] 738
 @28
 UlpiCtrlFormalTb.io_ulpi_clk
 @200
@@ -30,7 +30,7 @@ UlpiCtrlFormalTb.io_apb_PWDATA[31:0]
 UlpiCtrlFormalTb.io_apb_PRDATA[31:0]
 @200
 -
-@800200
+@c00200
 -regs
 @28
 UlpiCtrlFormalTb.apb_regs_u_reg_cmd_fifo.io_push_valid
@@ -66,20 +66,20 @@ UlpiCtrlFormalTb.apb_regs_u_reg_cmd_fifo.io_pop_ready
 UlpiCtrlFormalTb.apb_regs_u_reg_cmd_fifo.io_pop_payload
 @24
 UlpiCtrlFormalTb.apb_regs_u_reg_cmd_fifo.io_popOccupancy[1:0]
-@1000200
+@1401200
 -regs
 @200
 -
-@800200
+@c00200
 -rx_cmd
 @28
 UlpiCtrlFormalTb.apb_regs_rx_cmd_changed_sticky
 UlpiCtrlFormalTb.apb_regs_rx_cmd_changed_sync
-@1000200
+@1401200
 -rx_cmd
 @200
 -
-@800200
+@c00201
 -TX
 @28
 UlpiCtrlFormalTb.apb_regs_u_tx_data_fifo.io_push_valid
@@ -101,7 +101,7 @@ UlpiCtrlFormalTb.apb_regs_u_tx_data_fifo.io_popOccupancy[10:0]
 -
 @28
 UlpiCtrlFormalTb.apb_regs_tx_data_fifo_empty
-@1000200
+@1401201
 -TX
 @200
 -

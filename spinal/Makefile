@@ -1,6 +1,6 @@
 
-sim:
-	sbt "test-only rt.PanoTester"
+#sim:
+#	sbt "test-only rt.PanoTester"
 
 syn:
 	sbt "run-main pano.PanoVerilog"
