@@ -21,6 +21,8 @@ case class UlpiCtrl() extends Component {
         val tx_start        = in(Bool)
         val tx_data         = slave(Stream(Bits(8 bits)))
 
+        //val rx_active       = out(Bool)
+        //val rx_error        = out(Bool)
         val rx_data         = master(Flow(Bits(9 bits)))
 
         val rx_cmd_changed  = out(Bool)
@@ -444,7 +446,7 @@ case class UlpiCtrlFormalTb() extends Component
                 // Link should drive the bus when ulpi_dir is 0 and no turn around
                 assert( (!ulpi_turn_around && ulpi_link_driven) |-> (io.ulpi.data.writeEnable.orR) )
 
-                // When link is transmitting and nxt is deasserted by phy, data and stp must be stable
+                // When link is transmitting and NXT is deasserted by phy, data and STP must be stable
                 // Need sequence for this because nxt will be low for the first byte of a transmit
                 //assert( !stable(reset_) || !(ulpi_link_driven && !io.ulpi.nxt && !ulpi_turn_around) || (stable(io.ulpi.data.write) && stable(io.ulpi.stp)) )
 
@@ -454,6 +456,15 @@ case class UlpiCtrlFormalTb() extends Component
 
                 // When ulpi_stp is asserted, the link should be driving or there's a turn-around (due to an abort)
                 assert( (io.ulpi.stp) |-> (ulpi_link_driven || ulpi_turn_around) )
+
+                // 3.8.2.1: Phy must deassert NXT when it detects STP
+                assume( (ulpi_phy_driven && io.ulpi.stp) |=> (!io.ulpi.nxt) )
+
+                // 3.8.2.3:
+                // A full USB packet needs to be in the TX buffer before we send it out to the
+                // phy. As a result, their cannot be a TX buffer underrun, and thus
+                // tx data should always be 0 when STP is asserted.
+                assert( (io.ulpi.stp) |-> (io.ulpi.data.write === 0) )
             }
 
             //============================================================
