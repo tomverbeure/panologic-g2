@@ -100,3 +100,110 @@ Status Stage:
 * Function: DATA0/STALL/NAK
 * Host: Host ACK in case of DATA0
 
+# USB Minimum Viable HW
+
+* Higher level transactions:
+    * Control Transfers
+        * Setup stage
+            * H: SETUP
+            * H: DATA0
+            * F: ACK
+        * Data stage: 
+            * IN:
+                * H: IN
+                * F: DATAx/STALL/NAK
+                * H: ACK
+            * OUT:
+                * H: IN
+                * H: DATAx
+                * F: ACK/NAK/STALL
+        * Status stage: 
+            * IN:
+                * H: OUT
+                * H: DATA0 (zero length)
+                * F: ACK/STALL/NAK
+            * OUT: 
+                * H: IN
+                * F: DATA0 (zero length)/STALL/NAK
+                * H: ACK
+            
+    * Interrupt Transfers
+        * IN:
+            * H: IN
+            * F: DATAx/STALL/NAK
+            * H: ACK
+        * OUT:
+            * H: OUT
+            * H: DATAx
+            * F: ACK/NAK/STALL
+        
+    * ISO Transfers
+        * IN:
+            * H: IN
+            * F: DATAx
+        * OUT:
+            * H: OUT
+            * F: DATAx
+
+    * Bulk Transfers
+        * IN:
+            * H: IN
+            * F: DATAx/STALL/NAK
+            * H: ACK
+        * OUT: 
+            * H: OUT
+            * H: DATAx
+            * F: ACK/NAK/STALL
+
+    * SOF Transfers
+        H: SOF
+
+*  Basic primitives:
+    * Automatically send out SOF every x ms
+    * IN:
+        * H: IN/SETUP
+        * F: DATAx/STALL/NAK/TIMEOUT
+            * STALL or NAK not support for SETUP. But that's ok: we assume that the function
+              will just not do that 
+        * H: ACK (in case of DATAx)
+    * OUT:
+        * H: OUT
+        * H: DATAx
+        * F: ACK/NAK/STALL
+
+    What about issuing PRE (for downstream LS devices) ?
+
+* Register API: 
+    * Specify ISO or NISO
+        * Determines whether or not fire-and-forget
+        * Is this necessary? We could also simply make timeout, which SW should expect or could ignore.
+    * Specify IN/OUT/SETUP by writing PID (4 bits. HW creates inverted copy)
+        * HW automatically selects the right transfers
+    * Specify ADDR/ENDP
+    * Specify maximum payload size per packet (Max 8 for LS, 64 for FS, 1024 for HS)
+    * For TX:
+        * write all bytes for transaction to RAM. This means we can't support longer multi-packet
+          transactions that size of RAM
+        * Kick off transaction
+        * FSM kicks off different transactions.
+        * For each packet, all supports stuff is inserted: CRC, etc.k:w
+        * FSM automatically inserts necessary inter-packet delays and checked for timeouts
+        * In case of NAK, retry.
+        * Toggle between DATA0 and DATA1 when multiple packets for a transaction
+    * For RX:
+        * FSM kicks of different transactions
+        * Check CRCs of received data
+
+* ACK
+    * No errors (CRC or bitstuff)
+    * Issue when sequence bits match and more data can be received OR when sequences bits mismatch and sender
+      and receiver must resynchronize
+* NAK
+    * function unable to accept data (OUT) or function has no data to transmit (IN)
+    * Use for flow control purposes
+* STALL
+    * Unable to transmit or receive data
+    * control pipe request not supported
+
+
+
