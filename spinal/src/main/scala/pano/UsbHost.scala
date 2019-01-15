@@ -98,9 +98,9 @@ case class UsbHost(ulpiDomain: ClockDomain) extends Component {
 
         // Number of bytes that were written in the currently available send buffer
         // Static value.
-        val send_byte_count         = in(UInt(6 bits)) 
+        val send_byte_count         = in(UInt(6 bits))
 
-        // Type of transfer that's initiated. Determines the PID as well as 
+        // Type of transfer that's initiated. Determines the PID as well as
         // the number of global state machine steps
         // Static value.
         val xfer_type               = in(UsbHost.HostXferType)
@@ -117,7 +117,7 @@ case class UsbHost(ulpiDomain: ClockDomain) extends Component {
     io.cpu_fifo_bus.cmd.ready := True
 
     io.cpu_fifo_bus.rsp.data := fifo_ram.readWriteSync(
-                enable              = io.cpu_fifo_bus.cmd.valid, 
+                enable              = io.cpu_fifo_bus.cmd.valid,
                 write               = io.cpu_fifo_bus.cmd.write,
                 address             = io.cpu_fifo_bus.cmd.address,
                 mask                = B(True),
@@ -126,15 +126,34 @@ case class UsbHost(ulpiDomain: ClockDomain) extends Component {
     io.cpu_fifo_bus.rsp.valid := RegNext(io.cpu_fifo_bus.cmd.valid && !io.cpu_fifo_bus.cmd.write) init(False)
 
     val ulpi_domain = new ClockingArea(ulpiDomain) {
-        
+
     }
 
     def driveFrom(busCtrl: BusSlaveFactory, baseAddress: BigInt) = new Area {
 
+        io.cpu_fifo_bus.cmd.valid   := False
+        io.cpu_fifo_bus.cmd.write   := False
+        io.cpu_fifo_bus.cmd.address := 0
+        busCtrl.nonStopWrite(io.cpu_fifo_bus.cmd.data, 0)
+
         //============================================================
-        // RCVFIFO
+        // SNDFIFO - Send FIFO
         //============================================================
-        // Read-only received data FIFO
+        val send_fifo = new Area {
+
+            val wr_ptr  = Reg(UInt(6 bits)) init(0)
+            val wr_addr = U"2'b01" @@ io.send_buf_avail_nr.addTag(crossClockDomain) @@ wr_ptr
+
+            busCtrl.onWrite(UsbHost.SNDFIFO_ADDR){
+                io.cpu_fifo_bus.cmd.valid   := True
+                io.cpu_fifo_bus.cmd.write   := True
+                io.cpu_fifo_bus.cmd.address := wr_addr
+
+                wr_ptr := wr_ptr + 1
+            }
+
+        }
+
     }
 
 }
