@@ -99,6 +99,7 @@ case class UsbHost(ulpiDomain: ClockDomain) extends Component {
         // Number of bytes that were written in the currently available send buffer
         // Static value.
         val send_byte_count         = in(UInt(6 bits))
+        val send_byte_count_commit  = in(Bool)
 
         // Type of transfer that's initiated. Determines the PID as well as
         // the number of global state machine steps
@@ -151,9 +152,28 @@ case class UsbHost(ulpiDomain: ClockDomain) extends Component {
 
                 wr_ptr := wr_ptr + 1
             }
-
         }
 
+        //============================================================
+        // SNDBC - Send FIFO Byte Count
+        //============================================================
+        val send_byte_count = new Area {
+            val send_byte_count        = Reg(UInt(6 bits)) init (0)
+            val send_byte_count_commit = Reg(Bool)
+
+            send_byte_count_commit := False
+
+            busCtrl.onWrite(UsbHost.SNDBC_ADDR){
+                busCtrl.nonStopWrite(send_byte_count)
+                send_byte_count_commit := True
+            }
+
+            val u_sync_pulse_commit_buf = new PulseCCByToggle(ClockDomain.current, ulpiDomain)
+            u_sync_pulse_commit_buf.io.pulseIn   <> send_byte_count_commit
+            u_sync_pulse_commit_buf.io.pulseOut  <> io.send_byte_count_commit
+
+            io.send_byte_count := send_byte_count.addTag(crossClockDomain)
+        }
     }
 
 }
