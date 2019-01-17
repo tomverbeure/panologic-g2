@@ -8,6 +8,9 @@ syn:
 syn_ulpi:
 	sbt "run-main pano.UlpiCtrlVerilog"
 
+syn_apb3cc:
+	sbt "run-main pano.Apb3CCVerilog"
+
 waves:
 	gtkwave -o simWorkspace/PanoCoreDut/test.vcd &
     

@@ -33,10 +33,11 @@ class Apb3CC(apb3Config: Apb3Config, srcDomain: ClockDomain, destDomain: ClockDo
         val PWRITE      = RegInit(False)
         val PWDATA      = Reg(Bits(apb3Config.dataWidth bits)) init(0)
         val PRDATA      = Reg(Bits(apb3Config.dataWidth bits)) init(0)
+        val PREADY      = RegInit(False)
         val PSLVERROR   = if (apb3Config.useSlaveError) Reg(Bool) else null
 
         xfer_start  := False
-        when(io.src.PENABLE && io.src.PSEL.orR){
+        when((io.src.PENABLE && io.src.PSEL.orR).rise){
             xfer_start      := True
             PADDR           := io.src.PADDR
             PSEL            := io.src.PSEL
@@ -44,14 +45,16 @@ class Apb3CC(apb3Config: Apb3Config, srcDomain: ClockDomain, destDomain: ClockDo
             PWDATA          := io.src.PWDATA
         }
 
-        io.src.PREADY          := False
+        PREADY          := False
         when(xfer_done_dest){
-            io.src.PSEL        := 0
-            io.src.PREADY      := True
+            PREADY          := True
             when (!io.src.PWRITE){
-                io.src.PRDATA  := PRDATA_dest.addTag(crossClockDomain)
+                PRDATA      := PRDATA_dest.addTag(crossClockDomain)
             }
         }
+
+        io.src.PRDATA   := PRDATA
+        io.src.PREADY   := PREADY
     }
 
     val xfer_start_dest = Bool
@@ -60,7 +63,7 @@ class Apb3CC(apb3Config: Apb3Config, srcDomain: ClockDomain, destDomain: ClockDo
     u_sync_pulse_xfer_start.io.pulseOut     <> xfer_start_dest
 
     val dest = new ClockingArea(destDomain) {
-        val xfer_start_dest_d1 = RegNext(xfer_start_dest)
+        val xfer_start_dest_d1 = RegNext(xfer_start_dest) init(False)
 
         val PADDR       = Reg(UInt(apb3Config.addressWidth bits)) init(0)
         val PSEL        = Reg(Bits(apb3Config.selWidth bits)) init(0)
@@ -81,6 +84,7 @@ class Apb3CC(apb3Config: Apb3Config, srcDomain: ClockDomain, destDomain: ClockDo
 
         xfer_done := False
         when(PENABLE && io.dest.PREADY){
+            PSEL        := 0
             when(!io.dest.PWRITE){
                 PRDATA      := io.dest.PRDATA
             }
@@ -97,6 +101,87 @@ class Apb3CC(apb3Config: Apb3Config, srcDomain: ClockDomain, destDomain: ClockDo
         PRDATA_dest     := PRDATA
         xfer_done_dest  := xfer_done
     }
-
-
 }
+
+
+case class Apb3CCFormalTb() extends Component
+{
+    val io = new Bundle() {
+        val clk             = in(Bool)
+        val reset_          = in(Bool)
+    }
+
+
+    val domain = new ClockingArea(ClockDomain(io.clk, io.reset_, 
+                                                config = ClockDomainConfig(resetKind = SYNC, resetActiveLevel = LOW)))
+    {
+       val apb3Config = Apb3Config(addressWidth = 6, dataWidth = 32)
+   
+       val src     = Apb3(apb3Config)
+       val dest    = Apb3(apb3Config)
+   
+       val u_apb3cc = new Apb3CC(apb3Config, ClockDomain.current, ClockDomain.current)
+       u_apb3cc.io.src         <> src
+       u_apb3cc.io.dest        <> dest
+   
+       val src_xfer_cntr = Reg(UInt(8 bits)) init(0)
+       val dest_xfer_cntr = Reg(UInt(8 bits)) init(0)
+   
+       when(src.PENABLE && src.PREADY){
+           src_xfer_cntr := src_xfer_cntr + 1
+       }
+   
+       when(dest.PENABLE && dest.PREADY){
+           dest_xfer_cntr := dest_xfer_cntr + 1
+       }
+   
+   
+       import spinal.core.GenerationFlags._
+       import spinal.core.Formal._
+   
+       GenerationFlags.formal{
+            import pano.lib._
+
+            assume(io.reset_ === !initstate())
+
+            assume(rise(src.PENABLE)    |-> stable(src.PSEL))
+            assume(rise(src.PENABLE)    |-> stable(src.PADDR))
+            assume(rise(src.PENABLE)    |-> stable(src.PWRITE))
+            assume(rise(src.PENABLE)    |-> stable(src.PWDATA))
+
+            assume(src.PREADY           |-> stable(src.PENABLE))
+            assume(src.PREADY           |-> stable(src.PSEL))
+            assume(src.PREADY           |-> stable(src.PADDR))
+            assume(src.PREADY           |-> stable(src.PWRITE))
+            assume(src.PREADY           |-> stable(src.PWDATA))
+
+            assume(fall(src.PENABLE)    |-> src.PREADY)
+            assume(fall(src.PSEL.orR)   |-> src.PREADY)
+
+            assume(!stable(src.PSEL)    |=> (fall(src.PENABLE) || !src.PENABLE))
+            assume(!stable(src.PADDR)   |=> (fall(src.PENABLE) || !src.PENABLE))
+            assume(!stable(src.PWRITE)  |=> (fall(src.PENABLE) || !src.PENABLE))
+            assume(!stable(src.PWDATA)  |=> (fall(src.PENABLE) || !src.PENABLE))
+
+            assume(rise(dest.PREADY)   |-> dest.PENABLE)
+            assume(rise(dest.PREADY)   |=> fall(dest.PREADY))
+   
+            when(!initstate()){
+                assert(src_xfer_cntr === dest_xfer_cntr || src_xfer_cntr+1 === dest_xfer_cntr)
+            }
+       }
+    }.setName("")
+}
+
+object Apb3CCVerilog{
+    def main(args: Array[String]) {
+
+        val config = SpinalConfig(anonymSignalUniqueness = true)
+        config.includeFormal.generateSystemVerilog({
+            val toplevel = new Apb3CCFormalTb()
+            toplevel
+        })
+        println("DONE")
+    }
+}
+
