@@ -74,7 +74,7 @@ object UsbHost {
     }
 }
 
-case class UsbHost(ulpiDomain: ClockDomain) extends Component {
+case class UsbHost() extends Component {
 
     val io = new Bundle {
 
@@ -126,10 +126,6 @@ case class UsbHost(ulpiDomain: ClockDomain) extends Component {
         )
     io.cpu_fifo_bus.rsp.valid := RegNext(io.cpu_fifo_bus.cmd.valid && !io.cpu_fifo_bus.cmd.write) init(False)
 
-    val ulpi_domain = new ClockingArea(ulpiDomain) {
-
-    }
-
     def driveFrom(busCtrl: BusSlaveFactory, baseAddress: BigInt) = new Area {
 
         io.cpu_fifo_bus.cmd.valid   := False
@@ -157,24 +153,20 @@ case class UsbHost(ulpiDomain: ClockDomain) extends Component {
         //============================================================
         // SNDBC - Send FIFO Byte Count
         //============================================================
+if (false){
         val send_byte_count = new Area {
             val send_byte_count        = Reg(UInt(6 bits)) init (0)
             val send_byte_count_commit = Reg(Bool)
 
-            send_byte_count_commit := False
+            io.send_byte_count_commit := False
 
             busCtrl.onWrite(UsbHost.SNDBC_ADDR){
                 busCtrl.nonStopWrite(send_byte_count)
-                send_byte_count_commit := True
+                io.send_byte_count_commit := True
             }
-
-            val u_sync_pulse_commit_buf = new PulseCCByToggle(ClockDomain.current, ulpiDomain)
-            u_sync_pulse_commit_buf.io.pulseIn   <> send_byte_count_commit
-            u_sync_pulse_commit_buf.io.pulseOut  <> io.send_byte_count_commit
-
-            io.send_byte_count := send_byte_count.addTag(crossClockDomain)
         }
     }
+}
 
 }
 
