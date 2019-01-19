@@ -46,7 +46,7 @@ class Apb3CC(apb3Config: Apb3Config, srcDomain: ClockDomain, destDomain: ClockDo
         }
 
         PREADY          := False
-        when(xfer_done_dest){
+        when(xfer_done_src){
             PREADY          := True
             when (!io.src.PWRITE){
                 PRDATA      := PRDATA_dest.addTag(crossClockDomain)
