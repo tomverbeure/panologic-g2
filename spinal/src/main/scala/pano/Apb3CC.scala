@@ -144,10 +144,10 @@ case class Apb3CCFormalTb() extends Component
 
             assume(io.reset_ === !initstate())
 
-            assume(rise(src.PENABLE)    |-> stable(src.PSEL))
-            assume(rise(src.PENABLE)    |-> stable(src.PADDR))
-            assume(rise(src.PENABLE)    |-> stable(src.PWRITE))
-            assume(rise(src.PENABLE)    |-> stable(src.PWDATA))
+            assume(rose(src.PENABLE)    |-> stable(src.PSEL))
+            assume(rose(src.PENABLE)    |-> stable(src.PADDR))
+            assume(rose(src.PENABLE)    |-> stable(src.PWRITE))
+            assume(rose(src.PENABLE)    |-> stable(src.PWDATA))
 
             assume(src.PREADY           |-> stable(src.PENABLE))
             assume(src.PREADY           |-> stable(src.PSEL))
@@ -155,16 +155,16 @@ case class Apb3CCFormalTb() extends Component
             assume(src.PREADY           |-> stable(src.PWRITE))
             assume(src.PREADY           |-> stable(src.PWDATA))
 
-            assume(fall(src.PENABLE)    |-> src.PREADY)
-            assume(fall(src.PSEL.orR)   |-> src.PREADY)
+            assume(fell(src.PENABLE)    |-> src.PREADY)
+            assume(fell(src.PSEL.orR)   |-> src.PREADY)
 
-            assume(!stable(src.PSEL)    |=> (fall(src.PENABLE) || !src.PENABLE))
-            assume(!stable(src.PADDR)   |=> (fall(src.PENABLE) || !src.PENABLE))
-            assume(!stable(src.PWRITE)  |=> (fall(src.PENABLE) || !src.PENABLE))
-            assume(!stable(src.PWDATA)  |=> (fall(src.PENABLE) || !src.PENABLE))
+            assume(!stable(src.PSEL)    |=> (fell(src.PENABLE) || !src.PENABLE))
+            assume(!stable(src.PADDR)   |=> (fell(src.PENABLE) || !src.PENABLE))
+            assume(!stable(src.PWRITE)  |=> (fell(src.PENABLE) || !src.PENABLE))
+            assume(!stable(src.PWDATA)  |=> (fell(src.PENABLE) || !src.PENABLE))
 
-            assume(rise(dest.PREADY)   |-> dest.PENABLE)
-            assume(rise(dest.PREADY)   |=> fall(dest.PREADY))
+            assume(rose(dest.PREADY)   |-> dest.PENABLE)
+            assume(rose(dest.PREADY)   |=> fell(dest.PREADY))
    
             when(!initstate()){
                 assert(src_xfer_cntr === dest_xfer_cntr || src_xfer_cntr+1 === dest_xfer_cntr)
