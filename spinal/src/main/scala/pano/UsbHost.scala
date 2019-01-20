@@ -36,20 +36,45 @@ object UsbHost {
     def HIRQ_ADDR                   = 25
     def HIEN_ADDR                   = 26
     def MODE_ADDR                   = 27
-    def PER_ADDR                    = 28
+    def PERADDR_ADDR                = 28
     def HCTL_ADDR                   = 29
     def HXFR_ADDR                   = 30
     def HRSL_ADDR                   = 31
 
     // HIRQ bits
-    def HXFRDNIRQ_BIT               = 7 
-    def FRAMEIRQ_BIT                = 6 
-    def CONDETIRQ_BIT               = 5 
-    def SUSDNIRQ_BIT                = 4 
-    def SNDBAVIRQ_BIT               = 3 
-    def RCVDAVIRQ_BIT               = 2 
-    def RWUIRQ_BIT                  = 1 
+    def HXFRDNIRQ_BIT               = 7
+    def FRAMEIRQ_BIT                = 6
+    def CONDETIRQ_BIT               = 5
+    def SUSDNIRQ_BIT                = 4
+    def SNDBAVIRQ_BIT               = 3
+    def RCVDAVIRQ_BIT               = 2
+    def RWUIRQ_BIT                  = 1
     def BUSEVENTIRQ_BIT             = 0
+
+    // HCTL bits
+    def SNDTOG1_BIT                 = 7
+    def SNDTOG0_BIT                 = 6
+    def RCVTOG1_BIT                 = 5
+    def RCVTOG0_BIT                 = 4
+    def SIGRSM_BIT                  = 3
+    def SAMPLEBUS_BIT               = 2
+    def FRMRST_BIT                  = 1
+    def BUSRST_BIT                  = 0
+
+    // HXFR bits
+    def XFER_TYPE_BIT               = 4
+    def EP_BIT                      = 0
+
+    // HRSL bits
+    def JSTATUS_BIT                 = 7
+    def KSTATUS_BIT                 = 6
+    def SNDTOGRD_BIT                = 5
+    def RCVTOGRD_BIT                = 4
+    def HRSLT_BIT                   = 0
+
+    def TX_FIFO_SIZE                = 64
+    def RX_FIFO_SIZE                = 64
+    def SU_FIFO_SIZE                = 8
 
     object HostXferType extends SpinalEnum {
         val SETUP, BULK_IN, BULK_OUT, HS_IN, HS_OUT, ISO_IN, ISO_OUT = newElement()
@@ -86,12 +111,13 @@ object UsbHost {
 
 case class UsbHost() extends Component {
 
+    import UsbHost._
+
     // Everything in this block runs at ULPI 60MHz clock speed.
     // If the APB is running at a different clock speed, use Apb3CC which is a clock crossing
     // APB bridge.
 
     val io = new Bundle {
-
         // Interface into RAM that contains all the FIFOs.
         // So instead of a 'real' FIFO, it's just a RAM.
         val cpu_fifo_bus            = slave(PipelinedMemoryBus(UsbHost.getFifoMemoryBusConfig()))
@@ -103,28 +129,35 @@ case class UsbHost() extends Component {
         // Endpoint nr for next transaction. Static value.
         val endpoint                = in(UInt(4 bits))
 
-        // When high, the CPU is allowed to write to the send FIFO. 
+        // When high, the CPU is allowed to write to the send FIFO.
         // Value goes to false when a transmit is requested and both TX FIFOs are full.
         // Value goes to true when a transmit was successful with no low-level errors.
         val send_buf_avail          = out(Bool)
 
         // Indicates which one of the double-buffered FIFOs should be used to write a packet to.
         // Value changes after a transmit is started.
-        val send_buf_avail_nr       = out(Bool)
+        val send_buf_avail_nr       = out(UInt(1 bits))
 
         // Number of bytes that were written in the currently available send buffer
-        val send_byte_count         = slave(Flow(UInt(6 bits)))
+        val send_byte_count         = slave(Flow(UInt(log2Up(TX_FIFO_SIZE) bits)))
 
         // Type of transfer that's initiated. Determines the PID as well as
         // the number of global state machine steps
-        // Static value.
-        val xfer_type               = in(UsbHost.HostXferType)
+        // The valid field signals the start of the transfer.
+        // FIXME: this should have a HostXferType instead of Bits(4 bits), but Spinal currently
+        // doesn't support using an Enum as a Flow data type?
+        val xfer_type               = slave(Flow(Bits(4 bits)))
 
-        // Kick-off of a transfer. Pulse.
-        val xfer_start              = in(Bool)
+        // The current status of a host transfer.
+        val xfer_result             = out(HostXferResult)
 
-        val xfer_result             = out(UsbHost.HostXferResult)
+        // Current data toggle values
+        val cur_send_data_toggle    = out(Bool)
+        val cur_rcv_data_toggle     = out(Bool)
 
+        // Force new receive and send toggle values
+        val set_send_data_toggle    = slave(Flow(Bool))
+        val set_rcv_data_toggle     = slave(Flow(Bool))
     }
 
     // 2x64 deep double-buffered RX FIFOs
@@ -136,11 +169,11 @@ case class UsbHost() extends Component {
     // "010xxxxxx" : TX FIFO 0
     // "011xxxxxx" : TX FIFO 1
     // "100000xxx" : SU FIFO
-    val fifo_ram = Mem(Bits(8 bits), 256+8)
+    val fifo_ram = Mem(Bits(8 bits), (2*RX_FIFO_SIZE) + (2*TX_FIFO_SIZE) + SU_FIFO_SIZE)
 
     val cpu_ram_access = new Area {
         io.cpu_fifo_bus.cmd.ready := True
-    
+
         io.cpu_fifo_bus.rsp.data := fifo_ram.readWriteSync(
                     enable              = io.cpu_fifo_bus.cmd.valid,
                     write               = io.cpu_fifo_bus.cmd.write,
@@ -151,23 +184,83 @@ case class UsbHost() extends Component {
         io.cpu_fifo_bus.rsp.valid := RegNext(io.cpu_fifo_bus.cmd.valid && !io.cpu_fifo_bus.cmd.write) init(False)
     }
 
+    object UsbHostState extends SpinalEnum {
+        val Idle            = newElement()
+        val TxStart         = newElement()
+    }
+
+    val tx_buf = new Area {
+        // Currently active buffer. Either being transmitted right now, or the first
+        // one to be transmitted right now.
+        val cur_buf   = Reg(UInt(1 bits)) init(0)
+
+        val buf_primed      = Reg(Bits(2 bits)) init(0)
+        val byte_count0     = Reg(UInt(log2Up(TX_FIFO_SIZE) bits)) init(0)
+        val byte_count1     = Reg(UInt(log2Up(TX_FIFO_SIZE) bits)) init(0)
+
+        io.send_buf_avail     := !buf_primed(cur_buf) || !buf_primed(~cur_buf)
+        io.send_buf_avail_nr  := !buf_primed(cur_buf) ? cur_buf | ~cur_buf
+
+        when(io.send_byte_count.valid){
+            when(cur_buf === 0){
+                when(!buf_primed(0)){
+                    byte_count0   := io.send_byte_count.payload
+                    buf_primed(0) := True
+                }
+                .elsewhen(!buf_primed(1)){
+                    byte_count1   := io.send_byte_count.payload
+                    buf_primed(1) := True
+                }
+                .otherwise{
+                    // Both buffers have already been primed. Overwrite the one that is not current?
+                    byte_count1   := io.send_byte_count.payload
+                    buf_primed(1) := True
+                }
+            }
+            .elsewhen(cur_buf === 1){
+                when(!buf_primed(1)){
+                    byte_count1   := io.send_byte_count.payload
+                    buf_primed(1) := True
+                }
+                .elsewhen(!buf_primed(0)){
+                    byte_count0   := io.send_byte_count.payload
+                    buf_primed(0) := True
+                }
+                .otherwise{
+                    // Both buffers have already been primed. Overwrite the one that is not current?
+                    byte_count0   := io.send_byte_count.payload
+                    buf_primed(0) := True
+                }
+            }
+        }
+    }
 
     def driveFrom(busCtrl: BusSlaveFactory, baseAddress: BigInt) = new Area {
 
+        //============================================================
+        // PERADDR - Peripheral Address
+        //============================================================
+        val periph_addr = new Area {
+            val periph_addr = busCtrl.createReadAndWrite(io.periph_addr, PERADDR_ADDR << 2, 0)
+
+            io.periph_addr := periph_addr
+        }
+
+        //============================================================
+        // SNDFIFO - Send FIFO
+        //============================================================
+        //
         io.cpu_fifo_bus.cmd.valid   := False
         io.cpu_fifo_bus.cmd.write   := False
         io.cpu_fifo_bus.cmd.address := 0
         busCtrl.nonStopWrite(io.cpu_fifo_bus.cmd.data, 0)
 
-        //============================================================
-        // SNDFIFO - Send FIFO
-        //============================================================
         val send_fifo = new Area {
 
-            val wr_ptr  = Reg(UInt(6 bits)) init(0)
+            val wr_ptr  = Reg(UInt(log2Up(TX_FIFO_SIZE) bits)) init(0)
             val wr_addr = U"2'b01" @@ io.send_buf_avail_nr @@ wr_ptr
 
-            busCtrl.onWrite(UsbHost.SNDFIFO_ADDR << 2){
+            busCtrl.onWrite(SNDFIFO_ADDR << 2){
                 io.cpu_fifo_bus.cmd.valid   := True
                 io.cpu_fifo_bus.cmd.write   := True
                 io.cpu_fifo_bus.cmd.address := wr_addr
@@ -181,7 +274,7 @@ case class UsbHost() extends Component {
         //============================================================
         val send_byte_count = new Area {
             // Right now, this register is write only. It should probably be made r/w?
-            val send_byte_count = busCtrl.createAndDriveFlow(io.send_byte_count.payload, UsbHost.SNDBC_ADDR << 2, 0)
+            val send_byte_count = busCtrl.createAndDriveFlow(io.send_byte_count.payload, SNDBC_ADDR << 2, 0)
 
             io.send_byte_count  << send_byte_count
         }
@@ -190,10 +283,50 @@ case class UsbHost() extends Component {
         // HIRQ - Host IRQ - Various status registers
         //============================================================
         val hirq = new Area {
-            val sndbavirq = busCtrl.createReadOnly(io.send_buf_avail, UsbHost.HIRQ_ADDR << 2, UsbHost.SNDBAVIRQ_BIT)
+            val sndbavirq = busCtrl.createReadOnly(io.send_buf_avail, HIRQ_ADDR << 2, SNDBAVIRQ_BIT)
 
             sndbavirq   := io.send_buf_avail
         }
+
+        //============================================================
+        // HCTL - Host Transfer Control
+        //============================================================
+        val hctl = new Area {
+            val rcv_tog = busCtrl.createAndDriveFlow(Bits(2 bits), HCTL_ADDR << 2,  RCVTOG0_BIT)
+            io.set_rcv_data_toggle.valid      := rcv_tog.valid && rcv_tog.payload =/= B"2'b00" && rcv_tog.payload =/= B"2'b11"
+            io.set_rcv_data_toggle.payload    := rcv_tog.payload(1)
+
+            val send_tog = busCtrl.createAndDriveFlow(Bits(2 bits), HCTL_ADDR << 2,  SNDTOG0_BIT)
+            io.set_send_data_toggle.valid     := send_tog.valid && send_tog.payload =/= B"2'b00" && send_tog.payload =/= B"2'b11"
+            io.set_send_data_toggle.payload   := send_tog.payload(1)
+        }
+
+
+        //============================================================
+        // HXFR - Launch Host Transfer
+        //============================================================
+        val hxfr = new Area {
+            val endpoint = busCtrl.createWriteOnly(io.endpoint, HXFR_ADDR << 2, EP_BIT)
+            io.endpoint := endpoint
+
+            val xfer_type = busCtrl.createAndDriveFlow(io.xfer_type.payload, HXFR_ADDR << 2, XFER_TYPE_BIT)
+            io.xfer_type << xfer_type
+        }
+
+        //============================================================
+        // HRSL - Host Transfer Result
+        //============================================================
+        val hrsl = new Area {
+            val xfer_result = busCtrl.createReadOnly(io.xfer_result, HRSL_ADDR << 2, HRSLT_BIT)
+            xfer_result := io.xfer_result
+
+            val send_data_toggle = busCtrl.createReadOnly(io.cur_send_data_toggle, HRSL_ADDR << 2, SNDTOGRD_BIT)
+            send_data_toggle := io.cur_send_data_toggle
+
+            val rcv_data_toggle = busCtrl.createReadOnly(io.cur_rcv_data_toggle, HRSL_ADDR << 2, RCVTOGRD_BIT)
+            rcv_data_toggle := io.cur_rcv_data_toggle
+        }
+
     }
 
 }
@@ -221,7 +354,7 @@ case class UsbHostFormalTb() extends Component
     }
 
 
-    val domain = new ClockingArea(ClockDomain(io.clk, io.reset_, 
+    val domain = new ClockingArea(ClockDomain(io.clk, io.reset_,
                                                 config = ClockDomainConfig(resetKind = SYNC, resetActiveLevel = LOW)))
     {
         val apb = Apb3(UsbHost.getApb3Config())
@@ -231,7 +364,7 @@ case class UsbHostFormalTb() extends Component
 
        import spinal.core.GenerationFlags._
        import spinal.core.Formal._
-   
+
        GenerationFlags.formal{
             import pano.lib._
 
