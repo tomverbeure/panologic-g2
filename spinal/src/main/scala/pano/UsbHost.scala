@@ -41,6 +41,16 @@ object UsbHost {
     def HXFR_ADDR                   = 30
     def HRSL_ADDR                   = 31
 
+    // HIRQ bits
+    def HXFRDNIRQ_BIT               = 7 
+    def FRAMEIRQ_BIT                = 6 
+    def CONDETIRQ_BIT               = 5 
+    def SUSDNIRQ_BIT                = 4 
+    def SNDBAVIRQ_BIT               = 3 
+    def RCVDAVIRQ_BIT               = 2 
+    def RWUIRQ_BIT                  = 1 
+    def BUSEVENTIRQ_BIT             = 0
+
     object HostXferType extends SpinalEnum {
         val SETUP, BULK_IN, BULK_OUT, HS_IN, HS_OUT, ISO_IN, ISO_OUT = newElement()
         defaultEncoding = SpinalEnumEncoding("staticEncoding")(
@@ -93,9 +103,11 @@ case class UsbHost() extends Component {
         // Endpoint nr for next transaction. Static value.
         val endpoint                = in(UInt(4 bits))
 
-        // When high, the CPU is allowed to write to the send FIFO. Value changes
-        // after a transmit is started.
+        // When high, the CPU is allowed to write to the send FIFO. 
+        // Value goes to false when a transmit is requested and both TX FIFOs are full.
+        // Value goes to true when a transmit was successful with no low-level errors.
         val send_buf_avail          = out(Bool)
+
         // Indicates which one of the double-buffered FIFOs should be used to write a packet to.
         // Value changes after a transmit is started.
         val send_buf_avail_nr       = out(Bool)
@@ -155,7 +167,7 @@ case class UsbHost() extends Component {
             val wr_ptr  = Reg(UInt(6 bits)) init(0)
             val wr_addr = U"2'b01" @@ io.send_buf_avail_nr @@ wr_ptr
 
-            busCtrl.onWrite(UsbHost.SNDFIFO_ADDR){
+            busCtrl.onWrite(UsbHost.SNDFIFO_ADDR << 2){
                 io.cpu_fifo_bus.cmd.valid   := True
                 io.cpu_fifo_bus.cmd.write   := True
                 io.cpu_fifo_bus.cmd.address := wr_addr
@@ -169,9 +181,18 @@ case class UsbHost() extends Component {
         //============================================================
         val send_byte_count = new Area {
             // Right now, this register is write only. It should probably be made r/w?
-            val send_byte_count = busCtrl.createAndDriveFlow(io.send_byte_count.payload, UsbHost.SNDBC_ADDR, 0)
+            val send_byte_count = busCtrl.createAndDriveFlow(io.send_byte_count.payload, UsbHost.SNDBC_ADDR << 2, 0)
 
             io.send_byte_count  << send_byte_count
+        }
+
+        //============================================================
+        // HIRQ - Host IRQ - Various status registers
+        //============================================================
+        val hirq = new Area {
+            val sndbavirq = busCtrl.createReadOnly(io.send_buf_avail, UsbHost.HIRQ_ADDR << 2, UsbHost.SNDBAVIRQ_BIT)
+
+            sndbavirq   := io.send_buf_avail
         }
     }
 
