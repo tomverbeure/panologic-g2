@@ -11,6 +11,9 @@ syn_ulpi:
 syn_apb3cc:
 	sbt "runMain pano.Apb3CCVerilog"
 
+syn_usbh:
+	sbt "runMain pano.UsbHostVerilog"
+
 waves:
 	gtkwave -o simWorkspace/PanoCoreDut/test.vcd &
     

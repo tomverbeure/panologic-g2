@@ -76,6 +76,10 @@ object UsbHost {
 
 case class UsbHost() extends Component {
 
+    // Everything in this block runs at ULPI 60MHz clock speed.
+    // If the APB is running at a different clock speed, use Apb3CC which is a clock crossing
+    // APB bridge.
+
     val io = new Bundle {
 
         // Interface into RAM that contains all the FIFOs.
@@ -97,9 +101,7 @@ case class UsbHost() extends Component {
         val send_buf_avail_nr       = out(Bool)
 
         // Number of bytes that were written in the currently available send buffer
-        // Static value.
-        val send_byte_count         = in(UInt(6 bits))
-        val send_byte_count_commit  = in(Bool)
+        val send_byte_count         = slave(Flow(UInt(6 bits)))
 
         // Type of transfer that's initiated. Determines the PID as well as
         // the number of global state machine steps
@@ -113,18 +115,30 @@ case class UsbHost() extends Component {
 
     }
 
+    // 2x64 deep double-buffered RX FIFOs
+    // 2x64 deep double-buffered TX FIFOs
+    // 8 deep setup TX FIFO.
+
+    // "000xxxxxx" : RX FIFO 0
+    // "001xxxxxx" : RX FIFO 1
+    // "010xxxxxx" : TX FIFO 0
+    // "011xxxxxx" : TX FIFO 1
+    // "100000xxx" : SU FIFO
     val fifo_ram = Mem(Bits(8 bits), 256+8)
 
-    io.cpu_fifo_bus.cmd.ready := True
+    val cpu_ram_access = new Area {
+        io.cpu_fifo_bus.cmd.ready := True
+    
+        io.cpu_fifo_bus.rsp.data := fifo_ram.readWriteSync(
+                    enable              = io.cpu_fifo_bus.cmd.valid,
+                    write               = io.cpu_fifo_bus.cmd.write,
+                    address             = io.cpu_fifo_bus.cmd.address,
+                    mask                = B(True),
+                    data                = io.cpu_fifo_bus.cmd.data
+            )
+        io.cpu_fifo_bus.rsp.valid := RegNext(io.cpu_fifo_bus.cmd.valid && !io.cpu_fifo_bus.cmd.write) init(False)
+    }
 
-    io.cpu_fifo_bus.rsp.data := fifo_ram.readWriteSync(
-                enable              = io.cpu_fifo_bus.cmd.valid,
-                write               = io.cpu_fifo_bus.cmd.write,
-                address             = io.cpu_fifo_bus.cmd.address,
-                mask                = B(True),
-                data                = io.cpu_fifo_bus.cmd.data
-        )
-    io.cpu_fifo_bus.rsp.valid := RegNext(io.cpu_fifo_bus.cmd.valid && !io.cpu_fifo_bus.cmd.write) init(False)
 
     def driveFrom(busCtrl: BusSlaveFactory, baseAddress: BigInt) = new Area {
 
@@ -139,7 +153,7 @@ case class UsbHost() extends Component {
         val send_fifo = new Area {
 
             val wr_ptr  = Reg(UInt(6 bits)) init(0)
-            val wr_addr = U"2'b01" @@ io.send_buf_avail_nr.addTag(crossClockDomain) @@ wr_ptr
+            val wr_addr = U"2'b01" @@ io.send_buf_avail_nr @@ wr_ptr
 
             busCtrl.onWrite(UsbHost.SNDFIFO_ADDR){
                 io.cpu_fifo_bus.cmd.valid   := True
@@ -153,21 +167,89 @@ case class UsbHost() extends Component {
         //============================================================
         // SNDBC - Send FIFO Byte Count
         //============================================================
-if (false){
         val send_byte_count = new Area {
-            val send_byte_count        = Reg(UInt(6 bits)) init (0)
-            val send_byte_count_commit = Reg(Bool)
+            // Right now, this register is write only. It should probably be made r/w?
+            val send_byte_count = busCtrl.createAndDriveFlow(io.send_byte_count.payload, UsbHost.SNDBC_ADDR, 0)
 
-            io.send_byte_count_commit := False
-
-            busCtrl.onWrite(UsbHost.SNDBC_ADDR){
-                busCtrl.nonStopWrite(send_byte_count)
-                io.send_byte_count_commit := True
-            }
+            io.send_byte_count  << send_byte_count
         }
     }
-}
 
 }
 
+
+case class UsbHostTop() extends Component
+{
+    val io = new Bundle {
+        val apb         = slave(Apb3(UsbHost.getApb3Config()))
+    }
+
+    val u_usb_host = UsbHost()
+
+    val busCtrl = Apb3SlaveFactory(io.apb)
+    val apb_regs = u_usb_host.driveFrom(busCtrl, 0x0)
+
+}
+
+
+case class UsbHostFormalTb() extends Component
+{
+    val io = new Bundle {
+        val clk             = in(Bool)
+        val reset_          = in(Bool)
+    }
+
+
+    val domain = new ClockingArea(ClockDomain(io.clk, io.reset_, 
+                                                config = ClockDomainConfig(resetKind = SYNC, resetActiveLevel = LOW)))
+    {
+        val apb = Apb3(UsbHost.getApb3Config())
+
+        val u_usb_host_top = new UsbHostTop()
+        u_usb_host_top.io.apb           <> apb
+
+       import spinal.core.GenerationFlags._
+       import spinal.core.Formal._
+   
+       GenerationFlags.formal{
+            import pano.lib._
+
+            assume(io.reset_ === !initstate())
+
+            assume(rose(apb.PENABLE)    |-> stable(apb.PSEL))
+            assume(rose(apb.PENABLE)    |-> stable(apb.PADDR))
+            assume(rose(apb.PENABLE)    |-> stable(apb.PWRITE))
+            assume(rose(apb.PENABLE)    |-> stable(apb.PWDATA))
+
+            assume(apb.PREADY           |-> stable(apb.PENABLE))
+            assume(apb.PREADY           |-> stable(apb.PSEL))
+            assume(apb.PREADY           |-> stable(apb.PADDR))
+            assume(apb.PREADY           |-> stable(apb.PWRITE))
+            assume(apb.PREADY           |-> stable(apb.PWDATA))
+
+            assume(fell(apb.PENABLE)    |-> apb.PREADY)
+            assume(fell(apb.PSEL.orR)   |-> apb.PREADY)
+
+            assume(!stable(apb.PSEL)    |=> (fell(apb.PENABLE) || !apb.PENABLE))
+            assume(!stable(apb.PADDR)   |=> (fell(apb.PENABLE) || !apb.PENABLE))
+            assume(!stable(apb.PWRITE)  |=> (fell(apb.PENABLE) || !apb.PENABLE))
+            assume(!stable(apb.PWDATA)  |=> (fell(apb.PENABLE) || !apb.PENABLE))
+
+            when(!initstate()){
+            }
+        }
+    }.setName("")
+}
+
+object UsbHostVerilog{
+    def main(args: Array[String]) {
+
+        val config = SpinalConfig(anonymSignalUniqueness = true)
+        config.includeFormal.generateSystemVerilog({
+            val toplevel = new UsbHostFormalTb()
+            toplevel
+        })
+        println("DONE")
+    }
+}
 
