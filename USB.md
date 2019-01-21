@@ -20,6 +20,13 @@ is a good starting point when learning about what a general USB host should supp
 
 Here's a [bit-banged USB host](https://github.com/scanlime/propeller-usb-host) written in Propeller.
 
+The USB Host will be a register compatible clone of the [MAX3421E](https://www.maximintegrated.com/en/products/interface/controllers-expanders/MAX3421E.html).
+The datasheet is [here](https://datasheets.maximintegrated.com/en/ds/MAX3421E.pdf) with [errata](https://datasheets.maximintegrated.com/en/errata/Errata_MAX3421E.pdf)
+and [Programming Guide](http://pdfserv.maximintegrated.com/en/an/AN3785.pdf).
+
+By making the HW compatible with an existing chip, we should be able to reuse the firmware of the [Arduino USB Host Shield](https://github.com/felis/USB_Host_Shield_2.0)
+with no or minimal changes!
+
 ## ULPI
 
 ULPI is an interface standard to transfer USB information over an 8-bit data bus and a few additional control signals.

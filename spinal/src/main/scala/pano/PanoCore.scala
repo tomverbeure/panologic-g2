@@ -48,6 +48,26 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
 
     var cpuDomain = ClockDomain.current
 
+    val rawUlpiDomain = ClockDomain(
+        clock       = io.ulpi.clk,
+        frequency   = FixedFrequency(60 MHz),
+        config      = ClockDomainConfig(
+                        resetKind = BOOT
+        )
+    )
+
+    val ulpi_reset_ = rawUlpiDomain(RegNext(True) init(False))
+
+    val ulpiDomain = ClockDomain(
+        clock = io.ulpi.clk,
+        reset = ulpi_reset_,
+        config = ClockDomainConfig(
+                    resetKind = SYNC,
+                    resetActiveLevel = LOW
+        )
+    )
+
+
     val vo_area = new ClockingArea(voClkDomain) {
 
         // http://tinyvga.com/vga-timing
@@ -223,6 +243,25 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
 
         val apb_regs = u_ulpi_ctrl.driveFrom(busCtrl, 0x0)
     }
+
+    //============================================================
+    // USB Host
+    //============================================================
+
+    val usb_host_apb = Apb3(UsbHost.getApb3Config())
+
+    val u_apb2usb_host = new Apb3CC(UsbHost.getApb3Config, ClockDomain.current, ulpiDomain)
+    u_apb2usb_host.io.src           <> u_cpu_top.io.usb_host_apb
+    u_apb2usb_host.io.dest          <> usb_host_apb
+
+    val usb_host_domain = new ClockingArea(ulpiDomain) {
+        val u_usb_host = UsbHost()
+
+        val busCtrl = Apb3SlaveFactory(usb_host_apb)
+
+        val apb_regs = u_usb_host.driveFrom(busCtrl, 0x0)
+    }
+
 
     //============================================================
     // LED control

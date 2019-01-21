@@ -1,0 +1,68 @@
+[*]
+[*] GTKWave Analyzer v3.3.66 (w)1999-2015 BSI
+[*] Thu Jan 17 05:16:01 2019
+[*]
+[dumpfile] "/home/ubuntu/projects/panologic-g2/spinal/formal/apb3cc/check/engine_0/trace.vcd"
+[dumpfile_mtime] "Thu Jan 17 05:14:43 2019"
+[dumpfile_size] 17714
+[savefile] "/home/ubuntu/projects/panologic-g2/spinal/formal/apb3cc/check.gtkw"
+[timestart] 0
+[size] 1577 951
+[pos] -1 -1
+*-4.949959 85 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] Apb3CCFormalTb.
+[sst_width] 277
+[signals_width] 281
+[sst_expanded] 1
+[sst_vpaned_height] 278
+@28
+Apb3CCFormalTb.io_reset_
+Apb3CCFormalTb.io_clk
+@200
+-
+@22
+Apb3CCFormalTb.src_xfer_cntr[7:0]
+Apb3CCFormalTb.dest_xfer_cntr[7:0]
+@200
+-
+@28
+Apb3CCFormalTb.src_PENABLE
+Apb3CCFormalTb.src_PSEL
+Apb3CCFormalTb.src_PWRITE
+@22
+Apb3CCFormalTb.src_PADDR[5:0]
+Apb3CCFormalTb.src_PWDATA[31:0]
+@28
+Apb3CCFormalTb.src_PREADY
+@22
+Apb3CCFormalTb.src_PRDATA[31:0]
+@28
+Apb3CCFormalTb.src_PSLVERROR
+@200
+-
+-
+@28
+Apb3CCFormalTb.u_apb3cc.src_xfer_start
+Apb3CCFormalTb.u_apb3cc.xfer_start_dest
+Apb3CCFormalTb.u_apb3cc.dest_xfer_start_dest_d1
+@201
+-
+@28
+Apb3CCFormalTb.u_apb3cc.dest_xfer_done
+@200
+-
+@28
+Apb3CCFormalTb.dest_PENABLE
+Apb3CCFormalTb.dest_PSEL
+Apb3CCFormalTb.dest_PWRITE
+@22
+Apb3CCFormalTb.dest_PADDR[5:0]
+Apb3CCFormalTb.dest_PWDATA[31:0]
+@28
+Apb3CCFormalTb.dest_PREADY
+@22
+Apb3CCFormalTb.dest_PRDATA[31:0]
+@28
+Apb3CCFormalTb.dest_PSLVERROR
+[pattern_trace] 1
+[pattern_trace] 0
