@@ -19,9 +19,9 @@ lazy val root = (project in file(".")).
 //lazy val vexRiscv = RootProject(file("../../VexRiscv"))
   lazy val vexRiscv = RootProject(uri("git://github.com/SpinalHDL/VexRiscv.git#414d2aba54f8643ae0eade78960f02417fa910f1"))
 
-lazy val spinalHdlSim  = ProjectRef(file("../../SpinalHDL_tvb"), "sim")
-lazy val spinalHdlCore = ProjectRef(file("../../SpinalHDL_tvb"), "core")
-lazy val spinalHdlLib  = ProjectRef(file("../../SpinalHDL_tvb"), "lib")
+lazy val spinalHdlSim  = ProjectRef(file("../../SpinalHDL"), "sim")
+lazy val spinalHdlCore = ProjectRef(file("../../SpinalHDL"), "core")
+lazy val spinalHdlLib  = ProjectRef(file("../../SpinalHDL"), "lib")
 
 
 fork := true
