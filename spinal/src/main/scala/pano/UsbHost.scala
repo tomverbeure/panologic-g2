@@ -144,9 +144,7 @@ case class UsbHost() extends Component {
         // Type of transfer that's initiated. Determines the PID as well as
         // the number of global state machine steps
         // The valid field signals the start of the transfer.
-        // FIXME: this should have a HostXferType instead of Bits(4 bits), but Spinal currently
-        // doesn't support using an Enum as a Flow data type?
-        val xfer_type               = slave(Flow(Bits(4 bits)))
+        val xfer_type               = slave(Flow(HostXferType()))
 
         // The current status of a host transfer.
         val xfer_result             = out(HostXferResult)
