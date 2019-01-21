@@ -8,5 +8,6 @@ void ulpi_get_rx_cmd(int *rx_cmd, int *rx_cmd_changed);
 void ulpi_get_vendor_id_product_id(int *vendor_id, int *product_id);
 void ulpi_print_id();
 void ulpi_monitor_rx_cmd();
+void ulpi_reset_bus();
 
 #endif

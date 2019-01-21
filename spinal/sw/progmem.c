@@ -71,6 +71,9 @@ int main() {
 #endif
 
     ulpi_print_id();
+
+    ulpi_reset_bus();
+
     ulpi_monitor_rx_cmd();
 
 #if 0
