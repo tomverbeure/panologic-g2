@@ -3,11 +3,13 @@ package pano
 
 import spinal.core._
 import spinal.lib._
+import spinal.lib.Reverse
 import spinal.lib.io._
 import spinal.lib.bus.simple._
 import spinal.lib.bus.misc._
 import spinal.lib.bus.amba3.apb._
 
+import spinal_local.crypto.checksum._
 
 object UsbHost {
     // 8 bits -> 64 registers
@@ -137,6 +139,19 @@ object UsbHost {
             SPLIT       -> 0x8,
             PING        -> 0x4
         )
+    }
+
+    def crc5(data_in: Bits): Bits = {
+        val lfsr_q = Bits(5 bits).setAll
+        val lfsr_c = Bits(5 bits)
+
+        lfsr_c(0) := lfsr_q(0) ^ lfsr_q(3) ^ lfsr_q(4) ^ data_in(0) ^ data_in(3) ^ data_in(5) ^ data_in(6) ^ data_in(9) ^ data_in(10);
+        lfsr_c(1) := lfsr_q(0) ^ lfsr_q(1) ^ lfsr_q(4) ^ data_in(1) ^ data_in(4) ^ data_in(6) ^ data_in(7) ^ data_in(10);
+        lfsr_c(2) := lfsr_q(0) ^ lfsr_q(1) ^ lfsr_q(2) ^ lfsr_q(3) ^ lfsr_q(4) ^ data_in(0) ^ data_in(2) ^ data_in(3) ^ data_in(6) ^ data_in(7) ^ data_in(8) ^ data_in(9) ^ data_in(10);
+        lfsr_c(3) := lfsr_q(1) ^ lfsr_q(2) ^ lfsr_q(3) ^ lfsr_q(4) ^ data_in(1) ^ data_in(3) ^ data_in(4) ^ data_in(7) ^ data_in(8) ^ data_in(9) ^ data_in(10);
+        lfsr_c(4) := lfsr_q(2) ^ lfsr_q(3) ^ lfsr_q(4) ^ data_in(2) ^ data_in(4) ^ data_in(5) ^ data_in(8) ^ data_in(9) ^ data_in(10);
+
+        lfsr_c
     }
 }
 
@@ -314,8 +329,12 @@ case class UsbHost() extends Component {
         io.ulpi_tx_data.valid     := False
         io.ulpi_tx_data.payload   := 0
 
-        val crc5          = Bits(5 bits)
-        crc5 := 0
+//        val crc5Poly   = CRCPolynomial(polynomial = p"5'b00101", initValue = BigInt("FF", 5), inputReflected = false, outputReflected = false, finalXor = BigInt("00", 16))
+//        val crc5Config = CRCCombinationalConfig(crc5Poly, 11 bits)
+//
+        val crc5            = Reg(Bits(5 bits))
+        //crc5 := ~UsbHost.crc5(Reverse(B("4'b1110") ## B("7'b0010101")))
+        crc5 := ~UsbHost.crc5(Reverse(io.endpoint ## io.periph_addr))
 
         object TxState extends SpinalEnum {
             val Idle          = newElement()
@@ -569,6 +588,7 @@ case class UsbHostFormalTb() extends Component
             assume(!stable(apb.PWDATA)  |=> (fell(apb.PENABLE) || !apb.PENABLE))
 
             when(!initstate()){
+                cover(u_usb_host_top.io.apb.PREADY)
             }
         }
     }.setName("")
