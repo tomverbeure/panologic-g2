@@ -1,0 +1,35 @@
+[*]
+[*] GTKWave Analyzer v3.3.66 (w)1999-2015 BSI
+[*] Tue Jan 22 05:30:14 2019
+[*]
+[dumpfile] "/home/ubuntu/projects/panologic-g2/spinal/formal/usbh/cover/engine_0/trace0.vcd"
+[dumpfile_mtime] "Tue Jan 22 05:28:00 2019"
+[dumpfile_size] 7915
+[savefile] "/home/ubuntu/projects/panologic-g2/spinal/formal/usbh/cover.gtkw"
+[timestart] 0
+[size] 1601 1017
+[pos] 63 -2
+*-3.231730 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] UsbHostFormalTb.
+[treeopen] UsbHostFormalTb.u_usb_host_top.
+[sst_width] 392
+[signals_width] 158
+[sst_expanded] 1
+[sst_vpaned_height] 301
+@28
+UsbHostFormalTb.io_clk
+UsbHostFormalTb.io_reset_
+@200
+-
+@28
+UsbHostFormalTb.apb_PENABLE
+UsbHostFormalTb.apb_PSEL
+UsbHostFormalTb.apb_PWRITE
+UsbHostFormalTb.apb_PREADY
+@22
+UsbHostFormalTb.apb_PADDR[6:0]
+UsbHostFormalTb.apb_PWDATA[31:0]
+@23
+UsbHostFormalTb.apb_PRDATA[31:0]
+[pattern_trace] 1
+[pattern_trace] 0

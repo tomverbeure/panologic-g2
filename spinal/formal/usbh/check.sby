@@ -1,0 +1,13 @@
+[options]
+mode bmc
+depth 20
+
+[engines]
+smtbmc boolector
+
+[script]
+read_verilog -sv -formal UsbHostFormalTb.sv
+prep -nordff -top UsbHostFormalTb
+
+[files]
+../../UsbHostFormalTb.sv
