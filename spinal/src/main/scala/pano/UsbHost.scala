@@ -194,7 +194,6 @@ case class UsbHost() extends Component {
         val ulpi_rx_cmd_changed     = out(Bool)
         val ulpi_rx_cmd             = out(Bits(8 bits))
 
-        val ulpi_tx_start           = out(Bool)
         val ulpi_tx_data            = master(Stream(Bits(8 bits)))
     }
 
@@ -305,17 +304,102 @@ case class UsbHost() extends Component {
     }
 
     val tx = new Area {
-
-        val start_tx      = False
+        //============================================================
+        // This FSM has control over the ULPI TX interface
+        //============================================================
+        // Kick off TX by setting pid != NULL
         val pid           = PidType()
+        pid   := PidType.NULL
 
-        pid     := PidType.NULL
+        io.ulpi_tx_data.valid     := False
+        io.ulpi_tx_data.payload   := 0
+
+        val crc5          = Bits(5 bits)
+        crc5 := 0
 
         object TxState extends SpinalEnum {
-            val Idle    = newElement()
+            val Idle          = newElement()
+            val TokenPid      = newElement()
+            val TokenAddr     = newElement()
+            val TokenEndpoint = newElement()
+            val DataPid       = newElement()
+            val HandshakePid  = newElement()
+            val SpecialPid    = newElement()
         }
 
         val tx_state = Reg(TxState()) init(TxState.Idle)
+        val cur_pid  = Reg(PidType()) init(PidType.NULL)
+
+        switch(tx_state){
+            is(TxState.Idle){
+                switch(pid){
+                    is(PidType.NULL){
+                        // Don't do anything...
+                    }
+                    is(PidType.OUT, PidType.IN, PidType.SOF, PidType.SETUP){
+                        tx_state  := TxState.TokenPid
+                        cur_pid   := pid
+                    }
+                    is(PidType.DATA0, PidType.DATA1, PidType.DATA2, PidType.MDATA){
+                        tx_state  := TxState.DataPid
+                        cur_pid   := pid
+                    }
+                    is(PidType.ACK, PidType.NAK, PidType.STALL, PidType.NYET){
+                        tx_state  := TxState.HandshakePid
+                        cur_pid   := pid
+                    }
+                    is(PidType.PRE_ERR, PidType.SPLIT, PidType.PING){ 
+                        tx_state  := TxState.SpecialPid
+                        cur_pid   := pid
+                    }
+                }
+            }
+            //============================================================
+            // TOKEN
+            //============================================================
+            is(TxState.TokenPid){
+                io.ulpi_tx_data.valid     := True
+                io.ulpi_tx_data.payload   := B"4'b0100" ## cur_pid.asBits
+
+                when(io.ulpi_tx_data.ready){
+                    tx_state    := TxState.TokenAddr
+                }
+            }
+            is(TxState.TokenAddr){
+                io.ulpi_tx_data.valid     := True
+                io.ulpi_tx_data.payload   := io.endpoint(0) ## io.periph_addr
+
+                when(io.ulpi_tx_data.ready){
+                    tx_state    := TxState.TokenEndpoint
+                }
+            }
+            is(TxState.TokenEndpoint){
+                io.ulpi_tx_data.valid     := True
+                io.ulpi_tx_data.payload   := crc5 ## io.endpoint(3 downto 1)
+
+                when(io.ulpi_tx_data.ready){
+                    tx_state    := TxState.Idle
+                }
+            }
+
+            //============================================================
+            // DATA
+            //============================================================
+            is(TxState.DataPid){
+            }
+
+            //============================================================
+            // HANDSHAKE
+            //============================================================
+            is(TxState.HandshakePid){
+            }
+
+            //============================================================
+            // SPECIAL
+            //============================================================
+            is(TxState.SpecialPid){
+            }
+        }
     }
 
     val top_fsm = new Area {
