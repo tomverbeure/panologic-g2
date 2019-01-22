@@ -107,6 +107,37 @@ object UsbHost {
         val TIMEOUT     = newElement()
         val BABBLE      = newElement()
     }
+
+    object PidType extends SpinalEnum {
+        val NULL = newElement()
+        val OUT, IN, SOF, SETUP = newElement()
+        val DATA0, DATA1, DATA2, MDATA = newElement()
+        val ACK, NAK, STALL, NYET = newElement()
+        val PRE_ERR, SPLIT, PING = newElement()
+
+        defaultEncoding = SpinalEnumEncoding("staticEncoding")(
+            NULL        -> 0x0,
+            // Tokens
+            OUT         -> 0x1,
+            IN          -> 0x9,
+            SOF         -> 0x5,
+            SETUP       -> 0xd,
+            // Data
+            DATA0       -> 0x3,
+            DATA1       -> 0xb,
+            DATA2       -> 0x7,
+            MDATA       -> 0xf,
+            // Handshake
+            ACK         -> 0x2,
+            NAK         -> 0xa,
+            STALL       -> 0xe,
+            NYET        -> 0x6,
+            // Special
+            PRE_ERR     -> 0xc,
+            SPLIT       -> 0x8,
+            PING        -> 0x4
+        )
+    }
 }
 
 case class UsbHost() extends Component {
@@ -156,6 +187,15 @@ case class UsbHost() extends Component {
         // Force new receive and send toggle values
         val set_send_data_toggle    = slave(Flow(Bool))
         val set_rcv_data_toggle     = slave(Flow(Bool))
+
+        //============================================================
+        // Interface with ULPI
+        //============================================================
+        val ulpi_rx_cmd_changed     = out(Bool)
+        val ulpi_rx_cmd             = out(Bits(8 bits))
+
+        val ulpi_tx_start           = out(Bool)
+        val ulpi_tx_data            = master(Stream(Bits(8 bits)))
     }
 
     // 2x64 deep double-buffered RX FIFOs
@@ -231,6 +271,63 @@ case class UsbHost() extends Component {
                 }
             }
         }
+    }
+
+    val data_toggle = new Area {
+
+        val toggle_send   = Bool
+        val toggle_rcv    = Bool
+
+        toggle_send   := False
+        toggle_rcv    := False
+
+        val cur_send_data_toggle = RegInit(False)
+        val cur_rcv_data_toggle = RegInit(False)
+
+        io.cur_send_data_toggle := cur_send_data_toggle
+        io.cur_rcv_data_toggle  := cur_rcv_data_toggle
+
+        when(io.set_send_data_toggle.valid){
+            cur_send_data_toggle    := io.set_send_data_toggle.payload
+        }
+
+        when(io.set_rcv_data_toggle.valid){
+            cur_rcv_data_toggle     := io.set_rcv_data_toggle.payload
+        }
+
+        when(toggle_send){
+            cur_send_data_toggle  := ~cur_send_data_toggle
+        }
+
+        when(toggle_rcv){
+            cur_rcv_data_toggle   := ~cur_rcv_data_toggle
+        }
+    }
+
+    val tx = new Area {
+
+        val start_tx      = False
+        val pid           = PidType()
+
+        pid     := PidType.NULL
+
+        object TxState extends SpinalEnum {
+            val Idle    = newElement()
+        }
+
+        val tx_state = Reg(TxState()) init(TxState.Idle)
+    }
+
+    val top_fsm = new Area {
+
+        when(io.xfer_type.valid){
+        }
+
+        object HostState extends SpinalEnum {
+            val Idle    = newElement()
+        }
+
+        val cur_state = Reg(HostState()) init(HostState.Idle)
     }
 
     def driveFrom(busCtrl: BusSlaveFactory, baseAddress: BigInt) = new Area {
