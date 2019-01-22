@@ -142,14 +142,28 @@ object UsbHost {
     }
 
     def crc5(data_in: Bits): Bits = {
-        val lfsr_q = Bits(5 bits).setAll
+        //-----------------------------------------------------------------------------
+        //// Copyright (C) 2009 OutputLogic.com
+        //// This source file may be used and distributed without restriction
+        //// provided that this copyright statement is not removed from the file
+        //// and that any derivative work contains the original copyright notice
+        //// and the associated disclaimer.
+        ////
+        //// THIS SOURCE FILE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS
+        //// OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+        //// WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+        ////-----------------------------------------------------------------------------
+        //// CRC module for data[10:0] ,   crc[4:0]=1+x^2+x^5;
+        ////-----------------------------------------------------------------------------
+
+        val lfsr_q = Bits(5 bits).setAll      // Full CRC5 is calculated in 1 step, so init value is constant.
         val lfsr_c = Bits(5 bits)
 
-        lfsr_c(0) := lfsr_q(0) ^ lfsr_q(3) ^ lfsr_q(4) ^ data_in(0) ^ data_in(3) ^ data_in(5) ^ data_in(6) ^ data_in(9) ^ data_in(10);
-        lfsr_c(1) := lfsr_q(0) ^ lfsr_q(1) ^ lfsr_q(4) ^ data_in(1) ^ data_in(4) ^ data_in(6) ^ data_in(7) ^ data_in(10);
-        lfsr_c(2) := lfsr_q(0) ^ lfsr_q(1) ^ lfsr_q(2) ^ lfsr_q(3) ^ lfsr_q(4) ^ data_in(0) ^ data_in(2) ^ data_in(3) ^ data_in(6) ^ data_in(7) ^ data_in(8) ^ data_in(9) ^ data_in(10);
-        lfsr_c(3) := lfsr_q(1) ^ lfsr_q(2) ^ lfsr_q(3) ^ lfsr_q(4) ^ data_in(1) ^ data_in(3) ^ data_in(4) ^ data_in(7) ^ data_in(8) ^ data_in(9) ^ data_in(10);
-        lfsr_c(4) := lfsr_q(2) ^ lfsr_q(3) ^ lfsr_q(4) ^ data_in(2) ^ data_in(4) ^ data_in(5) ^ data_in(8) ^ data_in(9) ^ data_in(10);
+        lfsr_c(0) := lfsr_q(0) ^ lfsr_q(3) ^ lfsr_q(4) ^ data_in(0) ^ data_in(3) ^ data_in(5) ^ data_in(6) ^ data_in(9) ^ data_in(10)
+        lfsr_c(1) := lfsr_q(0) ^ lfsr_q(1) ^ lfsr_q(4) ^ data_in(1) ^ data_in(4) ^ data_in(6) ^ data_in(7) ^ data_in(10)
+        lfsr_c(2) := lfsr_q(0) ^ lfsr_q(1) ^ lfsr_q(2) ^ lfsr_q(3) ^ lfsr_q(4) ^ data_in(0) ^ data_in(2) ^ data_in(3) ^ data_in(6) ^ data_in(7) ^ data_in(8) ^ data_in(9) ^ data_in(10)
+        lfsr_c(3) := lfsr_q(1) ^ lfsr_q(2) ^ lfsr_q(3) ^ lfsr_q(4) ^ data_in(1) ^ data_in(3) ^ data_in(4) ^ data_in(7) ^ data_in(8) ^ data_in(9) ^ data_in(10)
+        lfsr_c(4) := lfsr_q(2) ^ lfsr_q(3) ^ lfsr_q(4) ^ data_in(2) ^ data_in(4) ^ data_in(5) ^ data_in(8) ^ data_in(9) ^ data_in(10)
 
         lfsr_c
     }
@@ -221,7 +235,8 @@ case class UsbHost() extends Component {
     // "010xxxxxx" : TX FIFO 0
     // "011xxxxxx" : TX FIFO 1
     // "100000xxx" : SU FIFO
-    val fifo_ram = Mem(Bits(8 bits), (2*RX_FIFO_SIZE) + (2*TX_FIFO_SIZE) + SU_FIFO_SIZE)
+    val fifo_ram_size = (2*RX_FIFO_SIZE) + (2*TX_FIFO_SIZE) + SU_FIFO_SIZE
+    val fifo_ram = Mem(Bits(8 bits), fifo_ram_size)
 
     val cpu_ram_access = new Area {
         io.cpu_fifo_bus.cmd.ready := True
@@ -234,6 +249,25 @@ case class UsbHost() extends Component {
                     data                = io.cpu_fifo_bus.cmd.data
             )
         io.cpu_fifo_bus.rsp.valid := RegNext(io.cpu_fifo_bus.cmd.valid && !io.cpu_fifo_bus.cmd.write) init(False)
+    }
+
+    val rxtx_ram_access = new Area {
+        val tx_rd       = Bool
+        val tx_rd_addr  = UInt(log2Up(fifo_ram_size) bits)
+
+        val rx_wr       = Bool
+        val rx_wr_addr  = UInt(log2Up(fifo_ram_size) bits)
+        val rx_wr_data  = Bits(8 bits)
+
+        val rxtx_addr   = tx_rd ? tx_rd_addr | rx_wr_addr
+
+        val tx_rd_data = fifo_ram.readWriteSync(
+                    enable              = (tx_rd | rx_wr),
+                    write               = rx_wr,
+                    address             = rxtx_addr,
+                    mask                = B(True),
+                    data                = rx_wr_data
+            )
     }
 
     object UsbHostState extends SpinalEnum {
@@ -329,27 +363,43 @@ case class UsbHost() extends Component {
         io.ulpi_tx_data.valid     := False
         io.ulpi_tx_data.payload   := 0
 
-//        val crc5Poly   = CRCPolynomial(polynomial = p"5'b00101", initValue = BigInt("FF", 5), inputReflected = false, outputReflected = false, finalXor = BigInt("00", 16))
-//        val crc5Config = CRCCombinationalConfig(crc5Poly, 11 bits)
-//
-        val crc5            = Reg(Bits(5 bits))
-        //crc5 := ~UsbHost.crc5(Reverse(B("4'b1110") ## B("7'b0010101")))
-        crc5 := ~UsbHost.crc5(Reverse(io.endpoint ## io.periph_addr))
-
         object TxState extends SpinalEnum {
             val Idle          = newElement()
             val TokenPid      = newElement()
             val TokenAddr     = newElement()
             val TokenEndpoint = newElement()
             val DataPid       = newElement()
+            val DataData      = newElement()
+            val DataCRC0      = newElement()
+            val DataCRC1      = newElement()
             val HandshakePid  = newElement()
             val SpecialPid    = newElement()
         }
 
-        val tx_state = Reg(TxState()) init(TxState.Idle)
-        val cur_pid  = Reg(PidType()) init(PidType.NULL)
+        val tx_state    = Reg(TxState()) init(TxState.Idle)
+        val cur_pid     = Reg(PidType()) init(PidType.NULL)
+        val frame_cntr  = Reg(UInt(11 bits)) init(0)
+        val rd_ptr      = Reg(UInt(log2Up(fifo_ram_size) bits)) init(0)
+
+        rxtx_ram_access.tx_rd       := True
+        rxtx_ram_access.tx_rd_addr  := rd_ptr
+
+        rxtx_ram_access.rx_wr       := False
+        rxtx_ram_access.rx_wr_addr  := 0
+        rxtx_ram_access.rx_wr_data  := 0
+
+//        val crc5Poly   = CRCPolynomial(polynomial = p"5'b00101", initValue = BigInt("FF", 5), inputReflected = false, outputReflected = false, finalXor = BigInt("00", 16))
+//        val crc5Config = CRCCombinationalConfig(crc5Poly, 11 bits)
+//
+        //val crc5            = Reg(Bits(5 bits))
+        //crc5 := ~UsbHost.crc5(Reverse(B("4'b1110") ## B("7'b0010101")))
+        val crc5        = Reg(Bits(5 bits)) init(0)
+        crc5 := ~UsbHost.crc5(Reverse((cur_pid === PidType.SOF) ? frame_cntr.asBits | (io.endpoint ## io.periph_addr)))
 
         switch(tx_state){
+            //============================================================
+            // IDLE
+            //============================================================
             is(TxState.Idle){
                 switch(pid){
                     is(PidType.NULL){
@@ -367,14 +417,14 @@ case class UsbHost() extends Component {
                         tx_state  := TxState.HandshakePid
                         cur_pid   := pid
                     }
-                    is(PidType.PRE_ERR, PidType.SPLIT, PidType.PING){ 
+                    is(PidType.PRE_ERR, PidType.SPLIT, PidType.PING){
                         tx_state  := TxState.SpecialPid
                         cur_pid   := pid
                     }
                 }
             }
             //============================================================
-            // TOKEN
+            // TOKEN - USB 2.0 - 8.4.1
             //============================================================
             is(TxState.TokenPid){
                 io.ulpi_tx_data.valid     := True
@@ -400,13 +450,23 @@ case class UsbHost() extends Component {
                     tx_state    := TxState.Idle
                 }
             }
-
             //============================================================
             // DATA
             //============================================================
             is(TxState.DataPid){
-            }
+                io.ulpi_tx_data.valid     := True
+                io.ulpi_tx_data.payload   := B"4'b0100" ## cur_pid.asBits
 
+                when(io.ulpi_tx_data.ready){
+                    tx_state    := TxState.DataData
+                }
+            }
+            is(TxState.DataData){
+            }
+            is(TxState.DataCRC0){
+            }
+            is(TxState.DataCRC1){
+            }
             //============================================================
             // HANDSHAKE
             //============================================================
