@@ -252,18 +252,18 @@ case class UsbHost() extends Component {
     }
 
     val rxtx_ram_access = new Area {
-        val tx_rd       = Bool
+        val tx_rd_req   = Bool
         val tx_rd_addr  = UInt(log2Up(fifo_ram_size) bits)
 
-        val rx_wr       = Bool
+        val rx_wr_req   = Bool
         val rx_wr_addr  = UInt(log2Up(fifo_ram_size) bits)
         val rx_wr_data  = Bits(8 bits)
 
-        val rxtx_addr   = tx_rd ? tx_rd_addr | rx_wr_addr
+        val rxtx_addr   = tx_rd_req ? tx_rd_addr | rx_wr_addr
 
         val tx_rd_data = fifo_ram.readWriteSync(
-                    enable              = (tx_rd | rx_wr),
-                    write               = rx_wr,
+                    enable              = (tx_rd_req | rx_wr_req),
+                    write               = rx_wr_req,
                     address             = rxtx_addr,
                     mask                = B(True),
                     data                = rx_wr_data
@@ -283,6 +283,9 @@ case class UsbHost() extends Component {
         val buf_primed      = Reg(Bits(2 bits)) init(0)
         val byte_count0     = Reg(UInt(log2Up(TX_FIFO_SIZE) bits)) init(0)
         val byte_count1     = Reg(UInt(log2Up(TX_FIFO_SIZE) bits)) init(0)
+
+        var cur_byte_count      = (cur_buf === 0) ? byte_count0 | byte_count1
+        var cur_first_byte_ptr  = U"2'b01" @@ cur_buf(0) @@ U(0, log2Up(TX_FIFO_SIZE) bits)
 
         io.send_buf_avail     := !buf_primed(cur_buf) || !buf_primed(~cur_buf)
         io.send_buf_avail_nr  := !buf_primed(cur_buf) ? cur_buf | ~cur_buf
@@ -379,14 +382,12 @@ case class UsbHost() extends Component {
         val tx_state    = Reg(TxState()) init(TxState.Idle)
         val cur_pid     = Reg(PidType()) init(PidType.NULL)
         val frame_cntr  = Reg(UInt(11 bits)) init(0)
+        val rd_req      = Bool
         val rd_ptr      = Reg(UInt(log2Up(fifo_ram_size) bits)) init(0)
+        val data_cntr   = Reg(UInt(log2Up(TX_FIFO_SIZE) bits)) init(0)
 
-        rxtx_ram_access.tx_rd       := True
+        rxtx_ram_access.tx_rd_req   := rd_req
         rxtx_ram_access.tx_rd_addr  := rd_ptr
-
-        rxtx_ram_access.rx_wr       := False
-        rxtx_ram_access.rx_wr_addr  := 0
-        rxtx_ram_access.rx_wr_data  := 0
 
 //        val crc5Poly   = CRCPolynomial(polynomial = p"5'b00101", initValue = BigInt("FF", 5), inputReflected = false, outputReflected = false, finalXor = BigInt("00", 16))
 //        val crc5Config = CRCCombinationalConfig(crc5Poly, 11 bits)
@@ -395,6 +396,10 @@ case class UsbHost() extends Component {
         //crc5 := ~UsbHost.crc5(Reverse(B("4'b1110") ## B("7'b0010101")))
         val crc5        = Reg(Bits(5 bits)) init(0)
         crc5 := ~UsbHost.crc5(Reverse((cur_pid === PidType.SOF) ? frame_cntr.asBits | (io.endpoint ## io.periph_addr)))
+
+        val crc16       = Reg(Bits(16 bits)) init(0)
+
+        rd_req  := False
 
         switch(tx_state){
             //============================================================
@@ -412,6 +417,7 @@ case class UsbHost() extends Component {
                     is(PidType.DATA0, PidType.DATA1, PidType.DATA2, PidType.MDATA){
                         tx_state  := TxState.DataPid
                         cur_pid   := pid
+                        rd_ptr    := tx_buf.cur_first_byte_ptr
                     }
                     is(PidType.ACK, PidType.NAK, PidType.STALL, PidType.NYET){
                         tx_state  := TxState.HandshakePid
@@ -458,14 +464,47 @@ case class UsbHost() extends Component {
                 io.ulpi_tx_data.payload   := B"4'b0100" ## cur_pid.asBits
 
                 when(io.ulpi_tx_data.ready){
-                    tx_state    := TxState.DataData
+                    when(tx_buf.cur_byte_count >= 0){
+                        tx_state      := TxState.DataData
+                        data_cntr     := tx_buf.cur_byte_count
+                        rd_req        := True
+                    }
+                    .otherwise{
+                        tx_state      := TxState.DataCRC0
+                    }
                 }
             }
             is(TxState.DataData){
+                io.ulpi_tx_data.valid     := True
+                io.ulpi_tx_data.payload   := rxtx_ram_access.tx_rd_data
+
+                rd_req    := True
+                when(io.ulpi_tx_data.ready){
+                    when(data_cntr > 1){
+                        tx_state      := TxState.DataData
+                        data_cntr     := data_cntr - 1
+                        rd_ptr        := rd_ptr + 1
+                    }
+                    .otherwise{
+                        tx_state      := TxState.DataCRC0
+                    }
+                }
             }
             is(TxState.DataCRC0){
+                io.ulpi_tx_data.valid     := True
+                io.ulpi_tx_data.payload   := crc16(7 downto 0)
+
+                when(io.ulpi_tx_data.ready){
+                    tx_state      := TxState.DataCRC1
+                }
             }
             is(TxState.DataCRC1){
+                io.ulpi_tx_data.valid     := True
+                io.ulpi_tx_data.payload   := crc16(15 downto 8)
+
+                when(io.ulpi_tx_data.ready){
+                    tx_state      := TxState.Idle
+                }
             }
             //============================================================
             // HANDSHAKE
@@ -480,6 +519,13 @@ case class UsbHost() extends Component {
             }
         }
     }
+
+    val rx = new Area {
+        rxtx_ram_access.rx_wr_req   := False
+        rxtx_ram_access.rx_wr_addr  := 0
+        rxtx_ram_access.rx_wr_data  := 0
+    }
+
 
     val top_fsm = new Area {
 
