@@ -1,0 +1,13 @@
+
+ADDRESS_SPACE progmem COMBINED [0x00000000:0x00001FFF]
+  ADDRESS_RANGE RAMB16
+    BUS_BLOCK
+      // The order of the RAMs and bus data is wrong. But if I don't this, it doesn't work.
+      core_u_pano_core/u_mr1_top/u_cpu/ram/Mram_ram_symbol3 [31:24] PLACED=X0Y3;
+      core_u_pano_core/u_mr1_top/u_cpu/ram/Mram_ram_symbol2 [23:16] PLACED=X0Y7;
+      core_u_pano_core/u_mr1_top/u_cpu/ram/Mram_ram_symbol1 [15:8]  PLACED=X0Y4;
+      core_u_pano_core/u_mr1_top/u_cpu/ram/Mram_ram_symbol0 [7:0]   PLACED=X0Y11;
+    END_BUS_BLOCK;
+  END_ADDRESS_RANGE;
+END_ADDRESS_SPACE;
+

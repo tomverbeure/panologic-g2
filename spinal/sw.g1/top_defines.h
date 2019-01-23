@@ -1,0 +1,31 @@
+
+#define GPIO_READ_ADDR              0x00000000
+#define GPIO_WRITE_ADDR             0x00000004
+#define GPIO_DIR_ADDR               0x00000008
+
+#define GPIO_BIT_LED_GREEN          0x00000001
+#define GPIO_BIT_LED_BLUE           0x00000002
+#define GPIO_BIT_LED_RED            0x00000004
+#define GPIO_BIT_SWITCH             0x00000008
+
+#define DVI_CTRL_DIR_ADDR           0x00000100
+#define DVI_CTRL_WR_ADDR            0x00000104
+#define DVI_CTRL_SET_ADDR           0x00000108
+#define DVI_CTRL_CLR_ADDR           0x0000010c
+#define DVI_CTRL_RD_ADDR            0x00000110
+
+#define GMII_MDIO_ADDR              0x00010000
+
+#define GMII_MDC_VAL_BIT         0
+#define GMII_MDIO_WR_BIT         1
+#define GMII_MDIO_ENA_BIT        2
+#define GMII_MDIO_RD_BIT         3
+
+#define GMII_RX_FIFO_RD_ADDR        0x00010004
+#define GMII_RX_FIFO_RD_COUNT_ADDR  0x00010008
+
+#define TEST_PATTERN_NR_ADDR                    0x00000200
+#define TEST_PATTERN_CONST_COLOR_ADDR           0x00000204
+
+#define TXT_BUF_ADDR                0x00020000
+
