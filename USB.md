@@ -10,24 +10,26 @@ it has no knowledge about USB packet framing, inter-packet timings, or anything 
 
 It is thus up to the FPGA to implement a USB host to take care of all that.
 
-The USB PHY chip is an [SMSC 3300-EKZ](https://www.microchip.com/wwwproducts/en/USB3300). It has an industry standard
-ULPI interface to connect to the FPGA. The data sheet itself is [here](http://ww1.microchip.com/downloads/en/DeviceDoc/00001783C.pdf).
+* The USB PHY chip is an [SMSC 3300-EKZ](https://www.microchip.com/wwwproducts/en/USB3300). It has an industry standard
+  ULPI interface to connect to the FPGA. The data sheet itself is [here](http://ww1.microchip.com/downloads/en/DeviceDoc/00001783C.pdf).
 
-[USB in a Nutshell](https://www.beyondlogic.org/usbnutshell/usb1.shtml) is a very good tutorial about USB in general.
+* [USB in a Nutshell](https://www.beyondlogic.org/usbnutshell/usb1.shtml) is a very good tutorial about USB in general.
 
-The [EHCI Specification](https://www.intel.com/content/dam/www/public/us/en/documents/technical-specifications/ehci-specification-for-usb.pdf)
-is a good starting point when learning about what a general USB host should support.
+* The [EHCI Specification](https://www.intel.com/content/dam/www/public/us/en/documents/technical-specifications/ehci-specification-for-usb.pdf)
+  is a good starting point when learning about what a general USB host should support.
+ 
+* A [bit-banged USB host](https://github.com/scanlime/propeller-usb-host) written in Propeller.
 
-Here's a [bit-banged USB host](https://github.com/scanlime/propeller-usb-host) written in Propeller.
+* [A real example of USB packets transferring](https://superjameszou.wordpress.com/2010/09/06/a-real-example-for-usb-packets-transferring/).
 
-[A real example of USB packets transferring](https://superjameszou.wordpress.com/2010/09/06/a-real-example-for-usb-packets-transferring/).
+* [Cyclic Redunancy Checks in USB](https://usb.org/sites/default/files/crcdes.pdf)
 
-The USB Host will be a register compatible clone of the [MAX3421E](https://www.maximintegrated.com/en/products/interface/controllers-expanders/MAX3421E.html).
-The datasheet is [here](https://datasheets.maximintegrated.com/en/ds/MAX3421E.pdf) with [errata](https://datasheets.maximintegrated.com/en/errata/Errata_MAX3421E.pdf)
-and [Programming Guide](http://pdfserv.maximintegrated.com/en/an/AN3785.pdf).
+* The USB Host will be a register compatible clone of the [MAX3421E](https://www.maximintegrated.com/en/products/interface/controllers-expanders/MAX3421E.html).
+  The datasheet is [here](https://datasheets.maximintegrated.com/en/ds/MAX3421E.pdf) with [errata](https://datasheets.maximintegrated.com/en/errata/Errata_MAX3421E.pdf)
+  and [Programming Guide](http://pdfserv.maximintegrated.com/en/an/AN3785.pdf).
 
-By making the HW compatible with an existing chip, we should be able to reuse the firmware of the [Arduino USB Host Shield](https://github.com/felis/USB_Host_Shield_2.0)
-with no or minimal changes!
+    By making the HW compatible with an existing chip, we should be able to reuse the firmware of the [Arduino USB Host Shield](https://github.com/felis/USB_Host_Shield_2.0)
+    with no or minimal changes!
 
 
 ## ULPI
