@@ -167,6 +167,43 @@ object UsbHost {
 
         lfsr_c
     }
+
+    def crc16(data_in: Bits, lfsr_q: Bits): Bits = {
+        //-----------------------------------------------------------------------------
+        //// Copyright (C) 2009 OutputLogic.com
+        //// This source file may be used and distributed without restriction
+        //// provided that this copyright statement is not removed from the file
+        //// and that any derivative work contains the original copyright notice
+        //// and the associated disclaimer.
+        ////
+        //// THIS SOURCE FILE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS
+        //// OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+        //// WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+        ////-----------------------------------------------------------------------------
+        //// CRC module for data[7:0] ,   crc[15:0]=1+x^2+x^15+x^16;
+        ////-----------------------------------------------------------------------------
+
+        val lfsr_c = Bits(16 bits)
+
+        lfsr_c(0)  := lfsr_q(8) ^ lfsr_q(9) ^ lfsr_q(10) ^ lfsr_q(11) ^ lfsr_q(12) ^ lfsr_q(13) ^ lfsr_q(14) ^ lfsr_q(15) ^ data_in(0) ^ data_in(1) ^ data_in(2) ^ data_in(3) ^ data_in(4) ^ data_in(5) ^ data_in(6) ^ data_in(7)
+        lfsr_c(1)  := lfsr_q(9) ^ lfsr_q(10) ^ lfsr_q(11) ^ lfsr_q(12) ^ lfsr_q(13) ^ lfsr_q(14) ^ lfsr_q(15) ^ data_in(1) ^ data_in(2) ^ data_in(3) ^ data_in(4) ^ data_in(5) ^ data_in(6) ^ data_in(7)
+        lfsr_c(2)  := lfsr_q(8) ^ lfsr_q(9) ^ data_in(0) ^ data_in(1)
+        lfsr_c(3)  := lfsr_q(9) ^ lfsr_q(10) ^ data_in(1) ^ data_in(2)
+        lfsr_c(4)  := lfsr_q(10) ^ lfsr_q(11) ^ data_in(2) ^ data_in(3)
+        lfsr_c(5)  := lfsr_q(11) ^ lfsr_q(12) ^ data_in(3) ^ data_in(4)
+        lfsr_c(6)  := lfsr_q(12) ^ lfsr_q(13) ^ data_in(4) ^ data_in(5)
+        lfsr_c(7)  := lfsr_q(13) ^ lfsr_q(14) ^ data_in(5) ^ data_in(6)
+        lfsr_c(8)  := lfsr_q(0) ^ lfsr_q(14) ^ lfsr_q(15) ^ data_in(6) ^ data_in(7)
+        lfsr_c(9)  := lfsr_q(1) ^ lfsr_q(15) ^ data_in(7)
+        lfsr_c(10) := lfsr_q(2)
+        lfsr_c(11) := lfsr_q(3)
+        lfsr_c(12) := lfsr_q(4)
+        lfsr_c(13) := lfsr_q(5)
+        lfsr_c(14) := lfsr_q(6)
+        lfsr_c(15) := lfsr_q(7) ^ lfsr_q(8) ^ lfsr_q(9) ^ lfsr_q(10) ^ lfsr_q(11) ^ lfsr_q(12) ^ lfsr_q(13) ^ lfsr_q(14) ^ lfsr_q(15) ^ data_in(0) ^ data_in(1) ^ data_in(2) ^ data_in(3) ^ data_in(4) ^ data_in(5) ^ data_in(6) ^ data_in(7)
+
+        lfsr_c
+    }
 }
 
 case class UsbHost() extends Component {
@@ -389,15 +426,18 @@ case class UsbHost() extends Component {
         rxtx_ram_access.tx_rd_req   := rd_req
         rxtx_ram_access.tx_rd_addr  := rd_ptr
 
-//        val crc5Poly   = CRCPolynomial(polynomial = p"5'b00101", initValue = BigInt("FF", 5), inputReflected = false, outputReflected = false, finalXor = BigInt("00", 16))
-//        val crc5Config = CRCCombinationalConfig(crc5Poly, 11 bits)
-//
-        //val crc5            = Reg(Bits(5 bits))
+        val crc16       = Reg(Bits(16 bits)) init(0)
+        val crc16_nxt   = UsbHost.crc16(Reverse(rxtx_ram_access.tx_rd_data), crc16)
+
+        //val crc_0 = B"16'hffff"
+        //val crc_1 = UsbHost.crc16(Reverse(B"8'h00"), crc_0)
+        //val crc_2 = UsbHost.crc16(Reverse(B"8'h01"), crc_1)
+        //val crc_3 = UsbHost.crc16(Reverse(B"8'h02"), crc_2)
+        //val crc_4 = RegNext(~Reverse(UsbHost.crc16(Reverse(B"8'h03"), crc_3)))
         //crc5 := ~UsbHost.crc5(Reverse(B("4'b1110") ## B("7'b0010101")))
+
         val crc5        = Reg(Bits(5 bits)) init(0)
         crc5 := ~UsbHost.crc5(Reverse((cur_pid === PidType.SOF) ? frame_cntr.asBits | (io.endpoint ## io.periph_addr)))
-
-        val crc16       = Reg(Bits(16 bits)) init(0)
 
         rd_req  := False
 
@@ -424,8 +464,10 @@ case class UsbHost() extends Component {
                         cur_pid   := pid
                     }
                     is(PidType.PRE_ERR, PidType.SPLIT, PidType.PING){
-                        tx_state  := TxState.SpecialPid
-                        cur_pid   := pid
+                        // None of these special packet are currently supported.
+                        // PRE: automatically inserted by ULPI PHY when XcvrSelect is set to 2'b11
+                        // ERR, SPLIT, PING: only used in HS mode
+                        tx_state  := TxState.Idle
                     }
                 }
             }
@@ -464,6 +506,8 @@ case class UsbHost() extends Component {
                 io.ulpi_tx_data.payload   := B"4'b0100" ## cur_pid.asBits
 
                 when(io.ulpi_tx_data.ready){
+                    crc16.setAll
+
                     when(tx_buf.cur_byte_count >= 0){
                         tx_state      := TxState.DataData
                         data_cntr     := tx_buf.cur_byte_count
@@ -480,6 +524,8 @@ case class UsbHost() extends Component {
 
                 rd_req    := True
                 when(io.ulpi_tx_data.ready){
+                    crc16 := crc16_nxt
+
                     when(data_cntr > 1){
                         tx_state      := TxState.DataData
                         data_cntr     := data_cntr - 1
@@ -492,7 +538,7 @@ case class UsbHost() extends Component {
             }
             is(TxState.DataCRC0){
                 io.ulpi_tx_data.valid     := True
-                io.ulpi_tx_data.payload   := crc16(7 downto 0)
+                io.ulpi_tx_data.payload   := ~crc16(7 downto 0)
 
                 when(io.ulpi_tx_data.ready){
                     tx_state      := TxState.DataCRC1
@@ -510,6 +556,12 @@ case class UsbHost() extends Component {
             // HANDSHAKE
             //============================================================
             is(TxState.HandshakePid){
+                io.ulpi_tx_data.valid     := True
+                io.ulpi_tx_data.payload   := B"4'b0100" ## cur_pid.asBits
+
+                when(io.ulpi_tx_data.ready){
+                    tx_state      := TxState.Idle
+                }
             }
 
             //============================================================
