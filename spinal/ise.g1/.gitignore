@@ -1,0 +1,14 @@
+*
+!Makefile
+!*.vhd
+!*.bit
+!*.cgp
+!*.ucf
+!*.xise
+!*.ipf
+!*.bmm
+!*.xaw
+!*.cdc
+!*.cpj
+!.gitignore
+
