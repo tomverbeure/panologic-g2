@@ -312,6 +312,7 @@ case class UsbHost() extends Component {
         // Currently active buffer. Either being transmitted right now, or the first
         // one to be transmitted right now.
         val cur_buf   = Reg(UInt(1 bits)) init(0)
+        cur_buf := 0      // FIXME
 
         val buf_primed      = Reg(Bits(2 bits)) init(0)
         val byte_count0     = Reg(UInt(log2Up(TX_FIFO_SIZE) bits)) init(0)
@@ -594,6 +595,10 @@ case class UsbHost() extends Component {
 
         val top_state = Reg(TopState()) init(TopState.Idle)
 
+        val xfer_result = Reg(HostXferResult()) init(HostXferResult.SUCCESS)
+        xfer_result := HostXferResult.SUCCESS     // FIXME
+        io.xfer_result := xfer_result
+
         switch(top_state){
             //============================================================
             // IDLE
@@ -773,46 +778,48 @@ case class UsbHostFormalTb() extends Component
     val io = new Bundle {
         val clk             = in(Bool)
         val reset_          = in(Bool)
+
+        val apb             = slave(Apb3(UsbHost.getApb3Config()))
     }
 
 
     val domain = new ClockingArea(ClockDomain(io.clk, io.reset_,
                                                 config = ClockDomainConfig(resetKind = SYNC, resetActiveLevel = LOW)))
     {
-        val apb = Apb3(UsbHost.getApb3Config())
+        val u_usb_host = new UsbHost()
 
-        val u_usb_host_top = new UsbHostTop()
-        u_usb_host_top.io.apb           <> apb
+        val busCtrl = Apb3SlaveFactory(io.apb)
+        val apb_regs = u_usb_host.driveFrom(busCtrl, 0x0)
 
        import spinal.core.GenerationFlags._
        import spinal.core.Formal._
 
        GenerationFlags.formal{
             import pano.lib._
+            import UsbHost._
 
             assume(io.reset_ === !initstate())
 
-            assume(rose(apb.PENABLE)    |-> stable(apb.PSEL))
-            assume(rose(apb.PENABLE)    |-> stable(apb.PADDR))
-            assume(rose(apb.PENABLE)    |-> stable(apb.PWRITE))
-            assume(rose(apb.PENABLE)    |-> stable(apb.PWDATA))
-
-            assume(apb.PREADY           |-> stable(apb.PENABLE))
-            assume(apb.PREADY           |-> stable(apb.PSEL))
-            assume(apb.PREADY           |-> stable(apb.PADDR))
-            assume(apb.PREADY           |-> stable(apb.PWRITE))
-            assume(apb.PREADY           |-> stable(apb.PWDATA))
-
-            assume(fell(apb.PENABLE)    |-> apb.PREADY)
-            assume(fell(apb.PSEL.orR)   |-> apb.PREADY)
-
-            assume(!stable(apb.PSEL)    |=> (fell(apb.PENABLE) || !apb.PENABLE))
-            assume(!stable(apb.PADDR)   |=> (fell(apb.PENABLE) || !apb.PENABLE))
-            assume(!stable(apb.PWRITE)  |=> (fell(apb.PENABLE) || !apb.PENABLE))
-            assume(!stable(apb.PWDATA)  |=> (fell(apb.PENABLE) || !apb.PENABLE))
-
             when(!initstate()){
-                cover(u_usb_host_top.io.apb.PREADY)
+                val apb_xfer_ok = io.apb.PENABLE && io.apb.PREADY
+                // After a successful transaction, PENABLE must be false for at least 1 cycle
+                // to set up the next transaction.
+                assume(apb_xfer_ok |=> !io.apb.PENABLE)
+
+                assume((io.apb.PENABLE)   |-> stable(io.apb.PSEL))
+                assume((io.apb.PENABLE)   |-> stable(io.apb.PADDR))
+                assume((io.apb.PENABLE)   |-> stable(io.apb.PWRITE))
+                assume((io.apb.PENABLE)   |-> stable(io.apb.PWDATA))
+
+                assume(fell(io.apb.PSEL.orR)  |-> past(apb_xfer_ok))
+
+                val cycle_cntr = Reg(UInt(10 bits)) init(0)
+                cycle_cntr := cycle_cntr + 1
+
+                //assume(cycle_cntr === 1 |-> io.apb.PADDR === SNDFIFO_ADDR)
+                //assume(cycle_cntr === 3 |-> io.apb.PADDR === SUDFIFO_ADDR)
+
+                cover(apb_regs.setup_fifo.wr_ptr === 3 && apb_regs.send_fifo.wr_ptr === 5)
             }
         }
     }.setName("")
