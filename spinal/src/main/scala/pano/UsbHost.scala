@@ -72,11 +72,13 @@ object UsbHost {
     def TX_FIFO_SIZE                = 64
     def RX_FIFO_SIZE                = 64
     def SU_FIFO_SIZE                = 8
+    def FIFO_RAM_SIZE               = (2*RX_FIFO_SIZE + 2*TX_FIFO_SIZE + SU_FIFO_SIZE)
+    def FIFO_RAM_BITS               = log2Up(FIFO_RAM_SIZE)
 
     // RX:      2x 64 bytes. Address: 0, 64
     // TX:      2x 64 bytes. Address: 128, 192
     // Setup:   8 bytes.     Address: 256
-    def getFifoMemoryBusConfig() = PipelinedMemoryBusConfig(addressWidth = log2Up(2 * RX_FIFO_SIZE + 2 * TX_FIFO_SIZE + SU_FIFO_SIZE), dataWidth = 8)
+    def getFifoMemoryBusConfig() = PipelinedMemoryBusConfig(addressWidth = FIFO_RAM_BITS, dataWidth = 8)
 
     object HostXferType extends SpinalEnum {
         val SETUP, BULK_IN, BULK_OUT, HS_IN, HS_OUT, ISO_IN, ISO_OUT = newElement()
@@ -272,8 +274,7 @@ case class UsbHost() extends Component {
     // "010xxxxxx" : TX FIFO 0
     // "011xxxxxx" : TX FIFO 1
     // "100000xxx" : SU FIFO
-    val fifo_ram_size = (2*RX_FIFO_SIZE) + (2*TX_FIFO_SIZE) + SU_FIFO_SIZE
-    val fifo_ram = Mem(Bits(8 bits), fifo_ram_size)
+    val fifo_ram = Mem(Bits(8 bits), FIFO_RAM_SIZE)
 
     val cpu_ram_access = new Area {
         io.cpu_fifo_bus.cmd.ready := True
@@ -290,10 +291,10 @@ case class UsbHost() extends Component {
 
     val rxtx_ram_access = new Area {
         val tx_rd_req   = Bool
-        val tx_rd_addr  = UInt(log2Up(fifo_ram_size) bits)
+        val tx_rd_addr  = UInt(FIFO_RAM_BITS bits)
 
         val rx_wr_req   = Bool
-        val rx_wr_addr  = UInt(log2Up(fifo_ram_size) bits)
+        val rx_wr_addr  = UInt(FIFO_RAM_BITS bits)
         val rx_wr_data  = Bits(8 bits)
 
         val rxtx_addr   = tx_rd_req ? tx_rd_addr | rx_wr_addr
@@ -421,7 +422,7 @@ case class UsbHost() extends Component {
         val tx_state    = Reg(TxState()) init(TxState.Idle)
         val frame_cntr  = Reg(UInt(11 bits)) init(0)
         val rd_req      = Bool
-        val rd_ptr      = Reg(UInt(log2Up(fifo_ram_size) bits)) init(0)
+        val rd_ptr      = Reg(UInt(FIFO_RAM_BITS bits)) init(0)
         val data_cntr   = Reg(UInt(log2Up(TX_FIFO_SIZE) bits)) init(0)
 
         rxtx_ram_access.tx_rd_req   := rd_req
@@ -651,7 +652,6 @@ case class UsbHost() extends Component {
         //============================================================
         // SNDFIFO - Send FIFO
         //============================================================
-        //
         io.cpu_fifo_bus.cmd.valid   := False
         io.cpu_fifo_bus.cmd.write   := False
         io.cpu_fifo_bus.cmd.address := 0
@@ -679,6 +679,26 @@ case class UsbHost() extends Component {
             val send_byte_count = busCtrl.createAndDriveFlow(io.send_byte_count.payload, SNDBC_ADDR << 2, 0)
 
             io.send_byte_count  << send_byte_count
+        }
+
+        //============================================================
+        // SUDFIFO - Setup FIFO
+        //============================================================
+        val setup_fifo = new Area {
+
+            val wr_ptr  = Reg(UInt(log2Up(SU_FIFO_SIZE) bits)) init(0)
+            val wr_addr = U(FIFO_RAM_BITS bits,
+                                (FIFO_RAM_BITS-1 downto FIFO_RAM_BITS-3) -> U"3'b100",
+                                (log2Up(SU_FIFO_SIZE)-1 downto 0) -> wr_ptr,
+                                default -> false)
+
+            busCtrl.onWrite(SUDFIFO_ADDR << 2){
+                io.cpu_fifo_bus.cmd.valid   := True
+                io.cpu_fifo_bus.cmd.write   := True
+                io.cpu_fifo_bus.cmd.address := wr_addr
+
+                wr_ptr := wr_ptr + 1
+            }
         }
 
         //============================================================
