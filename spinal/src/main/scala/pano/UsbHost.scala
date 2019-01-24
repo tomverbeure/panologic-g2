@@ -17,11 +17,6 @@ object UsbHost {
     // additional status and debug.
     def getApb3Config() = Apb3Config(addressWidth = 7, dataWidth=32)
 
-    // RX:      2x 64 bytes. Address: 0, 64
-    // TX:      2x 64 bytes. Address: 128, 192
-    // Setup:   8 bytes.     ADdress: 256
-    def getFifoMemoryBusConfig() = PipelinedMemoryBusConfig(addressWidth = 9, dataWidth = 8)
-
     // Supported host-only registers as defined by MAX3421E SPI-to-USB chip
     def RCVFIFO_ADDR                = 1
     def SNDFIFO_ADDR                = 2
@@ -77,6 +72,11 @@ object UsbHost {
     def TX_FIFO_SIZE                = 64
     def RX_FIFO_SIZE                = 64
     def SU_FIFO_SIZE                = 8
+
+    // RX:      2x 64 bytes. Address: 0, 64
+    // TX:      2x 64 bytes. Address: 128, 192
+    // Setup:   8 bytes.     Address: 256
+    def getFifoMemoryBusConfig() = PipelinedMemoryBusConfig(addressWidth = log2Up(2 * RX_FIFO_SIZE + 2 * TX_FIFO_SIZE + SU_FIFO_SIZE), dataWidth = 8)
 
     object HostXferType extends SpinalEnum {
         val SETUP, BULK_IN, BULK_OUT, HS_IN, HS_OUT, ISO_IN, ISO_OUT = newElement()
@@ -307,11 +307,6 @@ case class UsbHost() extends Component {
             )
     }
 
-    object UsbHostState extends SpinalEnum {
-        val Idle            = newElement()
-        val TxStart         = newElement()
-    }
-
     val tx_buf = new Area {
         // Currently active buffer. Either being transmitted right now, or the first
         // one to be transmitted right now.
@@ -321,8 +316,9 @@ case class UsbHost() extends Component {
         val byte_count0     = Reg(UInt(log2Up(TX_FIFO_SIZE) bits)) init(0)
         val byte_count1     = Reg(UInt(log2Up(TX_FIFO_SIZE) bits)) init(0)
 
-        var cur_byte_count      = (cur_buf === 0) ? byte_count0 | byte_count1
-        var cur_first_byte_ptr  = U"2'b01" @@ cur_buf(0) @@ U(0, log2Up(TX_FIFO_SIZE) bits)
+        var cur_byte_count        = (cur_buf === 0) ? byte_count0 | byte_count1
+        var cur_first_byte_ptr    = U"2'b01" @@ cur_buf(0) @@ U(0, log2Up(TX_FIFO_SIZE) bits)
+        var setup_first_byte_ptr  = U"2'b10" @@ 0          @@ U(0, log2Up(TX_FIFO_SIZE) bits)
 
         io.send_buf_avail     := !buf_primed(cur_buf) || !buf_primed(~cur_buf)
         io.send_buf_avail_nr  := !buf_primed(cur_buf) ? cur_buf | ~cur_buf
@@ -392,13 +388,16 @@ case class UsbHost() extends Component {
         }
     }
 
-    val tx = new Area {
+    val tx_fsm = new Area {
         //============================================================
         // This FSM has control over the ULPI TX interface
         //============================================================
         // Kick off TX by setting pid != NULL
         val pid           = PidType()
-        pid   := PidType.NULL
+        val setup         = Bool
+
+        pid       := PidType.NULL
+        setup     := False
 
         io.ulpi_tx_data.valid     := False
         io.ulpi_tx_data.payload   := 0
@@ -416,8 +415,10 @@ case class UsbHost() extends Component {
             val SpecialPid    = newElement()
         }
 
-        val tx_state    = Reg(TxState()) init(TxState.Idle)
         val cur_pid     = Reg(PidType()) init(PidType.NULL)
+        val cur_setup   = Reg(Bool) init(False)
+
+        val tx_state    = Reg(TxState()) init(TxState.Idle)
         val frame_cntr  = Reg(UInt(11 bits)) init(0)
         val rd_req      = Bool
         val rd_ptr      = Reg(UInt(log2Up(fifo_ram_size) bits)) init(0)
@@ -446,22 +447,24 @@ case class UsbHost() extends Component {
             // IDLE
             //============================================================
             is(TxState.Idle){
+                when(pid =/= PidType.NULL){
+                    cur_pid   := pid
+                    cur_setup := setup
+                }
+
                 switch(pid){
                     is(PidType.NULL){
                         // Don't do anything...
                     }
                     is(PidType.OUT, PidType.IN, PidType.SOF, PidType.SETUP){
                         tx_state  := TxState.TokenPid
-                        cur_pid   := pid
                     }
                     is(PidType.DATA0, PidType.DATA1, PidType.DATA2, PidType.MDATA){
                         tx_state  := TxState.DataPid
-                        cur_pid   := pid
-                        rd_ptr    := tx_buf.cur_first_byte_ptr
+                        rd_ptr    := setup ? tx_buf.setup_first_byte_ptr | tx_buf.cur_first_byte_ptr
                     }
                     is(PidType.ACK, PidType.NAK, PidType.STALL, PidType.NYET){
                         tx_state  := TxState.HandshakePid
-                        cur_pid   := pid
                     }
                     is(PidType.PRE_ERR, PidType.SPLIT, PidType.PING){
                         // None of these special packet are currently supported.
@@ -510,7 +513,7 @@ case class UsbHost() extends Component {
 
                     when(tx_buf.cur_byte_count >= 0){
                         tx_state      := TxState.DataData
-                        data_cntr     := tx_buf.cur_byte_count
+                        data_cntr     := cur_setup ? U(8, log2Up(TX_FIFO_SIZE) bits) | tx_buf.cur_byte_count
                         rd_req        := True
                     }
                     .otherwise{
@@ -581,14 +584,57 @@ case class UsbHost() extends Component {
 
     val top_fsm = new Area {
 
-        when(io.xfer_type.valid){
+        object TopState extends SpinalEnum {
+            val Idle                  = newElement()
+            val SetupSendToken        = newElement()
+            val SetupSendData0        = newElement()
+            val SetupWaitHandshake    = newElement()
         }
 
-        object HostState extends SpinalEnum {
-            val Idle    = newElement()
-        }
+        val top_state = Reg(TopState()) init(TopState.Idle)
 
-        val cur_state = Reg(HostState()) init(HostState.Idle)
+        switch(top_state){
+            //============================================================
+            // IDLE
+            //============================================================
+            is(TopState.Idle){
+                when(io.xfer_type.valid){
+                    switch(io.xfer_type.payload){
+                        is(HostXferType.SETUP){
+                        }
+                        is(HostXferType.BULK_IN, HostXferType.BULK_OUT, HostXferType.HS_IN, HostXferType.HS_OUT, HostXferType.ISO_IN, HostXferType.ISO_OUT){
+                            top_state     := TopState.Idle
+                        }
+                    }
+                }
+            }
+            //============================================================
+            // SETUP
+            //============================================================
+            is(TopState.SetupSendToken){
+                when(tx_fsm.tx_state === tx_fsm.TxState.Idle){
+                    tx_fsm.pid        := PidType.SETUP
+                    top_state         := TopState.SetupSendData0
+
+                    // Check for error?
+                }
+            }
+            is(TopState.SetupSendData0){
+                when(tx_fsm.tx_state === tx_fsm.TxState.Idle){
+                    tx_fsm.pid        := PidType.DATA0
+                    tx_fsm.setup      := True
+                    top_state         := TopState.SetupWaitHandshake
+
+                    // Check for error?
+                }
+            }
+            is(TopState.SetupWaitHandshake){
+                when(tx_fsm.tx_state === tx_fsm.TxState.Idle){
+                    // Check RX reply...
+                }
+            }
+
+        }
     }
 
     def driveFrom(busCtrl: BusSlaveFactory, baseAddress: BigInt) = new Area {
