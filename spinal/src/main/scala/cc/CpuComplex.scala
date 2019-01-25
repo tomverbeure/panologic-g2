@@ -28,7 +28,7 @@ object CpuComplexConfig{
 
     def default =  CpuComplexConfig(
         onChipRamSize         = 8 kB,
-        onChipRamHexFile      = "sw.g1/progmem.hex",
+        onChipRamHexFile      = null,
         pipelineDBus          = true,
         pipelineMainBus       = true,
         pipelineApbBridge     = true,
