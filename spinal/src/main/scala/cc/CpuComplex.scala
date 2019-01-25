@@ -5,6 +5,7 @@ import spinal.core._
 import spinal.lib._
 import spinal.lib.bus.amba3.apb._
 import spinal.lib.bus.misc.SizeMapping
+import spinal.lib.misc.{HexTools}
 
 import scala.collection.mutable.ArrayBuffer
 import vexriscv.plugin.{NONE, _}
@@ -27,7 +28,7 @@ object CpuComplexConfig{
 
     def default =  CpuComplexConfig(
         onChipRamSize         = 8 kB,
-        onChipRamHexFile      = null,
+        onChipRamHexFile      = "sw.g1/progmem.hex",
         pipelineDBus          = true,
         pipelineMainBus       = true,
         pipelineApbBridge     = true,
@@ -145,9 +146,13 @@ case class CpuComplex(config : CpuComplexConfig) extends Component
     val mainBusMapping = ArrayBuffer[(SimpleBus,SizeMapping)]()
     val ram = new MuraxSimpleBusRam(
         onChipRamSize = onChipRamSize,
-        onChipRamHexFile = onChipRamHexFile,
+        onChipRamHexFile = null,
         simpleBusConfig = simpleBusConfig
     )
+    if(onChipRamHexFile != null){
+        HexTools.initRam(ram.ram, onChipRamHexFile, 0x00000000l)
+    }
+
     mainBusMapping += ram.io.bus -> (0x00000000l, onChipRamSize)
 
     val apbBridge = new MuraxSimpleBusToApbBridge(
