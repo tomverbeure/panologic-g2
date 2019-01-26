@@ -21,7 +21,9 @@ case class CpuTopG1() extends Component {
         val uart_ctrl_apb       = master(Apb3(Apb3UartCtrl.getApb3Config))
     }
 
-    val u_cpu = CpuComplex(CpuComplexConfig.default)
+    val CpuConfig = CpuComplexConfig.default.copy(onChipRamHexFile = "sw.g1/progmem.hex")
+
+    val u_cpu = CpuComplex(CpuConfig)
     u_cpu.io.externalInterrupt <> False
 
     val apbMapping = ArrayBuffer[(Apb3, SizeMapping)]()
