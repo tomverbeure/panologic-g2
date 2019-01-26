@@ -19,6 +19,7 @@ case class CpuTopG1() extends Component {
     val io = new Bundle {
         val led_ctrl_apb        = master(Apb3(Apb3Gpio.getApb3Config()))
         val uart_ctrl_apb       = master(Apb3(Apb3UartCtrl.getApb3Config))
+        val usb_ctrl_apb        = master(Apb3(Apb3UsbCtrlG1.getApb3Config))
     }
 
     val CpuConfig = CpuComplexConfig.default.copy(onChipRamHexFile = "sw.g1/progmem.hex")
@@ -26,18 +27,19 @@ case class CpuTopG1() extends Component {
     val u_cpu = CpuComplex(CpuConfig)
     u_cpu.io.externalInterrupt <> False
 
-    val apbMapping = ArrayBuffer[(Apb3, SizeMapping)]()
-
-    apbMapping += io.led_ctrl_apb       -> (0x0, 256 Byte)
-    apbMapping += io.uart_ctrl_apb      -> (0x100, 256 Byte)
-
     //============================================================
     // Timer
     //============================================================
 
     val u_timer = new MuraxApb3Timer()
     u_timer.io.interrupt        <> u_cpu.io.timerInterrupt
-    apbMapping += u_timer.io.apb -> (0x30000, 4 kB)
+
+    val apbMapping = ArrayBuffer[(Apb3, SizeMapping)]()
+
+    apbMapping += io.led_ctrl_apb       -> (0x000000, 256 Byte)
+    apbMapping += io.uart_ctrl_apb      -> (0x000100, 256 Byte)
+    apbMapping += u_timer.io.apb        -> (0x000200, 256 Byte)
+    apbMapping += io.usb_ctrl_apb       -> (0x080000, 524288 Byte)
 
 
     //============================================================

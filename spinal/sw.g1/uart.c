@@ -2,7 +2,7 @@
 
 #include "reg.h"
 #include "top_defines.h"
-
+#include "uart.h"
 
 void UartInit()
 {

@@ -6,8 +6,6 @@ import spinal.core._
 import spinal.lib._
 import spinal.lib.io._
 
-import spartan3._
-
 class PanoG1 extends Component {
 
     val io = new Bundle {
@@ -18,15 +16,28 @@ class PanoG1 extends Component {
         val led_blue            = out(Bool)
 
         val pano_button         = in(Bool)
+
+        val usb_a   = out(UInt(17 bits))
+        val usb_d   = master(TriStateArray(16 bits))
+        val usb_cs_ = out(Bool)
+        val usb_rd_ = out(Bool)
+        val usb_wr_ = out(Bool)
+        val usb_clkin = out(Bool)
+        val usb_reset_n = out(Bool)
     }
 
     noIoPrefix()
+
+//  USB controller clock
+    val usb_clk = new Usb_clk()
+    usb_clk.io.CLKIN_IN  <> io.osc_clk
+    usb_clk.io.CLKFX_OUT <> io.usb_clkin
 
     //============================================================
     // Create osc_clk clock domain
     //============================================================
     val oscClkDomain = ClockDomain(
-        clock = io.osc_clk,
+        clock = usb_clk.io.CLK0_OUT,
         frequency = FixedFrequency(100 MHz),
         config = ClockDomainConfig(
                     resetKind = BOOT
@@ -71,8 +82,10 @@ class PanoG1 extends Component {
         }
 
         main_reset_ := RegNext(reset_unbuffered_)
+
     }
 
+    io.usb_reset_n := main_reset_
 
     val main_clk    = Bool
     main_clk       := clkDivider.main_clk_raw
@@ -101,8 +114,25 @@ class PanoG1 extends Component {
 
         u_pano_core.io.switch_      <> io.pano_button
 
+        u_pano_core.io.usb_a <> io.usb_a
+        u_pano_core.io.usb_d <> io.usb_d
+        u_pano_core.io.usb_cs_ <> io.usb_cs_
+        u_pano_core.io.usb_rd_ <> io.usb_rd_
+        u_pano_core.io.usb_wr_ <> io.usb_wr_
+
     }
 
+}
+
+class Usb_clk() extends BlackBox {
+val io = new Bundle {
+    val CLKIN_IN = in  Bool 
+    val CLKFX_OUT = out Bool 
+    var CLK0_OUT = out Bool
+  }
+
+  // Remove io_ prefix 
+  noIoPrefix() 
 }
 
 object PanoG1Verilog{

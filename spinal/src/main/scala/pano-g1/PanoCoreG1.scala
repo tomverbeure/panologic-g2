@@ -18,6 +18,12 @@ class PanoCoreG1(voClkDomain: ClockDomain) extends Component {
         val led_green           = out(Bool)
         val led_blue            = out(Bool)
         val switch_             = in(Bool)
+
+        val usb_a   = out(UInt(17 bits))
+        val usb_d   = master(TriStateArray(16 bits))
+        val usb_cs_ = out(Bool)
+        val usb_rd_ = out(Bool)
+        val usb_wr_ = out(Bool)
     }
 
     val leds = new Area {
@@ -54,6 +60,7 @@ class PanoCoreG1(voClkDomain: ClockDomain) extends Component {
     u_led_ctrl.io.gpio.read(1)              := io.led_blue
     u_led_ctrl.io.gpio.read(2)              := False
     u_led_ctrl.io.gpio.read(3)              := io.switch_
+
     //============================================================
     // UART 
     //============================================================
@@ -73,6 +80,21 @@ class PanoCoreG1(voClkDomain: ClockDomain) extends Component {
     uartCtrl.io.apb <> u_cpu_top.io.uart_ctrl_apb
     uartCtrl.io.uart.rxd := True
     uartCtrl.io.uart.txd <> io.led_blue
+
+    //============================================================
+    // USB
+    //============================================================
+
+    val u_usb = new Apb3UsbCtrlG1()
+
+    u_usb.io.apb <> u_cpu_top.io.usb_ctrl_apb
+
+    io.usb_cs_           <> u_usb.io.usb_cs_
+    io.usb_a             <> u_usb.io.usb_a
+    io.usb_wr_           <> u_usb.io.usb_wr_
+    io.usb_rd_           <> u_usb.io.usb_rd_
+    io.usb_d             <> u_usb.io.usb_d
+
 }
 
 
