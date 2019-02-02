@@ -53,7 +53,7 @@ void next_line()
 }
 
 #ifndef PRINT_UART
-void print(char *str)
+void print(const char *str)
 {
     while(*str != '\0'){
         if (*str == '\n'){
@@ -72,7 +72,7 @@ void print(char *str)
     }
 }
 #else
-void print(char *str)
+void print(const char *str)
 {
     while(*str != '\0'){
         UartPutch(*str++);
@@ -96,17 +96,30 @@ void print_byte(unsigned char value, int hex)
     print(buf);
 }
 
-void print_int(int value, int hex)
+void print_int(int value, int Flags)
 {
     char buf[16] = "\0";
-    if (hex) {
+    char *cp = buf;
+
+    if (Flags & 1) {
         for(int i=7;i>=0;--i){
             buf[7-i] = hex_digits[((value >> (i*4))&0xf)];
         }
         buf[8] = '\0';
     }
 
-    print(buf);
+    if(Flags & 2) {
+    // Supress leading zeros
+       while(*cp == '0') {
+          cp++;
+       }
+       if(*cp == 0) {
+       // All zeros, display one
+          cp--;
+       }
+    }
+
+    print(cp);
 }
 
 

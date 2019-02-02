@@ -11,6 +11,7 @@
 #define TEST_PATTERN_NR_ADDR                    0x00000200
 #define TEST_PATTERN_CONST_COLOR_ADDR           0x00000204
 
+typedef unsigned char u8;
 typedef unsigned char byte;
 typedef unsigned short u16;
 typedef unsigned int u32;

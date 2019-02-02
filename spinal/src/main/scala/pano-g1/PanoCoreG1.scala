@@ -36,7 +36,7 @@ class PanoCoreG1(voClkDomain: ClockDomain) extends Component {
             led_cntr := led_cntr +1
         }
 
-        io.led_red  := led_cntr.msb
+//        io.led_red  := led_cntr.msb
     }
 
     val u_cpu_top = CpuTopG1()

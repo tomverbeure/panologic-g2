@@ -29,8 +29,7 @@ void UartInit()
 
 void UartPutch(char c)
 {
-// For debugging with a big fifo don't bother waiting for FIFO empty
-// while ((REG_RD(UART_STATUS) & 0x00FF0000) == 0);
+   while ((REG_RD(UART_STATUS) & 0x00FF0000) == 0);
    REG_WR(UART_TX_DATA,c);
 }
 

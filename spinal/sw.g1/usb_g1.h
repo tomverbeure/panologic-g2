@@ -4,5 +4,8 @@
 
 void UsbInit(void);
 bool UsbProbe(void);
+void UsbTest(void);
+void UsbRegDump(void);
+void UsbInit(void);
 #endif   // _USB_G1_H_
 

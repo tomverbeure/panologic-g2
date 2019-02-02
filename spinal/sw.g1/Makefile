@@ -10,7 +10,7 @@ ASFLAGS         = -march=rv32i -mabi=ilp32
 LD              = $(TARGET)-gcc
 LDFLAGS         = -march=rv32i -mabi=ilp32 -Wl,-Tsections.lds,-Map,progmem.map -ffreestanding -nostartfiles
 CC              = $(TARGET)-gcc
-CFLAGS          = -march=rv32i -mabi=ilp32 -Wall -Wextra -pedantic -DFREQ=$(FREQ_PLL)000000 -O2 -DPRINT_UART -Iinclude
+CFLAGS          = -march=rv32i -mabi=ilp32 -Wall -Wextra -pedantic -DFREQ=$(FREQ_PLL)000000 -O2 -DPRINT_UART -Iinclude -fno-builtin-printf
 OBJCOPY         = $(TARGET)-objcopy
 OBJDUMP         = $(TARGET)-objdump
 
@@ -57,17 +57,15 @@ progmem.bin: progmem.elf
 progmem8k.bin: progmem.elf
 	$(OBJCOPY) --pad-to=8192 -O binary $< $@
 
-progmem.elf: fpxx_sin_table.h $(OBJ_FILES) top_defines.h sections.lds Makefile
+progmem.elf: $(OBJ_FILES) top_defines.h sections.lds Makefile
 	$(LD) $(LDFLAGS) -s -o $@ $(OBJ_FILES) > progmem.map
 
-progmem_dis.elf: fpxx_sin_table.h $(OBJ_FILES) top_defines.h sections.lds Makefile
+progmem_dis.elf: $(OBJ_FILES) top_defines.h sections.lds Makefile
+	$(OBJDUMP) -s -D usb_g1.o > usb_g1.dis
 	$(LD) $(LDFLAGS) -o $@ $(OBJ_FILES) > progmem.map
-
-fpxx_sin_table.h: create_sin_table Makefile
-	./create_sin_table > $@
 
 create_sin_table: create_sin_table.c
 	gcc -o $@ $< -lm
 
 clean:
-	\rm -fr *.o *.hex *.elf *.dis *.bin *.coe *.map *.mif *.mem create_sin_table fpxx_sin_table.h
+	\rm -fr *.o *.hex *.elf *.dis *.bin *.coe *.map *.mif *.mem

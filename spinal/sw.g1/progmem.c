@@ -38,7 +38,7 @@ void wait(int cycles)
 #endif
 }
 
-
+// 422 millisecond delay
 #define WAIT_CYCLES 500000
 
 int button_pressed()
@@ -61,11 +61,13 @@ int main()
  // Turn off all LEDS
     REG_WR(GPIO_WRITE_ADDR, GPIO_BIT_LED_GREEN | GPIO_BIT_LED_BLUE | GPIO_BIT_LED_RED);
 
+//    UsbProbe();
+    UsbTest();
+
     while(1){
        uint32_t Leds;
         if(button_pressed()){
         // Flash Green LED when button is pressed
-            UsbProbe();
             Leds = REG_RD(GPIO_READ_ADDR);
             Leds &= ~GPIO_BIT_LED_GREEN;
             REG_WR(GPIO_WRITE_ADDR,Leds);

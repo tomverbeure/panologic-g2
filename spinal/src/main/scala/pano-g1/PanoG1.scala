@@ -32,6 +32,8 @@ class PanoG1 extends Component {
     val usb_clk = new Usb_clk()
     usb_clk.io.CLKIN_IN  <> io.osc_clk
     usb_clk.io.CLKFX_OUT <> io.usb_clkin
+    io.led_red := usb_clk.io.CLKFX_OUT
+
 
     //============================================================
     // Create osc_clk clock domain
@@ -108,7 +110,7 @@ class PanoG1 extends Component {
 
         val u_pano_core = new PanoCoreG1(clkMainDomain)
 
-        u_pano_core.io.led_red      <> io.led_red
+//        u_pano_core.io.led_red      <> io.led_red
         u_pano_core.io.led_green    <> io.led_green
         u_pano_core.io.led_blue     <> io.led_blue
 
