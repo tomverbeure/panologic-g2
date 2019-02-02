@@ -555,7 +555,12 @@ void UsbTest()
    isp1760_write32(HC_ATL_PTD_LASTPTD_REG,0x80000000);
    isp1760_write32(HC_ATL_PTD_SKIPMAP_REG,0);
 
-// Poll interrupt register for 2 seconds...
+   isp1760_write32(HC_ATL_IRQ_MASK_OR_REG,1);
+   isp1760_write32(HC_INTERRUPT_ENABLE,HC_ATL_INT | HC_SOT_INT);
+
+   isp1760_write32(HC_BUFFER_STATUS_REG,ATL_BUF_FILL);
+
+// Poll interrupt register for up to 2 seconds...
    {
       int i = 0;
       int Toggle = 0;
@@ -600,6 +605,7 @@ void UsbTest()
                }
                if(Value & (1 << 8)) {
                   print(" ATL");
+                  i = 0x7fffffff;
                }
                if(Value & (1 << 9)) {
                   print(" ISO");
