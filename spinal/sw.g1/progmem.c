@@ -50,13 +50,14 @@ int main()
 {
    REG_WR(GPIO_DIR_ADDR, 0xff);
    UartInit();
-   UsbInit();
     clear();
     print("Pano Logic G1 Reverse Engineering\n");
     print("---------------------------------\n");
     print("\n");
     print("\n");
     print("Code at github.com/tomverbeure/panologic-g2\n");
+
+    UsbInit();
 
  // Turn off all LEDS
     REG_WR(GPIO_WRITE_ADDR, GPIO_BIT_LED_GREEN | GPIO_BIT_LED_BLUE | GPIO_BIT_LED_RED);

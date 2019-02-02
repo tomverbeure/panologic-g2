@@ -6,10 +6,12 @@
 #include "isp1760-regs.h"
 #include "print.h"
 #include "usb_ch9.h"
+#include "gpio.h"
 
 #define WAIT_CYCLES_1MS    1184
 
 #define RW_TEST_VALUE   0x5555aaaa
+#define INT_REG_RESERVED_BITS 0xfffffc15
 
 #ifdef __GNUC__
 #define GCC_PACKED __attribute__ ((packed))
@@ -409,7 +411,7 @@ void UsbRegDump()
    }
 }
 
-u32 Setup[8] = {
+u32 PtdSetup[8] = {
    0x21000041,   // DW0
    0x00000800,   // DW1
    0x10038000,   // DW2
@@ -437,7 +439,7 @@ dw2: 0x10038000 = 0001 0000 0000 0011 1000 0000 0000 0000
                      |   |  |                 |
 */
  
-u32 SetAdr[8] = {
+u32 PtdIn[8] = {
    0x21000200, // DW0
    0x00002400, // DW1
    0x10038100, // DW2
@@ -531,9 +533,19 @@ void UsbTest()
    print("Memdump before setup\n");
    Dump1760Mem();
 
+#if 0
+   print("\nIn PTD:\n");
+   DumpPtd(PtdIn);
+
+// Create a PTD that points to it
+   mem_writes8(ATL_PTD_OFFSET+4,&PtdIn[1],sizeof(PtdIn) - 4);
+   mem_writes8(ATL_PTD_OFFSET,PtdIn,4);
+#else
    print("\nsetup PTD:\n");
-   DumpPtd(Setup);
-   SetUsbAddress(1);
+   DumpPtd(PtdSetup);
+   GetDevDesc();
+//   SetUsbAddress(1);
+#endif
 
    print("Memdump after setup\n");
    Dump1760Mem();
@@ -543,6 +555,61 @@ void UsbTest()
    isp1760_write32(HC_ATL_PTD_LASTPTD_REG,0x80000000);
    isp1760_write32(HC_ATL_PTD_SKIPMAP_REG,0);
 
+// Poll interrupt register for 2 seconds...
+   {
+      int i = 0;
+      int Toggle = 0;
+
+      while(i < 2000) {
+         Value = isp1760_read32(HC_INTERRUPT_REG) & ~INT_REG_RESERVED_BITS;
+         if(Value != 0) {
+            i++;
+            if(Value == HC_SOT_INT) {
+               i++;
+#if 0
+               uint32_t Leds = REG_RD(GPIO_READ_ADDR);
+               if(Toggle) {
+                  Toggle = 0;
+                  Leds |= GPIO_BIT_LED_RED;
+               }
+               else {
+                  Toggle = 1;
+                  Leds &= ~GPIO_BIT_LED_RED;
+               }
+               REG_WR(GPIO_WRITE_ADDR,Leds);
+#endif
+            }
+            else {
+               print("ints: ");
+               print_int(Value,3);
+               if(Value & HC_SOT_INT) {
+                  i++;
+                  print(" SOT");
+               }
+               if(Value & HC_EOT_INT) {
+                  print(" EOT");
+               }
+               if(Value & (1 << 5)) {
+                  print(" SUSP");
+               }
+               if(Value & (1 << 6)) {
+                  print(" CLKREADY");
+               }
+               if(Value & (1 << 7)) {
+                  print(" INT");
+               }
+               if(Value & (1 << 8)) {
+                  print(" ATL");
+               }
+               if(Value & (1 << 9)) {
+                  print(" ISO");
+               }
+               print("\n");
+            }
+         }
+         isp1760_write32(HC_INTERRUPT_REG,Value);
+      }
+   }
    Value = isp1760_read32(HC_USBCMD);
    Value |= (1 << 5);   // enable sync schedule ???
    isp1760_write32(HC_USBCMD,Value);
@@ -550,8 +617,8 @@ void UsbTest()
    msleep(1000);
 
    print("\nsetup PTD after sleep:\n");
-   mem_reads8(ATL_PTD_OFFSET,Setup,sizeof(Setup));
-   DumpPtd(Setup);
+   mem_reads8(ATL_PTD_OFFSET,PtdSetup,sizeof(PtdSetup));
+   DumpPtd(PtdSetup);
 
    UsbRegDump();
 
@@ -580,6 +647,7 @@ void UsbTest()
 
 void SetUsbAddress(uint8_t Adr)
 {
+#if 0
    SetupPkt Pkt;
 
    /* fill in setup packet */
@@ -589,16 +657,24 @@ void SetUsbAddress(uint8_t Adr)
    Pkt.wVal_u.wValueHi = 0;
    Pkt.wIndex = 0;
    Pkt.wLength = 0;
-
 // copy it into payload memory
    mem_writes8(/* PAYLOAD_OFFSET*/ 0x2000,&Pkt,sizeof(Pkt));
+
+#else
+   u32 Pkt[2] = {0x20500, 0x0};
+// copy it into payload memory
+#endif
+   mem_writes8(/* PAYLOAD_OFFSET*/ 0x2000,&Pkt,sizeof(Pkt));
+
 // Create a PTD that points to it
 
-   mem_writes8(ATL_PTD_OFFSET,Setup,sizeof(Setup));
+   mem_writes8(ATL_PTD_OFFSET+4,&PtdSetup[1],sizeof(PtdSetup) - 4);
+   mem_writes8(ATL_PTD_OFFSET,PtdSetup,4);
 }
 
 void GetDevDesc(uint8_t Adr)
 {
+#if 0
    SetupPkt Pkt;
 
    /* fill in setup packet */
@@ -608,12 +684,15 @@ void GetDevDesc(uint8_t Adr)
    Pkt.wVal_u.wValueHi = USB_DESCRIPTOR_DEVICE;
    Pkt.wIndex = 0;
    Pkt.wLength = sizeof(USB_DEVICE_DESCRIPTOR);
-
+#else
+   u32 Pkt[2] = {0x1000680, 0x120000};
+#endif
 // copy it into payload memory
    mem_writes8(/* PAYLOAD_OFFSET*/ 0x2000,&Pkt,sizeof(Pkt));
 // Create a PTD that points to it
 
-   mem_writes8(ATL_PTD_OFFSET,Setup,sizeof(Setup));
+   mem_writes8(ATL_PTD_OFFSET+4,&PtdSetup[1],sizeof(PtdSetup) - 4);
+   mem_writes8(ATL_PTD_OFFSET,PtdSetup,4);
 }
 
 
@@ -1039,8 +1118,8 @@ void InitTest()
    isp1760_write32(HC_HW_MODE_CTRL,0);
    isp1760_write32(HC_HW_MODE_CTRL,0);
 
-   print("Step 11 register dump\n");
-   UsbRegDump();
+//   print("Step 11 register dump\n");
+//   UsbRegDump();
    Value &= ~2;
    isp1760_write32(0x20,Value);
 
@@ -1095,8 +1174,8 @@ void InitTest()
    Value |= 1;
    isp1760_write32(0x300,Value);
 
-   print("Step 23 register dump\n");
-   UsbRegDump();
+//   print("Step 23 register dump\n");
+//   UsbRegDump();
 
 // Putting the host controller in operational mode:
 // 24. Write 1h (RS) to the USBCMD register (20h).
@@ -1117,8 +1196,8 @@ void InitTest()
    print("Waiting for cf bit\n");
    while((isp1760_read32(0x60) & 1) == 0);
 
-   print("Register dump after step 27:\n");
-   UsbRegDump();
+//   print("Register dump after step 27:\n");
+//   UsbRegDump();
 
 // PTD register initialization part 2:
 // 28. Write 8000 0000h to the ATL PTD Last PTD register (158h).
@@ -1129,8 +1208,8 @@ void InitTest()
 
 // 30. Write 1h to the ISO PTD Last PTD register (138h).
    isp1760_write32(0x138,0x80000000);
-   print("Register dump after step 30:\n");
-   UsbRegDump();
+//   print("Register dump after step 30:\n");
+//   UsbRegDump();
 
 // Powering the root port:
 // 31. Write 1000h (PP) to the PORTSC1 register (64h).
