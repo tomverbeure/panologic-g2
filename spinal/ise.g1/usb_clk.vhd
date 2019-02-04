@@ -36,7 +36,7 @@ begin
    generic map( CLK_FEEDBACK => "1X",
             CLKDV_DIVIDE => 2.0,
             CLKFX_DIVIDE => 25,
-            CLKFX_MULTIPLY => 3,
+            CLKFX_MULTIPLY => 6,
             CLKIN_DIVIDE_BY_2 => FALSE,
             CLKIN_PERIOD => 10.000,
             CLKOUT_PHASE_SHIFT => "NONE",

@@ -25,6 +25,7 @@ class PanoG1 extends Component {
         val usb_clkin = out(Bool)
         val usb_reset_n = out(Bool)
         val usb_hub_reset_n = out(Bool)
+        val usb_hub_clkin = out(Bool)
     }
 
     noIoPrefix()
@@ -32,7 +33,30 @@ class PanoG1 extends Component {
 //  USB controller clock
     val usb_clk = new Usb_clk()
     usb_clk.io.CLKIN_IN  <> io.osc_clk
-    usb_clk.io.CLKFX_OUT <> io.usb_clkin
+    usb_clk.io.CLKFX_OUT <> io.usb_hub_clkin
+
+
+    //============================================================
+    // Create osc_clk clock domain
+    //============================================================
+    val usbClkDomain = ClockDomain(
+        clock = usb_clk.io.CLKFX_OUT,
+        frequency = FixedFrequency(24 MHz),
+        config = ClockDomainConfig(
+                    resetKind = BOOT
+        )
+    )
+
+
+    //============================================================
+    // Create osc_clk clock domain
+    //============================================================
+    val clkDividerUsb = new ClockingArea(usbClkDomain) {
+        // Create div2 clock
+        val clk_cntr = Reg(Bool)
+        clk_cntr := !clk_cntr
+        io.usb_clkin := clk_cntr
+    }
 
 
     //============================================================

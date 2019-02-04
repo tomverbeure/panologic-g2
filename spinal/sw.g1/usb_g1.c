@@ -326,6 +326,7 @@ void UsbInit()
    isp1760_write32(HC_HW_MODE_CTRL,0);
 }
 
+#if 0
 // Return 1 if USB controller is detected
 bool UsbProbe(void)
 {
@@ -388,6 +389,7 @@ bool UsbProbe(void)
 
    return Ret;
 }
+#endif
 
 void UsbRegDump()
 {
@@ -569,38 +571,21 @@ void UsbTest()
    GetDevDesc();
    SetUsbAddress(1);
    SetConfiguration(1,1);
-
    GetHubDesc(1);
 
-   msleep(1000);
-
-   for(i = 1; i < 4; i++) {
-      GetPortStatus(i);
-   }
-
 // Only Port 3 is connected
-   for(i = 1; i < 4; i++) {
-      SetHubFeature(bmREQ_SET_PORT_FEATURE,HUB_FEATURE_PORT_POWER,i);
-      ClearHubFeature(bmREQ_CLEAR_PORT_FEATURE,HUB_FEATURE_C_PORT_CONNECTION,i);
-      SetHubFeature(bmREQ_SET_PORT_FEATURE,HUB_FEATURE_PORT_RESET,i);
-   }
-
+   SetHubFeature(bmREQ_SET_PORT_FEATURE,HUB_FEATURE_PORT_POWER,3);
 
    msleep(1000);
    print("After powering up port 3\n");
-   for(i = 1; i < 4; i++) {
-      GetPortStatus(i);
-   }
-
-   ClearHubFeature(bmREQ_CLEAR_PORT_FEATURE,HUB_FEATURE_PORT_RESET,2);
+   ClearHubFeature(bmREQ_CLEAR_PORT_FEATURE,HUB_FEATURE_C_PORT_CONNECTION,3);
+   SetHubFeature(bmREQ_SET_PORT_FEATURE,HUB_FEATURE_PORT_RESET,3);
+   GetPortStatus(3);
    msleep(1000);
+   GetPortStatus(3);
 
-   print("After powering clearing reset\n");
-   for(i = 1; i < 4; i++) {
-      GetPortStatus(i);
-   }
-
-// Get device descriptor from the external hub
+// Get device descriptor from the root hub
+   print("Get external hub device desc\n");
    GetDevDesc();
 
    Dump1760Mem();
@@ -722,6 +707,30 @@ void GetPortStatus(uint16_t Port)
 {
    SetupPkt Pkt;
    uint32_t Status;
+#if 0
+   const struct {
+      const char *Desc;
+      uint8_t Bit;
+   } GCC_PACKED Bits[] = {
+      {" conn",0},
+      {" enabled",1},
+      {" suspend",2},
+      {" oc",3},
+      {" rst",4},
+      {" pwr",8},
+      {" lo_spd",9},
+      {" hi_spd",10},
+      {" tst",11},
+      {" ind",12},
+      {" conn_ch",16},
+      {" en_ch",17},
+      {" suspend_ch",18},
+      {" oc_ch",19},
+      {" rst_ch",20},
+      {NULL}
+   };
+#endif
+   int i;
 
    /* fill in setup packet */
    Pkt.ReqType_u.bmRequestType = bmREQ_GET_PORT_STATUS;
@@ -748,7 +757,7 @@ void GetPortStatus(uint16_t Port)
       print_int(Port,3);
       mem_reads8(0x2008,&Status,sizeof(Status));
       print_1cr(" status",Status);
-#if 1
+#if 0
       if(Status != 0) {
          if(Status & 1) {
             print(" conn");
@@ -789,14 +798,26 @@ void GetPortStatus(uint16_t Port)
          if(Status & (1 << 18)) {
             print(" suspend_ch");
          }
-         if(Status & (1 << 17)) {
+         if(Status & (1 << 19)) {
             print(" oc_ch");
          }
-         if(Status & (1 << 18)) {
+         if(Status & (1 << 20)) {
             print(" rst_ch");
          }
          print("\n");
       }
+#else
+#if 0
+      if(Status != 0) {
+         for(i = 0; Bits[i].Desc != NULL; i++) {
+            if(Status && (1 << Bits[i].Bit) ) {
+               print(" ");
+               print(Bits[i].Desc);
+            }
+            print("\n");
+         }
+      }
+#endif
 #endif
    } while(false);
 }
@@ -844,7 +865,7 @@ void GetHubDesc(uint16_t Adr)
 
 void GetDevDesc(uint8_t Adr)
 {
-#if 0
+#if 1
    USB_DEVICE_DESCRIPTOR DevDesc;
    SetupPkt Pkt;
 
