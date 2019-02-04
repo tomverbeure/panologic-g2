@@ -273,6 +273,12 @@ NET "usb_d[0]" LOC = V6 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 16;
 NET "usb_clkin" LOC = K6;
 NET "usb_clkin" IOSTANDARD = LVCMOS33;
 #============================================================
+# USB Host - ISP1760BE
+#============================================================
+
+NET "usb_hub_reset_n" LOC = H4 | IOSTANDARD = LVCMOS33;
+
+#============================================================
 # Board to Board Connector
 #============================================================
 #NET "b2b_a[18]"  LOC = E5  | IOSTANDARD = LVCMOS33;          # B2B A[18]

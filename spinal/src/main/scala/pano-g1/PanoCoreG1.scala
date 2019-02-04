@@ -55,10 +55,10 @@ class PanoCoreG1(voClkDomain: ClockDomain) extends Component {
     u_led_ctrl.io.apb                       <> u_cpu_top.io.led_ctrl_apb
     u_led_ctrl.io.gpio.write(0)             <> io.led_green
     // u_led_ctrl.io.gpio.write(1)             <> io.led_blue
-    // u_led_ctrl.io.gpio.write(2)          <> io.led_red
+    u_led_ctrl.io.gpio.write(2)             <> io.led_red
     u_led_ctrl.io.gpio.read(0)              := io.led_green
     u_led_ctrl.io.gpio.read(1)              := io.led_blue
-    u_led_ctrl.io.gpio.read(2)              := False
+    u_led_ctrl.io.gpio.read(2)              := io.led_red
     u_led_ctrl.io.gpio.read(3)              := io.switch_
 
     //============================================================

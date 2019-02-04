@@ -24,6 +24,7 @@ class PanoG1 extends Component {
         val usb_wr_ = out(Bool)
         val usb_clkin = out(Bool)
         val usb_reset_n = out(Bool)
+        val usb_hub_reset_n = out(Bool)
     }
 
     noIoPrefix()
@@ -32,7 +33,6 @@ class PanoG1 extends Component {
     val usb_clk = new Usb_clk()
     usb_clk.io.CLKIN_IN  <> io.osc_clk
     usb_clk.io.CLKFX_OUT <> io.usb_clkin
-    io.led_red := usb_clk.io.CLKFX_OUT
 
 
     //============================================================
@@ -88,6 +88,7 @@ class PanoG1 extends Component {
     }
 
     io.usb_reset_n := main_reset_
+    io.usb_hub_reset_n := main_reset_
 
     val main_clk    = Bool
     main_clk       := clkDivider.main_clk_raw
@@ -110,7 +111,7 @@ class PanoG1 extends Component {
 
         val u_pano_core = new PanoCoreG1(clkMainDomain)
 
-//        u_pano_core.io.led_red      <> io.led_red
+        u_pano_core.io.led_red      <> io.led_red
         u_pano_core.io.led_green    <> io.led_green
         u_pano_core.io.led_blue     <> io.led_blue
 

@@ -10,7 +10,7 @@ ASFLAGS         = -march=rv32i -mabi=ilp32
 LD              = $(TARGET)-gcc
 LDFLAGS         = -march=rv32i -mabi=ilp32 -Wl,-Tsections.lds,-Map,progmem.map -ffreestanding -nostartfiles
 CC              = $(TARGET)-gcc
-CFLAGS          = -march=rv32i -mabi=ilp32 -Wall -Wextra -pedantic -DFREQ=$(FREQ_PLL)000000 -O2 -DPRINT_UART -Iinclude -fno-builtin-printf
+CFLAGS          = -march=rv32i -mabi=ilp32 -Wall -Wextra -DFREQ=$(FREQ_PLL)000000 -O2 -DPRINT_UART -Iinclude -fno-builtin-printf
 OBJCOPY         = $(TARGET)-objcopy
 OBJDUMP         = $(TARGET)-objdump
 

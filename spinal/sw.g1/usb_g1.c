@@ -7,6 +7,7 @@
 #include "print.h"
 #include "usb_ch9.h"
 #include "gpio.h"
+#include "usbhub.h"
 
 #define WAIT_CYCLES_1MS    1184
 
@@ -194,10 +195,18 @@ static void isp1760_bits(u32 reg,u32 Sets,u32 Resets);
 
 void UsbTest(void);
 void print_1cr(const char *label,int value);
-void DumpPtd(u32 *p);
+void DumpPtd(const char *msg,u32 *p);
 void DumpResetReg(int Line);
 void Dump1760Mem(void);
 void InitTest(void);
+int _DoTransfer(u32 *ptd,const char *Func,int Line);
+#define DoTransfer(x)  _DoTransfer(x,__FUNCTION__,__LINE__)
+
+void SetConfiguration(uint8_t Adr,uint8_t Configuration);
+void SetHubFeature(uint8_t bmRequestType,uint8_t bRequest,uint16_t wIndex);
+void ClearHubFeature(uint8_t bmRequestType,uint8_t bRequest,uint16_t wIndex);
+void GetPortStatus(uint16_t Port);
+void GetHubDesc(uint16_t Adr);
 
 void msleep(int ms)
 {
@@ -411,6 +420,7 @@ void UsbRegDump()
    }
 }
 
+
 u32 PtdSetup[8] = {
    0x21000041,   // DW0
    0x00000800,   // DW1
@@ -421,6 +431,18 @@ u32 PtdSetup[8] = {
    0x00000000,   // DW6
    0x00000000    // DW7
 };
+
+u32 PtdSetup2[8] = {
+   0x21000041,   // DW0
+   0x00000810,   // DW1
+   0x10038000,   // DW2
+   0x83800000,   // DW3
+   0x00000000,   // DW4
+   0x00000000,   // DW5
+   0x00000000,   // DW6
+   0x00000000    // DW7
+};
+
 /* 
  dw3: 0x83800000 = 1000 0011 1000 0000 0000 0000 0000 0000
                    ^^^^ X^^^ ^^^...^^...............^
@@ -440,7 +462,7 @@ dw2: 0x10038000 = 0001 0000 0000 0011 1000 0000 0000 0000
 */
  
 u32 PtdIn[8] = {
-   0x21000200, // DW0
+   0x21000201, // DW0
    0x00002400, // DW1
    0x10038100, // DW2
    0x83800000, // DW3
@@ -450,6 +472,16 @@ u32 PtdIn[8] = {
    0x00000000, // DW7
 };
 
+u32 PtdIn2[8] = {
+   0x21000201, // DW0
+   0x00002410, // DW1
+   0x10038100, // DW2
+   0x83800000, // DW3
+   0x00000000, // DW4
+   0x00000000, // DW5
+   0x00000000, // DW6
+   0x00000000, // DW7
+};
 
 void UsbTest()
 {
@@ -529,126 +561,49 @@ void UsbTest()
    msleep(2);
 #endif
 
-// Get device descriptor from the root hub
-   print("Memdump before setup\n");
-   Dump1760Mem();
-
-#if 0
-   print("\nIn PTD:\n");
-   DumpPtd(PtdIn);
-
-// Create a PTD that points to it
-   mem_writes8(ATL_PTD_OFFSET+4,&PtdIn[1],sizeof(PtdIn) - 4);
-   mem_writes8(ATL_PTD_OFFSET,PtdIn,4);
-#else
-   print("\nsetup PTD:\n");
-   DumpPtd(PtdSetup);
-   GetDevDesc();
-//   SetUsbAddress(1);
-#endif
-
-   print("Memdump after setup\n");
-   Dump1760Mem();
-
-// Set ATL Skip Map register
-//   isp1760_write32(HC_ATL_PTD_SKIPMAP_REG,0xffffffe);
-   isp1760_write32(HC_ATL_PTD_LASTPTD_REG,0x80000000);
-   isp1760_write32(HC_ATL_PTD_SKIPMAP_REG,0);
-
    isp1760_write32(HC_ATL_IRQ_MASK_OR_REG,1);
    isp1760_write32(HC_INTERRUPT_ENABLE,HC_ATL_INT | HC_SOT_INT);
 
-   isp1760_write32(HC_BUFFER_STATUS_REG,ATL_BUF_FILL);
+// Get device descriptor from the root hub
+   print("Get root hub device desc\n");
+   GetDevDesc();
+   SetUsbAddress(1);
+   SetConfiguration(1,1);
 
-// Poll interrupt register for up to 2 seconds...
-   {
-      int i = 0;
-      int Toggle = 0;
-
-      while(i < 2000) {
-         Value = isp1760_read32(HC_INTERRUPT_REG) & ~INT_REG_RESERVED_BITS;
-         if(Value != 0) {
-            i++;
-            if(Value == HC_SOT_INT) {
-               i++;
-#if 0
-               uint32_t Leds = REG_RD(GPIO_READ_ADDR);
-               if(Toggle) {
-                  Toggle = 0;
-                  Leds |= GPIO_BIT_LED_RED;
-               }
-               else {
-                  Toggle = 1;
-                  Leds &= ~GPIO_BIT_LED_RED;
-               }
-               REG_WR(GPIO_WRITE_ADDR,Leds);
-#endif
-            }
-            else {
-               print("ints: ");
-               print_int(Value,3);
-               if(Value & HC_SOT_INT) {
-                  i++;
-                  print(" SOT");
-               }
-               if(Value & HC_EOT_INT) {
-                  print(" EOT");
-               }
-               if(Value & (1 << 5)) {
-                  print(" SUSP");
-               }
-               if(Value & (1 << 6)) {
-                  print(" CLKREADY");
-               }
-               if(Value & (1 << 7)) {
-                  print(" INT");
-               }
-               if(Value & (1 << 8)) {
-                  print(" ATL");
-                  i = 0x7fffffff;
-               }
-               if(Value & (1 << 9)) {
-                  print(" ISO");
-               }
-               print("\n");
-            }
-         }
-         isp1760_write32(HC_INTERRUPT_REG,Value);
-      }
-   }
-   Value = isp1760_read32(HC_USBCMD);
-   Value |= (1 << 5);   // enable sync schedule ???
-   isp1760_write32(HC_USBCMD,Value);
+   GetHubDesc(1);
 
    msleep(1000);
 
-   print("\nsetup PTD after sleep:\n");
-   mem_reads8(ATL_PTD_OFFSET,PtdSetup,sizeof(PtdSetup));
-   DumpPtd(PtdSetup);
+   for(i = 1; i < 4; i++) {
+      GetPortStatus(i);
+   }
 
-   UsbRegDump();
+// Only Port 3 is connected
+   for(i = 1; i < 4; i++) {
+      SetHubFeature(bmREQ_SET_PORT_FEATURE,HUB_FEATURE_PORT_POWER,i);
+      ClearHubFeature(bmREQ_CLEAR_PORT_FEATURE,HUB_FEATURE_C_PORT_CONNECTION,i);
+      SetHubFeature(bmREQ_SET_PORT_FEATURE,HUB_FEATURE_PORT_RESET,i);
+   }
 
-   print("Memdump after sleep\n");
+
+   msleep(1000);
+   print("After powering up port 3\n");
+   for(i = 1; i < 4; i++) {
+      GetPortStatus(i);
+   }
+
+   ClearHubFeature(bmREQ_CLEAR_PORT_FEATURE,HUB_FEATURE_PORT_RESET,2);
+   msleep(1000);
+
+   print("After powering clearing reset\n");
+   for(i = 1; i < 4; i++) {
+      GetPortStatus(i);
+   }
+
+// Get device descriptor from the external hub
+   GetDevDesc();
+
    Dump1760Mem();
-
-
-#if 0
-   print("Waiting for PTD done...");
-
-   for( ; ; ) {
-      if((Value = isp1760_read32(HC_ATL_PTD_DONEMAP_REG)) != 0) {
-         break;
-      }
-   }
-   print_1cr("\nPTD_DONEMAP_REG: ",Value);
-
-   print("set address PTD:\n");
-   DumpPtd(SetAdr);
-
-   UsbRegDump();
-   msleep(1000);
-#endif
-
 }
 
 void SetUsbAddress(uint8_t Adr)
@@ -664,23 +619,233 @@ void SetUsbAddress(uint8_t Adr)
    Pkt.wIndex = 0;
    Pkt.wLength = 0;
 // copy it into payload memory
-   mem_writes8(/* PAYLOAD_OFFSET*/ 0x2000,&Pkt,sizeof(Pkt));
 
 #else
    u32 Pkt[2] = {0x20500, 0x0};
 // copy it into payload memory
 #endif
+   do {
+   // copy it into payload memory
+      mem_writes8(/* PAYLOAD_OFFSET*/ 0x2000,&Pkt,sizeof(Pkt));
+   // Create a PTD that points to it
+
+      if(DoTransfer(PtdSetup)) {
+         break;
+      }
+      if(DoTransfer(PtdIn)) {
+         break;
+      }
+   } while(false);
+}
+
+void SetConfiguration(uint8_t Adr,uint8_t Configuration)
+{
+   SetupPkt Pkt;
+
+   /* fill in setup packet */
+   Pkt.ReqType_u.bmRequestType = bmREQ_SET;
+   Pkt.bRequest = USB_REQUEST_SET_CONFIGURATION;
+   Pkt.wVal_u.wValueLo = Configuration;
+   Pkt.wVal_u.wValueHi = 0;
+   Pkt.wIndex = 0;
+   Pkt.wLength = 0;
+// copy it into payload memory
    mem_writes8(/* PAYLOAD_OFFSET*/ 0x2000,&Pkt,sizeof(Pkt));
 
-// Create a PTD that points to it
+   do {
+   // Create a PTD that points to it
+      if(DoTransfer(PtdSetup2)) {
+         break;
+      }
 
-   mem_writes8(ATL_PTD_OFFSET+4,&PtdSetup[1],sizeof(PtdSetup) - 4);
-   mem_writes8(ATL_PTD_OFFSET,PtdSetup,4);
+      if(DoTransfer(PtdIn2)) {
+         break;
+      }
+   } while(false);
 }
+
+void SetHubFeature(uint8_t bmRequestType,uint8_t bRequest,uint16_t wIndex)
+{
+   SetupPkt Pkt;
+
+   /* fill in setup packet */
+   Pkt.ReqType_u.bmRequestType = bmRequestType;
+   Pkt.bRequest = USB_REQUEST_SET_FEATURE;
+   Pkt.wVal_u.wValueLo = bRequest;
+   Pkt.wVal_u.wValueHi = 0;
+   Pkt.wIndex = wIndex;
+   Pkt.wLength = 0;
+
+// copy it into payload memory
+   mem_writes8(/* PAYLOAD_OFFSET*/ 0x2000,&Pkt,sizeof(Pkt));
+
+   do {
+   // Create a PTD that points to it
+      if(DoTransfer(PtdSetup2)) {
+         break;
+      }
+
+      if(DoTransfer(PtdIn2)) {
+         break;
+      }
+   } while(false);
+}
+
+void ClearHubFeature(uint8_t bmRequestType,uint8_t bRequest,uint16_t wIndex)
+{
+   SetupPkt Pkt;
+
+   /* fill in setup packet */
+   Pkt.ReqType_u.bmRequestType = bmRequestType;
+   Pkt.bRequest = USB_REQUEST_CLEAR_FEATURE;
+   Pkt.wVal_u.wValueLo = bRequest;
+   Pkt.wVal_u.wValueHi = 0;
+   Pkt.wIndex = wIndex;
+   Pkt.wLength = 0;
+
+// copy it into payload memory
+   mem_writes8(/* PAYLOAD_OFFSET*/ 0x2000,&Pkt,sizeof(Pkt));
+
+   do {
+   // Create a PTD that points to it
+      if(DoTransfer(PtdSetup2)) {
+         break;
+      }
+
+      if(DoTransfer(PtdIn2)) {
+         break;
+      }
+   } while(false);
+}
+
+void GetPortStatus(uint16_t Port)
+{
+   SetupPkt Pkt;
+   uint32_t Status;
+
+   /* fill in setup packet */
+   Pkt.ReqType_u.bmRequestType = bmREQ_GET_PORT_STATUS;
+   Pkt.bRequest = USB_REQUEST_GET_STATUS;
+   Pkt.wVal_u.wValueLo = 0;
+   Pkt.wVal_u.wValueHi = 0;
+   Pkt.wIndex = Port;
+   Pkt.wLength = sizeof(Status);
+
+// copy it into payload memory
+   mem_writes8(/* PAYLOAD_OFFSET*/ 0x2000,&Pkt,sizeof(Pkt));
+
+   do {
+   // Create a PTD that points to it
+      if(DoTransfer(PtdSetup2)) {
+         break;
+      }
+
+      if(DoTransfer(PtdIn2)) {
+         print_1cr("Port",Port);
+         break;
+      }
+      print("Port ");
+      print_int(Port,3);
+      mem_reads8(0x2008,&Status,sizeof(Status));
+      print_1cr(" status",Status);
+#if 1
+      if(Status != 0) {
+         if(Status & 1) {
+            print(" conn");
+         }
+         if(Status & 2) {
+            print(" enabled");
+         }
+         if(Status & 4) {
+            print(" suspend");
+         }
+         if(Status & 8) {
+            print(" oc");
+         }
+         if(Status & 0x10) {
+            print(" rst");
+         }
+         if(Status & (1 << 8)) {
+            print(" pwr");
+         }
+         if(Status & (1 << 9)) {
+            print(" lo_spd");
+         }
+         if(Status & (1 << 10)) {
+            print(" hi_spd");
+         }
+         if(Status & (1 << 11)) {
+            print(" tst");
+         }
+         if(Status & (1 << 12)) {
+            print(" ind");
+         }
+         if(Status & (1 << 16)) {
+            print(" conn_ch");
+         }
+         if(Status & (1 << 17)) {
+            print(" en_ch");
+         }
+         if(Status & (1 << 18)) {
+            print(" suspend_ch");
+         }
+         if(Status & (1 << 17)) {
+            print(" oc_ch");
+         }
+         if(Status & (1 << 18)) {
+            print(" rst_ch");
+         }
+         print("\n");
+      }
+#endif
+   } while(false);
+}
+
+void GetHubDesc(uint16_t Adr)
+{
+   SetupPkt Pkt;
+   uint32_t Status;
+   struct HubDescriptor Desc;
+
+   /* fill in setup packet */
+   Pkt.ReqType_u.bmRequestType = bmREQ_GET_HUB_DESCRIPTOR;
+   Pkt.bRequest = USB_REQUEST_GET_DESCRIPTOR;
+   Pkt.wVal_u.wValueLo = 0;
+   Pkt.wVal_u.wValueHi = 0x29;
+   Pkt.wIndex = 0;
+   Pkt.wLength = sizeof(Desc);
+
+// copy it into payload memory
+   mem_writes8(/* PAYLOAD_OFFSET*/ 0x2000,&Pkt,sizeof(Pkt));
+
+   do {
+   // Create a PTD that points to it
+      if(DoTransfer(PtdSetup2)) {
+         break;
+      }
+
+      if(DoTransfer(PtdIn2)) {
+         break;
+      }
+      mem_reads8(0x2008,&Desc,sizeof(Desc));
+
+#if 1
+      print_1cr("bDescLength",Desc.bDescLength);
+      print_1cr("bDescriptorType",Desc.bDescriptorType);
+      print_1cr("bNbrPorts",Desc.bNbrPorts);
+      print_1cr("wHubCharacteristics",Desc.wHubCharacteristics);
+      print_1cr("bPwrOn2PwrGood",Desc.bPwrOn2PwrGood);
+      print_1cr("bHubContrCurrent",Desc.bHubContrCurrent);
+      Dump1760Mem();
+#endif
+   } while(false);
+}
+
 
 void GetDevDesc(uint8_t Adr)
 {
 #if 0
+   USB_DEVICE_DESCRIPTOR DevDesc;
    SetupPkt Pkt;
 
    /* fill in setup packet */
@@ -690,15 +855,35 @@ void GetDevDesc(uint8_t Adr)
    Pkt.wVal_u.wValueHi = USB_DESCRIPTOR_DEVICE;
    Pkt.wIndex = 0;
    Pkt.wLength = sizeof(USB_DEVICE_DESCRIPTOR);
-#else
-   u32 Pkt[2] = {0x1000680, 0x120000};
-#endif
-// copy it into payload memory
-   mem_writes8(/* PAYLOAD_OFFSET*/ 0x2000,&Pkt,sizeof(Pkt));
-// Create a PTD that points to it
 
-   mem_writes8(ATL_PTD_OFFSET+4,&PtdSetup[1],sizeof(PtdSetup) - 4);
-   mem_writes8(ATL_PTD_OFFSET,PtdSetup,4);
+   do {
+   // copy it into payload memory
+      mem_writes8(/* PAYLOAD_OFFSET*/ 0x2000,&Pkt,sizeof(Pkt));
+   // Create a PTD that points to it
+
+      if(DoTransfer(PtdSetup)) {
+         break;
+      }
+      if(DoTransfer(PtdIn)) {
+         break;
+      }
+      mem_reads8(0x2008,&DevDesc,sizeof(DevDesc));
+      print_1cr("bLength",DevDesc.bLength);
+      print_1cr("bDescriptorType",DevDesc.bDescriptorType);
+      print_1cr("bcdUSB",DevDesc.bcdUSB);
+      print_1cr("bDeviceClass",DevDesc.bDeviceClass);
+      print_1cr("bDeviceSubClass",DevDesc.bDeviceSubClass);
+      print_1cr("bDeviceProtocol",DevDesc.bDeviceProtocol);
+      print_1cr("bMaxPacketSize0",DevDesc.bMaxPacketSize0);
+      print_1cr("idVendor",DevDesc.idVendor);
+      print_1cr("idProduct",DevDesc.idProduct);
+      print_1cr("bcdDevice",DevDesc.bcdDevice);
+      print_1cr("iManufacturer",DevDesc.iManufacturer);
+      print_1cr("iProduct",DevDesc.iProduct);
+      print_1cr("iSerialNumber",DevDesc.iSerialNumber);
+      print_1cr("bNumConfigurations",DevDesc.bNumConfigurations);
+   } while(false);
+#endif
 }
 
 
@@ -787,7 +972,7 @@ void print_1cr(const char *label,int value)
    print("\n");
 }
 
-void DumpPtd(u32 *p)
+void DumpPtd(const char *msg,u32 *p)
 {
    const char *TokenTbl[] = {
       "OUT",
@@ -801,10 +986,30 @@ void DumpPtd(u32 *p)
       "bulk",
       "???"
    };
+   int EndPt;
 
-   int EndPt = ((p[0] >> 31) & 1) + ((p[1] & 07) << 1);
+   print(msg);
+   print("\n");
+   EndPt = ((p[0] >> 31) & 1) + ((p[1] & 07) << 1);
+
    print_1cr("V",p[0] & 1);
+   if((p[3] >> 29) & 0x1) {
+      print("Babble!\n");
+   }
+   if((p[3] >> 30) & 0x1) {
+      print("Halt!\n");
+   }
+
+   if((p[3] >> 28) & 0x1) {
+      print("Error!\n");
+   }
+   print_1cr("A",(p[3] >> 31) & 0x1);
    print_1cr("BytesTodo",(p[0] >> 3) & 0x7fff);
+   print_1cr("BytesDone",p[3] & 0x7fff);
+
+   print_1cr("NakCnt",(p[3] >> 19) & 0xf);
+   print_1cr("RL",(p[2] >> 25) & 0xf);
+
    print_1cr("MaxPak",(p[0] >> 18) & 0x7ff);
    print_1cr("Multp",(p[0] >> 29) & 0x3);
    print_1cr("EndPt",EndPt);
@@ -817,24 +1022,16 @@ void DumpPtd(u32 *p)
 
    print_1cr("\nSplit",(p[1] >> 14) & 0x1);
 
-   print_1cr("Start Adr internal",((p[2] >> 8) & 0xffff) << 3);
-   print_1cr("Start Adr cpu",(((p[2] >> 8) & 0xffff) << 3) + 0x400);
-   print_1cr("RL",(p[2] >> 25) & 0xf);
+   print_1cr("Start Adr",(((p[2] >> 8) & 0xffff) << 3) + 0x400);
 
-   print_1cr("BytesDone",p[3] & 0x7fff);
-   print_1cr("NakCnt",(p[3] >> 19) & 0xf);
    print_1cr("Cerr",(p[3] >> 23) & 0x3);
    print_1cr("DT",(p[3] >> 25) & 0x1);
    print_1cr("Ping",(p[3] >> 26) & 0x1);
-   print_1cr("X",(p[3] >> 28) & 0x1);
-   print_1cr("B",(p[3] >> 29) & 0x1);
-   print_1cr("H",(p[3] >> 30) & 0x1);
-   print_1cr("A",(p[3] >> 31) & 0x1);
 
-   print_1cr("NextPTD",p[4] & 0x1f);
    print_1cr("J",(p[4] >> 5) & 0x1);
-
+   print_1cr("NextPTD",p[4] & 0x1f);
 }
+
 
 #if 0
 uint8_t ctrlReq(
@@ -942,6 +1139,8 @@ void Dump1760Mem()
 {
    int i;
    u32 Value;
+
+   print("1760 Memdump:\n");
 
    isp1760_write32(HC_MEMORY_REG,0x400);
    for(i = 0; i < 16128; i++) {
@@ -1242,3 +1441,113 @@ void InitTest()
    print("Register dump after step 36:\n");
    UsbRegDump();
 }
+
+// return 0 on success
+int _DoTransfer(u32 *ptd,const char *Func,int Line)
+{
+   u32 Value;
+   int Ret = 1;   // assume the worse
+   u32 PtdBuf[8];
+
+   mem_writes8(ATL_PTD_OFFSET+4,&ptd[1],28);
+   mem_writes8(ATL_PTD_OFFSET,ptd,4);
+
+// Set ATL Skip Map register
+//   isp1760_write32(HC_ATL_PTD_SKIPMAP_REG,0xffffffe);
+   isp1760_write32(HC_ATL_PTD_LASTPTD_REG,0x80000000);
+   isp1760_write32(HC_ATL_PTD_SKIPMAP_REG,0);
+
+   isp1760_write32(HC_ATL_IRQ_MASK_OR_REG,1);
+   isp1760_write32(HC_INTERRUPT_ENABLE,HC_ATL_INT | HC_SOT_INT);
+
+   isp1760_write32(HC_BUFFER_STATUS_REG,ATL_BUF_FILL);
+
+// Poll interrupt register for up to 2 seconds...
+   {
+      int i = 0;
+      int Toggle = 0;
+
+      while(i < 2000) {
+         Value = isp1760_read32(HC_INTERRUPT_REG) & ~INT_REG_RESERVED_BITS;
+         if(Value != 0) {
+            i++;
+            if(Value == HC_SOT_INT) {
+               i++;
+#if 0
+               uint32_t Leds = REG_RD(GPIO_READ_ADDR);
+               if(Toggle) {
+                  Toggle = 0;
+                  Leds |= GPIO_BIT_LED_RED;
+               }
+               else {
+                  Toggle = 1;
+                  Leds &= ~GPIO_BIT_LED_RED;
+               }
+               REG_WR(GPIO_WRITE_ADDR,Leds);
+#endif
+            }
+            else {
+#if 1
+               if(Value & (1 << 8)) {
+                  i = 0x7fffffff;
+                  Ret = 0;
+               }
+#else
+               print("ints: ");
+               print_int(Value,3);
+               if(Value & HC_SOT_INT) {
+                  i++;
+                  print(" SOT");
+               }
+               if(Value & HC_EOT_INT) {
+                  print(" EOT");
+               }
+               if(Value & (1 << 5)) {
+                  print(" SUSP");
+               }
+               if(Value & (1 << 6)) {
+                  print(" CLKREADY");
+               }
+               if(Value & (1 << 7)) {
+                  print(" INT");
+               }
+               if(Value & (1 << 8)) {
+                  print(" ATL");
+                  i = 0x7fffffff;
+                  Ret = 0;
+               }
+               if(Value & (1 << 9)) {
+                  print(" ISO");
+               }
+               print("\n");
+#endif
+            }
+         }
+         isp1760_write32(HC_INTERRUPT_REG,Value);
+      }
+   }
+
+   isp1760_write32(HC_ATL_PTD_SKIPMAP_REG,0xffffffff);
+   isp1760_write32(HC_BUFFER_STATUS_REG,0);
+
+   if(Ret == 0) {
+   // Read the Done bit map to clear the bits
+      isp1760_read32(HC_ATL_PTD_DONEMAP_REG);
+   // Read back the Ptd to check status
+      mem_reads8(ATL_PTD_OFFSET,PtdBuf,sizeof(PtdBuf));
+      if(((PtdBuf[3] >> 28) & 0x1) || ((PtdBuf[3] >> 30) & 0x1)) {
+         Ret = 1;
+      }
+   }
+
+   if(Ret != 0) {
+      print_1cr(Func,Line);
+      DumpPtd("Transfer failed, ptd before:\n",ptd);
+      DumpPtd("\nafter",PtdBuf);
+      Dump1760Mem();
+   }
+
+
+   return Ret;
+}
+
