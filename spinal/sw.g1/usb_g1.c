@@ -587,6 +587,9 @@ void UsbTest()
 // Get device descriptor from the root hub
    print("Get external hub device desc\n");
    GetDevDesc();
+   SetUsbAddress(2);
+   SetConfiguration(2,1);
+   GetHubDesc(2);
 
    Dump1760Mem();
 }
@@ -707,7 +710,7 @@ void GetPortStatus(uint16_t Port)
 {
    SetupPkt Pkt;
    uint32_t Status;
-#if 0
+#if 1
    const struct {
       const char *Desc;
       uint8_t Bit;
@@ -807,7 +810,7 @@ void GetPortStatus(uint16_t Port)
          print("\n");
       }
 #else
-#if 0
+#if 1
       if(Status != 0) {
          for(i = 0; Bits[i].Desc != NULL; i++) {
             if(Status && (1 << Bits[i].Bit) ) {

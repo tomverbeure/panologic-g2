@@ -238,37 +238,85 @@ NET "usb_a[0]" LOC = N11;
 NET "usb_a[0]" IOSTANDARD = LVCMOS33;
 # usb_d[31:16] not connected.
 # Pin 58
-NET "usb_d[15]" LOC = V13 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 16;
+NET "usb_d[15]" LOC = V13;
+NET "usb_d[15]" IOSTANDARD = LVCMOS33;
+NET "usb_d[15]" DRIVE = 16;
+NET "usb_d[15]" SLEW = FAST;
 # Pin 57
-NET "usb_d[14]" LOC = R9 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 16;
+NET "usb_d[14]" LOC = R9;
+NET "usb_d[14]" IOSTANDARD = LVCMOS33;
+NET "usb_d[14]" DRIVE = 16;
+NET "usb_d[14]" SLEW = FAST;
 # Pin 56
-NET "usb_d[13]" LOC = V11 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 16;
+NET "usb_d[13]" LOC = V11;
+NET "usb_d[13]" IOSTANDARD = LVCMOS33;
+NET "usb_d[13]" DRIVE = 16;
+NET "usb_d[13]" SLEW = FAST;
 # Pin 54
-NET "usb_d[12]" LOC = U4 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 16;
+NET "usb_d[12]" LOC = U4;
+NET "usb_d[12]" IOSTANDARD = LVCMOS33;
+NET "usb_d[12]" DRIVE = 16;
+NET "usb_d[12]" SLEW = FAST;
 # Pin 52
-NET "usb_d[11]" LOC = M10 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 16;
+NET "usb_d[11]" LOC = M10;
+NET "usb_d[11]" IOSTANDARD = LVCMOS33;
+NET "usb_d[11]" DRIVE = 16;
+NET "usb_d[11]" SLEW = FAST;
 # Pin 51
-NET "usb_d[10]" LOC = R13 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 16;
+NET "usb_d[10]" LOC = R13;
+NET "usb_d[10]" IOSTANDARD = LVCMOS33;
+NET "usb_d[10]" DRIVE = 16;
+NET "usb_d[10]" SLEW = FAST;
 # Pin 49
-NET "usb_d[9]" LOC = P13 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 16;
+NET "usb_d[9]" LOC = P13;
+NET "usb_d[9]" IOSTANDARD = LVCMOS33;
+NET "usb_d[9]" DRIVE = 16;
+NET "usb_d[9]" SLEW = FAST;
 # Pin 47
-NET "usb_d[8]" LOC = R14 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 16;
+NET "usb_d[8]" LOC = R14;
+NET "usb_d[8]" IOSTANDARD = LVCMOS33;
+NET "usb_d[8]" DRIVE = 16;
+NET "usb_d[8]" SLEW = FAST;
 # Pin 46
-NET "usb_d[7]" LOC = T14 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 16;
+NET "usb_d[7]" LOC = T14;
+NET "usb_d[7]" IOSTANDARD = LVCMOS33;
+NET "usb_d[7]" DRIVE = 16;
+NET "usb_d[7]" SLEW = FAST;
 # Pin 45
-NET "usb_d[6]" LOC = T16 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 16;
+NET "usb_d[6]" LOC = T16;
+NET "usb_d[6]" IOSTANDARD = LVCMOS33;
+NET "usb_d[6]" DRIVE = 16;
+NET "usb_d[6]" SLEW = FAST;
 # Pin 43
-NET "usb_d[5]" LOC = M9 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 16;
+NET "usb_d[5]" LOC = M9;
+NET "usb_d[5]" IOSTANDARD = LVCMOS33;
+NET "usb_d[5]" DRIVE = 16;
+NET "usb_d[5]" SLEW = FAST;
 # Pin 42
-NET "usb_d[4]" LOC = N9 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 16;
+NET "usb_d[4]" LOC = N9;
+NET "usb_d[4]" IOSTANDARD = LVCMOS33;
+NET "usb_d[4]" DRIVE = 16;
+NET "usb_d[4]" SLEW = FAST;
 # Pin 41
-NET "usb_d[3]" LOC = V12 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 16;
+NET "usb_d[3]" LOC = V12;
+NET "usb_d[3]" IOSTANDARD = LVCMOS33;
+NET "usb_d[3]" DRIVE = 16;
+NET "usb_d[3]" SLEW = FAST;
 # Pin 39
-NET "usb_d[2]" LOC = T15 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 16;
+NET "usb_d[2]" LOC = T15;
+NET "usb_d[2]" IOSTANDARD = LVCMOS33;
+NET "usb_d[2]" DRIVE = 16;
+NET "usb_d[2]" SLEW = FAST;
 # Pin 38
-NET "usb_d[1]" LOC = U5 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 16;
+NET "usb_d[1]" LOC = U5;
+NET "usb_d[1]" IOSTANDARD = LVCMOS33;
+NET "usb_d[1]" DRIVE = 16;
+NET "usb_d[1]" SLEW = FAST;
 # Pin 37
-NET "usb_d[0]" LOC = V6 | IOSTANDARD = LVCMOS33 | SLEW = FAST | DRIVE = 16;
+NET "usb_d[0]" LOC = V6;
+NET "usb_d[0]" IOSTANDARD = LVCMOS33;
+NET "usb_d[0]" DRIVE = 16;
+NET "usb_d[0]" SLEW = FAST;
 # Pin 13
 NET "usb_clkin" LOC = K6;
 NET "usb_clkin" IOSTANDARD = LVCMOS33;
@@ -277,10 +325,12 @@ NET "usb_clkin" IOSTANDARD = LVCMOS33;
 # USB Hub - USB2513
 #============================================================
 
-NET "usb_hub_clkin" LOC = L2 | IOSTANDARD = LVCMOS33;
+NET "usb_hub_clkin" LOC = L2;
+NET "usb_hub_clkin" IOSTANDARD = LVCMOS33;
 #NET "usb_hub_scl" LOC = H2 | IOSTANDARD = LVCMOS33;
 #NET "usb_hub_sda" LOC = H3 | IOSTANDARD = LVCMOS33;
-NET "usb_hub_reset_n" LOC = H4 | IOSTANDARD = LVCMOS33;
+NET "usb_hub_reset_n" LOC = H4;
+NET "usb_hub_reset_n" IOSTANDARD = LVCMOS33;
 #NET "hub_hs_ind" LOC = H5 | IOSTANDARD = LVCMOS33;
 
 #============================================================
@@ -292,8 +342,11 @@ NET "pano_button" LOC = R7;
 NET "pano_button" IOSTANDARD = LVCMOS33;
 #NET "b2b_aa[16]" LOC = B7  | IOSTANDARD = LVCMOS33;          # B2B A'[16]
 
-INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol0" LOC = RAMB16_X0Y11;
-INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol1" LOC = RAMB16_X0Y4;
-INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol2" LOC = RAMB16_X0Y7;
-INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol3" LOC = RAMB16_X0Y3;
-
+INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol12" LOC = RAMB16_X1Y3;
+INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol01" LOC = RAMB16_X1Y8;
+INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol02" LOC = RAMB16_X0Y5;
+INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol11" LOC = RAMB16_X1Y5;
+INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol21" LOC = RAMB16_X1Y10;
+INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol31" LOC = RAMB16_X0Y6;
+INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol22" LOC = RAMB16_X0Y3;
+INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol32" LOC = RAMB16_X0Y11;
