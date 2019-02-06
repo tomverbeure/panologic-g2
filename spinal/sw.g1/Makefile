@@ -1,5 +1,5 @@
 
-MEM_WORDS       = 2048
+MEM_WORDS       = 4096
 
 OBJ_FILES       = start.o progmem.o print.o uart.o usb_g1.o
 
