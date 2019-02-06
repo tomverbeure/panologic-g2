@@ -1,18 +1,13 @@
-
 ADDRESS_SPACE progmem RAMB16 [0x00000000:0x00003FFF]
     BUS_BLOCK
-      // The order of the RAMs and bus data is wrong. But if I don't this, it doesn't work.
-      core_u_pano_core/u_mr1_top/u_cpu/ram/Mram_ram_symbol31 [31:24] PLACED=X0Y6;
-      core_u_pano_core/u_mr1_top/u_cpu/ram/Mram_ram_symbol21 [23:16] PLACED=X1Y10;
-      core_u_pano_core/u_mr1_top/u_cpu/ram/Mram_ram_symbol11 [15:8]  PLACED=X1Y5;
-      core_u_pano_core/u_mr1_top/u_cpu/ram/Mram_ram_symbol01 [7:0]   PLACED=X1Y8;
-    END_BUS_BLOCK;
-    BUS_BLOCK
-      // The order of the RAMs and bus data is wrong. But if I don't this, it doesn't work.
-      core_u_pano_core/u_mr1_top/u_cpu/ram/Mram_ram_symbol32 [31:24] PLACED=X0Y11;
-      core_u_pano_core/u_mr1_top/u_cpu/ram/Mram_ram_symbol22 [23:16] PLACED=X0Y3;
-      core_u_pano_core/u_mr1_top/u_cpu/ram/Mram_ram_symbol12 [15:8]  PLACED=X1Y3;
-      core_u_pano_core/u_mr1_top/u_cpu/ram/Mram_ram_symbol02 [7:0]   PLACED=X0Y5;
+      core_u_pano_core/u_mr1_top/u_cpu/ram/Mram_ram_symbol32 [31:28] PLACED=X0Y11;
+      core_u_pano_core/u_mr1_top/u_cpu/ram/Mram_ram_symbol31 [27:24] PLACED=X0Y6;
+      core_u_pano_core/u_mr1_top/u_cpu/ram/Mram_ram_symbol22 [23:20] PLACED=X0Y3;
+      core_u_pano_core/u_mr1_top/u_cpu/ram/Mram_ram_symbol21 [19:16] PLACED=X1Y10;
+      core_u_pano_core/u_mr1_top/u_cpu/ram/Mram_ram_symbol12 [15:12] PLACED=X1Y3;
+      core_u_pano_core/u_mr1_top/u_cpu/ram/Mram_ram_symbol11 [11:8]  PLACED=X1Y5;
+      core_u_pano_core/u_mr1_top/u_cpu/ram/Mram_ram_symbol02 [7:4]   PLACED=X0Y5;
+      core_u_pano_core/u_mr1_top/u_cpu/ram/Mram_ram_symbol01 [3:0]   PLACED=X1Y8;
     END_BUS_BLOCK;
 END_ADDRESS_SPACE;
 
