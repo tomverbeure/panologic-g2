@@ -6,8 +6,6 @@ import spinal.core._
 import spinal.lib._
 import spinal.lib.io._
 
-import spartan3._
-
 class PanoG1 extends Component {
 
     val io = new Bundle {
