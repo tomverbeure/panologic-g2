@@ -3,8 +3,8 @@
 
 To use the `dev` branch: 
 
-* clone https://github.com/SpinalHDL/SpinalHDL.git to your local machine
-* git checkout dev
+* git clone https://github.com/SpinalHDL/SpinalHDL.git 
+* git checkout c3b555afb39144
 * `sbt publishLocal`
 
 # Pano Logic G2
