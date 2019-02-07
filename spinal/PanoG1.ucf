@@ -342,11 +342,22 @@ NET "pano_button" LOC = R7;
 NET "pano_button" IOSTANDARD = LVCMOS33;
 #NET "b2b_aa[16]" LOC = B7  | IOSTANDARD = LVCMOS33;          # B2B A'[16]
 
-INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol12" LOC = RAMB16_X1Y3;
-INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol01" LOC = RAMB16_X1Y8;
-INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol02" LOC = RAMB16_X0Y5;
-INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol11" LOC = RAMB16_X1Y5;
-INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol21" LOC = RAMB16_X1Y10;
-INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol31" LOC = RAMB16_X0Y6;
-INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol22" LOC = RAMB16_X0Y3;
-INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol32" LOC = RAMB16_X0Y11;
+
+# PlanAhead Generated physical constraints 
+
+INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol01" LOC = RAMB16_X0Y15;
+INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol23" LOC = RAMB16_X0Y1;
+INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol33" LOC = RAMB16_X0Y11;
+INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol12" LOC = RAMB16_X0Y17;
+INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol11" LOC = RAMB16_X1Y15;
+INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol22" LOC = RAMB16_X0Y5;
+INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol04" LOC = RAMB16_X1Y9;
+INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol03" LOC = RAMB16_X0Y8;
+INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol24" LOC = RAMB16_X0Y3;
+INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol02" LOC = RAMB16_X0Y13;
+INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol13" LOC = RAMB16_X0Y16;
+INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol21" LOC = RAMB16_X1Y11;
+INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol32" LOC = RAMB16_X0Y6;
+INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol34" LOC = RAMB16_X0Y7;
+INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol31" LOC = RAMB16_X0Y4;
+INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol14" LOC = RAMB16_X0Y14;

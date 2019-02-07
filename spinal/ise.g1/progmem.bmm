@@ -1,14 +1,23 @@
-ADDRESS_SPACE progmem RAMB16 [0x00000000:0x00003FFF]
+ADDRESS_SPACE progmem RAMB16 [0x00000000:0x00007FFF]
     BUS_BLOCK
-      core_u_pano_core/u_mr1_top/u_cpu/ram/Mram_ram_symbol32 [31:28] PLACED=X0Y11;
-      core_u_pano_core/u_mr1_top/u_cpu/ram/Mram_ram_symbol31 [27:24] PLACED=X0Y6;
-      core_u_pano_core/u_mr1_top/u_cpu/ram/Mram_ram_symbol22 [23:20] PLACED=X0Y3;
-      core_u_pano_core/u_mr1_top/u_cpu/ram/Mram_ram_symbol21 [19:16] PLACED=X1Y10;
-      core_u_pano_core/u_mr1_top/u_cpu/ram/Mram_ram_symbol12 [15:12] PLACED=X1Y3;
-      core_u_pano_core/u_mr1_top/u_cpu/ram/Mram_ram_symbol11 [11:8]  PLACED=X1Y5;
-      core_u_pano_core/u_mr1_top/u_cpu/ram/Mram_ram_symbol02 [7:4]   PLACED=X0Y5;
-      core_u_pano_core/u_mr1_top/u_cpu/ram/Mram_ram_symbol01 [3:0]   PLACED=X1Y8;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol34 [31:30] PLACED=X0Y7;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol33 [29:28] PLACED=X0Y11;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol32 [27:26] PLACED=X0Y6;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol31 [25:24] PLACED=X0Y4;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol24 [23:22] PLACED=X0Y3;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol23 [21:20] PLACED=X0Y1;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol22 [19:18] PLACED=X0Y5;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol21 [17:16] PLACED=X1Y11;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol14 [15:14] PLACED=X0Y14;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol13 [13:12] PLACED=X0Y16;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol12 [11:10] PLACED=X0Y17;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol11 [9:8] PLACED=X1Y15;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol04 [7:6] PLACED=X1Y9;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol03 [5:4] PLACED=X0Y8;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol02 [3:2] PLACED=X0Y13;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol01 [1:0] PLACED=X0Y15;
     END_BUS_BLOCK;
 END_ADDRESS_SPACE;
+
 
 
