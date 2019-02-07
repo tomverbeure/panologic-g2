@@ -3,11 +3,12 @@
 
 #include "reg.h"
 #include "top_defines.h"
+void _putchar(char character);
+
 
 #ifdef PRINT_UART
 #include "uart.h"
-#endif
-
+#else
 int cur_x = 0;
 int cur_y = 0;
 
@@ -17,6 +18,7 @@ int txt_buf_height        = 60;
 
 int txt_buf_active_width  = 130;
 int txt_buf_active_height = 60;
+#endif
 
 void clear()
 {
@@ -29,57 +31,48 @@ void clear()
 #endif
 }
 
+#ifndef PRINT_UART
 void scroll()
 {
-#ifndef PRINT_UART
     for(int l=0;l<txt_buf_active_height;++l){
         for(int c=0;c<txt_buf_active_width;++c){
             TXT_BUF[l * txt_buf_width + c] = (l==txt_buf_active_height-1) ? ' ' : TXT_BUF[(l+1)*txt_buf_width + c];
         }
     }
-#endif
 }
 
 void next_line()
 {
-#ifndef PRINT_UART
     cur_x = 0;
     ++cur_y;
     if (cur_y >= txt_buf_active_height){
         scroll();
         cur_y = txt_buf_active_height-1;
     }
-#endif
 }
 
-#ifndef PRINT_UART
-void print(const char *str)
+void _putchar(char c)
 {
-    while(*str != '\0'){
-        if (*str == '\n'){
-            next_line();
+   if (c == '\n'){
+       next_line();
+   }
+   else {
+      TXT_BUF[cur_y * txt_buf_width + cur_x] = c;
 
-            ++str;
-            continue;
-        }
-        TXT_BUF[cur_y * txt_buf_width + cur_x] = *str;
-        ++str;
-
-        ++cur_x;
-        if (cur_x >= txt_buf_active_width){
-            next_line();
-        }
-    }
-}
-#else
-void print(const char *str)
-{
-    while(*str != '\0'){
-        UartPutch(*str++);
-    }
+      ++cur_x;
+      if (cur_x >= txt_buf_active_width){
+          next_line();
+      }
+   }
 }
 #endif
 
+void print(const char *str)
+{
+    while(*str != '\0'){
+       _putchar(*str++);
+    }
+}
 
 char hex_digits[] = "0123456789abcdef";
 

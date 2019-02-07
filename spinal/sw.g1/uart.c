@@ -3,6 +3,7 @@
 #include "reg.h"
 #include "top_defines.h"
 #include "uart.h"
+#include "printf.h"
 
 void UartInit()
 {
@@ -27,7 +28,7 @@ void UartInit()
    REG_WR(UART_FRAME,u.uint32);
 }
 
-void UartPutch(char c)
+void _putchar(char c)
 {
    while ((REG_RD(UART_STATUS) & 0x00FF0000) == 0);
    REG_WR(UART_TX_DATA,c);

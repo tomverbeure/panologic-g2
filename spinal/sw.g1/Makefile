@@ -1,7 +1,7 @@
 
 MEM_WORDS       = 8192
 
-OBJ_FILES       = start.o progmem.o print.o uart.o usb_g1.o
+OBJ_FILES       = start.o progmem.o print.o uart.o usb_g1.o printf.o
 
 TOOLS_PREFIX    = /opt/riscv32i/bin
 TARGET          = $(TOOLS_PREFIX)/riscv32-unknown-elf
@@ -13,6 +13,9 @@ CC              = $(TARGET)-gcc
 CFLAGS          = -march=rv32i -mabi=ilp32 -Wall -Wextra -DFREQ=$(FREQ_PLL)000000 -O2 -DPRINT_UART -Iinclude -fno-builtin-printf
 OBJCOPY         = $(TARGET)-objcopy
 OBJDUMP         = $(TARGET)-objdump
+
+#printf configuration flags
+CFLAGS += -DPRINTF_DISABLE_SUPPORT_FLOAT -DPRINTF_DISABLE_SUPPORT_LONG_LONG -DPRINTF_DISABLE_SUPPORT_PTRDIFF_T
 
 #include boards/$(BOARD).mk
 
