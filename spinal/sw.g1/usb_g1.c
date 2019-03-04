@@ -16,14 +16,33 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 Code in this file is derived and/or copied from many sources including:
  
-GPL 
+GPL:
 Copyright (C) 2011 Circuits At Home, LTD. All rights reserved.
 http://www.circuitsathome.com 
  
 Linux driver for the NXP ISP1760 chip
 Copyright 2014 Laurent Pinchart
 Copyright 2007 Sebastian Siewior 
-
+ 
+This is a very minimal USB host driver with specific goals and limitations. 
+ 
+Goals in priority order
+1. Provide USB game controller support for vintage games. 
+2. Provide mass storage support for loading programs and games.
+3. Provide keyboard support for development and vintage computing. 
+ 
+Limitations: 
+1. Only support up to 3 USB perpherials connected DIRECTLY to one of 
+the 3 USB ports on the Pano.  Code is much simplifed by limiting the number 
+of devices as well as eliminating the need for general USB HUB support. 
+ 
+2. Game controller support will be limited to a few specific devices, no 
+attempt will be made to parse the HID decsciptors. 
+ 
+3. Keyboard support will be limited to keyboards that support the opional boot 
+mode. 
+ 
+4. Hot pulling of USB devices is not supported to simplify the logic.
 */
  
 #include <stdbool.h>
@@ -39,14 +58,19 @@ Copyright 2007 Sebastian Siewior
 #include "printf.h"
 
 #define LOG(format, ...) printf("%s: " format,__FUNCTION__ ,## __VA_ARGS__)
+#define LOG_RAW(format, ...) printf(format,## __VA_ARGS__)
 
 #define WAIT_CYCLES_1MS    1184
 
 #define RW_TEST_VALUE   0x5555aaaa
 #define INT_REG_RESERVED_BITS 0xfffffc15
 
-#define USB_DEVICE_ID_BITS 3
-#define MAX_USB_DEVICES    (1 << USB_DEVICE_ID_BITS)
+// Support a maximum of 5 devices (root hub, built in external hub, 3 external
+// devices
+#define MAX_USB_DEVICES    5
+
+#define ROOT_HUB_ADR       1     // hub built into the isp1760
+#define EXTERNAL_HUB_ADR   2     // Pano's built in hub
 
 #ifdef __GNUC__
 #define GCC_PACKED __attribute__ ((packed))
@@ -98,19 +122,19 @@ typedef struct {
 typedef struct {
    uint16_t CtrlOutBuf;
    uint16_t CtrlInBuf;
-   uint8_t HubAdr:USB_DEVICE_ID_BITS;  // USB Address of HUB device is connected to
    uint8_t TTPort;
    uint8_t HubDevnum;
    uint8_t bDeviceClass;      // Class code (assigned by the USB-IF). 0xFF-Vendor specific.
    uint8_t bDeviceSubClass;   // Subclass code (assigned by the USB-IF).
-   uint32_t MaxPacket:10;
+   uint32_t bMaxPacketSize0:10;
    uint32_t UsbSpeed:2;
    uint32_t Toggle:1;
    uint32_t Ping:1;
+   uint32_t Present:1;        // This device is present
 } GCC_PACKED PanoUsbDevice;
 
-// Indexed by USB address - 1
-PanoUsbDevice gUsbDevice[MAX_USB_DEVICES];
+// Indexed by USB address
+PanoUsbDevice gUsbDevice[MAX_USB_DEVICES + 1];
 
 /* Philips Proprietary Transfer Descriptor (PTD) */
 struct ptd {
@@ -130,6 +154,10 @@ struct ptd {
 #define ATL_PTD_OFFSET     0x0c00
 #define PAYLOAD_OFFSET     0x1000
 
+#define USB_TOKEN_OUT      0
+#define USB_TOKEN_IN       1
+#define USB_TOKEN_SETUP    2
+#define USB_TOKEN_PING     3
 /* ATL */
 /* DW0 */
 #define DW0_VALID_BIT         1
@@ -239,13 +267,14 @@ int _DoTransfer(u32 *ptd,const char *Func,int Line);
 #define DoTransfer(x)  _DoTransfer(x,__FUNCTION__,__LINE__)
 
 void SetConfiguration(uint8_t Adr,uint8_t Configuration);
-void SetHubFeature(uint16_t Adr,uint8_t bmRequestType,uint8_t bRequest,uint16_t wIndex);
-void ClearHubFeature(uint8_t Adr,uint8_t bmRequestType,uint8_t bRequest,uint16_t wIndex);
+int SetHubFeature(uint16_t Adr,uint8_t bmRequestType,uint8_t bRequest,uint16_t wIndex);
+int ClearHubFeature(uint8_t Adr,uint8_t bmRequestType,uint8_t bRequest,uint16_t wIndex);
 void GetPortStatus(uint8_t Adr,uint16_t Port);
 void GetHubDesc(uint16_t Adr);
+void InitPtd(u32 *Ptd,uint8_t Adr,uint8_t Token,u16 PayLoadAdr,int Len);
 int SetupTransaction(uint8_t Adr,SetupPkt *p,int8_t *pResponse,int ResponseLen);
-void GetDevDesc(uint8_t Adr);
-void SetUsbAddress(uint8_t Adr);
+int GetDevDesc(uint8_t Adr);
+int SetUsbAddress(uint8_t Adr);
 u32 base_to_chip(u32 base);
 
 void msleep(int ms)
@@ -460,68 +489,6 @@ void UsbRegDump()
 }
 
 
-u32 PtdSetup[8] = {
-   0x21000041,   // DW0
-   0x00000800,   // DW1
-   0x10038000,   // DW2
-   0x83800000,   // DW3
-   0x00000000,   // DW4
-   0x00000000,   // DW5
-   0x00000000,   // DW6
-   0x00000000    // DW7
-};
-
-u32 PtdSetup2[8] = {
-   0x21000041,   // DW0
-   0x00000810,   // DW1
-   0x10038000,   // DW2
-   0x83800000,   // DW3
-   0x00000000,   // DW4
-   0x00000000,   // DW5
-   0x00000000,   // DW6
-   0x00000000    // DW7
-};
-
-/* 
- dw3: 0x83800000 = 1000 0011 1000 0000 0000 0000 0000 0000
-                   ^^^^ X^^^ ^^^...^^...............^
-Active ------------+|||   || |||   ||               |
-Halt   -------------+||   || |||   ||               |
-Babble --------------+|   || |||   ||               |
-X      ---------------+   || |||   ||               |
-Ping   -------------------+| |||   ||               |
-DT     --------------------+ |||   ||               |
-Cerr   ----------------------++|   ||               |
-NackCnt------------------------+---+|               |
-NrByte -----------------------------+---------------+
- 
-dw2: 0x10038000 = 0001 0000 0000 0011 1000 0000 0000 0000 
-                  XXX^   ^X ^                 ^ XXXX XXXX
-                     |   |  |                 |
-*/
- 
-u32 PtdIn[8] = {
-   0x21000201, // DW0
-   0x00002400, // DW1
-   0x10038100, // DW2
-   0x83800000, // DW3
-   0x00000000, // DW4
-   0x00000000, // DW5
-   0x00000000, // DW6
-   0x00000000, // DW7
-};
-
-u32 PtdIn2[8] = {
-   0x21000201, // DW0
-   0x00002410, // DW1
-   0x10038100, // DW2
-   0x83800000, // DW3
-   0x00000000, // DW4
-   0x00000000, // DW5
-   0x00000000, // DW6
-   0x00000000, // DW7
-};
-
 void UsbTest()
 {
    int i;
@@ -603,55 +570,77 @@ void UsbTest()
    isp1760_write32(HC_ATL_IRQ_MASK_OR_REG,1);
    isp1760_write32(HC_INTERRUPT_ENABLE,HC_ATL_INT | HC_SOT_INT);
 
-   gUsbDevice[0].MaxPacket = 8;
 
 // Get device descriptor from the root hub
    LOG("Get root hub device desc\n");
+   gUsbDevice[0].bMaxPacketSize0 = 64;
    gUsbDevice[0].UsbSpeed = USB_SPEED_HIGH;
    GetDevDesc(0);
-   SetUsbAddress(2);
-   SetConfiguration(2,1);
-   GetHubDesc(2);
+   LOG("Set root hub address\n");
+   SetUsbAddress(ROOT_HUB_ADR);
+   LOG("Set root hub configuration\n");
+   SetConfiguration(ROOT_HUB_ADR,1);
+   LOG("Get root hub desc\n");
+   GetHubDesc(ROOT_HUB_ADR);
 
+   LOG("Enable power on port 3\n");
 // Only Port 3 is connected
-   SetHubFeature(2,bmREQ_SET_PORT_FEATURE,HUB_FEATURE_PORT_POWER,3);
+   SetHubFeature(ROOT_HUB_ADR,bmREQ_SET_PORT_FEATURE,HUB_FEATURE_PORT_POWER,3);
 
    msleep(1000);
    LOG("After powering up port 3\n");
-   ClearHubFeature(2,bmREQ_CLEAR_PORT_FEATURE,HUB_FEATURE_C_PORT_CONNECTION,3);
-   SetHubFeature(2,bmREQ_SET_PORT_FEATURE,HUB_FEATURE_PORT_RESET,3);
-   GetPortStatus(2,3);
+   ClearHubFeature(ROOT_HUB_ADR,bmREQ_CLEAR_PORT_FEATURE,HUB_FEATURE_C_PORT_CONNECTION,3);
+   SetHubFeature(ROOT_HUB_ADR,bmREQ_SET_PORT_FEATURE,HUB_FEATURE_PORT_RESET,3);
+   GetPortStatus(ROOT_HUB_ADR,3);
    msleep(1000);
-   GetPortStatus(2,3);
+   GetPortStatus(ROOT_HUB_ADR,3);
 
 // Get device descriptor from the root hub
-   LOG("Get external hub device desc\n");
+   LOG("\nGet external hub device desc\n");
    GetDevDesc(0);
-   LOG("Set adr to 2\n");
-   SetUsbAddress(2);
+   LOG("Set adr to %d\n",EXTERNAL_HUB_ADR);
+   SetUsbAddress(EXTERNAL_HUB_ADR);
    LOG("Set configuration to 1\n");
-   SetConfiguration(2,1);
+   SetConfiguration(EXTERNAL_HUB_ADR,1);
    LOG("Get external hub desc\n");
-   GetHubDesc(2);
-// Enable all three ports
+   GetHubDesc(EXTERNAL_HUB_ADR);
+// Power up all three ports
    for(i = 0; i < 3; i++) {
-      SetHubFeature(i,bmREQ_SET_PORT_FEATURE,HUB_FEATURE_PORT_POWER,3);
+      LOG("Power UP external hub port %d\n",i+1);
+      SetHubFeature(EXTERNAL_HUB_ADR,
+                    bmREQ_SET_PORT_FEATURE,HUB_FEATURE_PORT_POWER,i+1);
+   }
+   LOG("Port status after power up\n");
+   for(i = 0; i < 3; i++) {
+      GetPortStatus(EXTERNAL_HUB_ADR,i+1);
+#if 0
+      SetHubFeature(EXTERNAL_HUB_ADR,
+                    bmREQ_SET_PORT_FEATURE,HUB_FEATURE_PORT_POWER,i);
+      ClearHubFeature(EXTERNAL_HUB_ADR,
+                      bmREQ_CLEAR_PORT_FEATURE,HUB_FEATURE_C_PORT_CONNECTION,i);
+#endif
    }
    msleep(1000);
-   GetHubDesc(2);
-// Enable all three ports
+// Check status of ports
    for(i = 0; i < 3; i++) {
-      SetHubFeature(i,bmREQ_SET_PORT_FEATURE,HUB_FEATURE_PORT_POWER,i);
-      ClearHubFeature(i,bmREQ_CLEAR_PORT_FEATURE,HUB_FEATURE_C_PORT_CONNECTION,i);
+      GetPortStatus(EXTERNAL_HUB_ADR,i+1);
+#if 0
+      SetHubFeature(EXTERNAL_HUB_ADR,
+                    bmREQ_SET_PORT_FEATURE,HUB_FEATURE_PORT_POWER,i);
+      ClearHubFeature(EXTERNAL_HUB_ADR,
+                      bmREQ_CLEAR_PORT_FEATURE,HUB_FEATURE_C_PORT_CONNECTION,i);
+#endif
    }
 
    Dump1760Mem();
 }
 
-void SetUsbAddress(uint8_t Adr)
+int SetUsbAddress(uint8_t Adr)
 {
    SetupPkt Pkt;
-   u32 Ptd[8];
+
+// copy data read from device descriptor while was address zero
+   memcpy(&gUsbDevice[Adr],&gUsbDevice[0],sizeof(PanoUsbDevice));
 
    /* fill in setup packet */
    Pkt.ReqType_u.bmRequestType = bmREQ_SET;
@@ -660,27 +649,13 @@ void SetUsbAddress(uint8_t Adr)
    Pkt.wVal_u.wValueHi = 0;
    Pkt.wIndex = 0;
    Pkt.wLength = 0;
-#if 0
-   SetupTransaction(&Pkt,NULL,0);
-#else
-   do {
-   // copy it into payload memory
-      mem_writes8(/* PAYLOAD_OFFSET*/ 0x2000,(u32 *) &Pkt,sizeof(Pkt));
-   // Create a PTD that points to it
-
-      if(DoTransfer(PtdSetup)) {
-         break;
-      }
-      if(DoTransfer(PtdIn)) {
-         break;
-      }
-   } while(false);
-#endif
+   return SetupTransaction(0,&Pkt,NULL,0);
 }
 
 void SetConfiguration(uint8_t Adr,uint8_t Configuration)
 {
    SetupPkt Pkt;
+   int8_t Dummy;
 
    /* fill in setup packet */
    Pkt.ReqType_u.bmRequestType = bmREQ_SET;
@@ -689,24 +664,15 @@ void SetConfiguration(uint8_t Adr,uint8_t Configuration)
    Pkt.wVal_u.wValueHi = 0;
    Pkt.wIndex = 0;
    Pkt.wLength = 0;
-// copy it into payload memory
-   mem_writes8(/* PAYLOAD_OFFSET*/ 0x2000,(u32 *)&Pkt,sizeof(Pkt));
 
-   do {
-   // Create a PTD that points to it
-      if(DoTransfer(PtdSetup2)) {
-         break;
-      }
-
-      if(DoTransfer(PtdIn2)) {
-         break;
-      }
-   } while(false);
+   return SetupTransaction(Adr,&Pkt,&Dummy,sizeof(Dummy));
 }
 
-void SetHubFeature(uint16_t Adr,uint8_t bmRequestType,uint8_t bRequest,uint16_t wIndex)
+int SetHubFeature(uint16_t Adr,uint8_t bmRequestType,uint8_t bRequest,uint16_t wIndex)
 {
    SetupPkt Pkt;
+   uint8_t Dummy;
+   int Err;
 
    /* fill in setup packet */
    Pkt.ReqType_u.bmRequestType = bmRequestType;
@@ -716,24 +682,13 @@ void SetHubFeature(uint16_t Adr,uint8_t bmRequestType,uint8_t bRequest,uint16_t 
    Pkt.wIndex = wIndex;
    Pkt.wLength = 0;
 
-// copy it into payload memory
-   mem_writes8(/* PAYLOAD_OFFSET*/ 0x2000,(u32 *) &Pkt,sizeof(Pkt));
-
-   do {
-   // Create a PTD that points to it
-      if(DoTransfer(PtdSetup2)) {
-         break;
-      }
-
-      if(DoTransfer(PtdIn2)) {
-         break;
-      }
-   } while(false);
+   return SetupTransaction(Adr,&Pkt,&Dummy,sizeof(Dummy));
 }
 
-void ClearHubFeature(uint8_t Adr,uint8_t bmRequestType,uint8_t bRequest,uint16_t wIndex)
+int ClearHubFeature(uint8_t Adr,uint8_t bmRequestType,uint8_t bRequest,uint16_t wIndex)
 {
    SetupPkt Pkt;
+   uint8_t Dummy;
 
    /* fill in setup packet */
    Pkt.ReqType_u.bmRequestType = bmRequestType;
@@ -743,19 +698,7 @@ void ClearHubFeature(uint8_t Adr,uint8_t bmRequestType,uint8_t bRequest,uint16_t
    Pkt.wIndex = wIndex;
    Pkt.wLength = 0;
 
-// copy it into payload memory
-   mem_writes8(/* PAYLOAD_OFFSET*/ 0x2000,(u32 *) &Pkt,sizeof(Pkt));
-
-   do {
-   // Create a PTD that points to it
-      if(DoTransfer(PtdSetup2)) {
-         break;
-      }
-
-      if(DoTransfer(PtdIn2)) {
-         break;
-      }
-   } while(false);
+   return SetupTransaction(Adr,&Pkt,&Dummy,sizeof(Dummy));
 }
 
 void GetPortStatus(uint8_t Adr,uint16_t Port)
@@ -763,6 +706,7 @@ void GetPortStatus(uint8_t Adr,uint16_t Port)
    SetupPkt Pkt;
    uint32_t Status;
    const char *Sep = "";
+   int Err;
 #if 1
    const struct {
       const char *Desc;
@@ -796,32 +740,25 @@ void GetPortStatus(uint8_t Adr,uint16_t Port)
    Pkt.wIndex = Port;
    Pkt.wLength = sizeof(Status);
 
-// copy it into payload memory
-   mem_writes8(/* PAYLOAD_OFFSET*/ 0x2000,(u32 *)&Pkt,sizeof(Pkt));
-
    do {
    // Create a PTD that points to it
-      if(DoTransfer(PtdSetup2)) {
+      Err = SetupTransaction(Adr,&Pkt,(int8_t *)&Status,sizeof(Status));
+      if(Err != 0) {
          break;
       }
-
-      if(DoTransfer(PtdIn2)) {
-         LOG("Port: %d\n",Port);
-         break;
-      }
-      mem_reads8(0x2008,(u32 *)&Status,sizeof(Status));
-      LOG("Port %d status: 0x%x",Port,Status);
+      LOG_RAW("%sport status: 0x%x",
+              Adr == ROOT_HUB_ADR ? "root hub" : "",Port,Status);
       if(Status != 0) {
-         LOG(" (");
+         LOG_RAW(" (");
          for(i = 0; Bits[i].Desc != NULL; i++) {
             if(Status & (1 << Bits[i].Bit) ) {
-               LOG("%s%s",Sep,Bits[i].Desc);
+               LOG_RAW("%s%s",Sep,Bits[i].Desc);
                Sep = ", ";
             }
          }
-         LOG(")");
+         LOG_RAW(")");
       }
-      LOG("\n");
+      LOG_RAW("\n");
    } while(false);
 }
 
@@ -830,6 +767,7 @@ void GetHubDesc(uint16_t Adr)
    SetupPkt Pkt;
    uint32_t Status;
    struct HubDescriptor Desc;
+   int Err;
 
    /* fill in setup packet */
    Pkt.ReqType_u.bmRequestType = bmREQ_GET_HUB_DESCRIPTOR;
@@ -839,35 +777,28 @@ void GetHubDesc(uint16_t Adr)
    Pkt.wIndex = 0;
    Pkt.wLength = sizeof(Desc);
 
-// copy it into payload memory
-   mem_writes8(/* PAYLOAD_OFFSET*/ 0x2000,(u32 *)&Pkt,sizeof(Pkt));
-
    do {
-   // Create a PTD that points to it
-      if(DoTransfer(PtdSetup2)) {
+      Err = SetupTransaction(Adr,&Pkt,(int8_t *)&Desc,sizeof(Desc));
+      if(Err != 0) {
          break;
       }
 
-      if(DoTransfer(PtdIn2)) {
-         break;
-      }
-      mem_reads8(0x2008,(u32 *)&Desc,sizeof(Desc));
-
-      print_1cr("bDescLength",Desc.bDescLength);
-      print_1cr("bDescriptorType",Desc.bDescriptorType);
-      print_1cr("bNbrPorts",Desc.bNbrPorts);
-      print_1cr("wHubCharacteristics",Desc.wHubCharacteristics);
-      print_1cr("bPwrOn2PwrGood",Desc.bPwrOn2PwrGood);
-      print_1cr("bHubContrCurrent",Desc.bHubContrCurrent);
+      print_1cr("  bDescLength",Desc.bDescLength);
+      print_1cr("  bDescriptorType",Desc.bDescriptorType);
+      print_1cr("  bNbrPorts",Desc.bNbrPorts);
+      print_1cr("  wHubCharacteristics",Desc.wHubCharacteristics);
+      print_1cr("  bPwrOn2PwrGood",Desc.bPwrOn2PwrGood);
+      print_1cr("  bHubContrCurrent",Desc.bHubContrCurrent);
 //      Dump1760Mem();
    } while(false);
 }
 
-
-void GetDevDesc(uint8_t Adr)
+int GetDevDesc(uint8_t Adr)
 {
    USB_DEVICE_DESCRIPTOR DevDesc;
    SetupPkt Pkt;
+   PanoUsbDevice *pDev = &gUsbDevice[Adr];
+   int Err = 0;
 
    /* fill in setup packet */
    Pkt.ReqType_u.bmRequestType = bmREQ_GET_DESCR;
@@ -878,37 +809,32 @@ void GetDevDesc(uint8_t Adr)
    Pkt.wLength = sizeof(USB_DEVICE_DESCRIPTOR);
 
    do {
-#if 0
-      SetupTransaction(Adr,&Pkt,(int8_t *)&DevDesc,sizeof(DevDesc));
-#else
-   // copy it into payload memory
-      mem_writes8(/* PAYLOAD_OFFSET*/ 0x2000,&Pkt,sizeof(Pkt));
-   // Create a PTD that points to it
+      Err = SetupTransaction(Adr,&Pkt,(int8_t *)&DevDesc,sizeof(DevDesc));
+      if(Err != 0) {
+         break;
+      }
 
-      if(DoTransfer(PtdSetup)) {
-         break;
-      }
-      if(DoTransfer(PtdIn)) {
-         break;
-      }
-      mem_reads8(0x2008,&DevDesc,sizeof(DevDesc));
-#endif
-      print_1cr("bLength",DevDesc.bLength);
-      print_1cr("bDescriptorType",DevDesc.bDescriptorType);
-      print_1cr("bcdUSB",DevDesc.bcdUSB);
-      print_1cr("bDeviceClass",DevDesc.bDeviceClass);
-      print_1cr("bDeviceSubClass",DevDesc.bDeviceSubClass);
-      print_1cr("bDeviceProtocol",DevDesc.bDeviceProtocol);
-      print_1cr("bMaxPacketSize0",DevDesc.bMaxPacketSize0);
-      print_1cr("idVendor",DevDesc.idVendor);
-      print_1cr("idProduct",DevDesc.idProduct);
-      print_1cr("bcdDevice",DevDesc.bcdDevice);
-      print_1cr("iManufacturer",DevDesc.iManufacturer);
-      print_1cr("iProduct",DevDesc.iProduct);
-      print_1cr("iSerialNumber",DevDesc.iSerialNumber);
-      print_1cr("bNumConfigurations",DevDesc.bNumConfigurations);
-      LOG("\n");
+      pDev->bDeviceClass = DevDesc.bDeviceClass;
+      pDev->bDeviceSubClass = DevDesc.bDeviceSubClass;
+      pDev->bMaxPacketSize0 = DevDesc.bMaxPacketSize0;
+
+      print_1cr("  bLength",DevDesc.bLength);
+      print_1cr("  bDescriptorType",DevDesc.bDescriptorType);
+      print_1cr("  bcdUSB",DevDesc.bcdUSB);
+      print_1cr("  bDeviceClass",DevDesc.bDeviceClass);
+      print_1cr("  bDeviceSubClass",DevDesc.bDeviceSubClass);
+      print_1cr("  bDeviceProtocol",DevDesc.bDeviceProtocol);
+      print_1cr("  bMaxPacketSize0",DevDesc.bMaxPacketSize0);
+      print_1cr("  idVendor",DevDesc.idVendor);
+      print_1cr("  idProduct",DevDesc.idProduct);
+      print_1cr("  bcdDevice",DevDesc.bcdDevice);
+      print_1cr("  iManufacturer",DevDesc.iManufacturer);
+      print_1cr("  iProduct",DevDesc.iProduct);
+      print_1cr("  iSerialNumber",DevDesc.iSerialNumber);
+      print_1cr("  bNumConfigurations",DevDesc.bNumConfigurations);
    } while(false);
+
+   return Err;
 }
 
 
@@ -991,7 +917,7 @@ static void create_ptd_atl(struct isp1760_qh *qh,
 
 void print_1cr(const char *label,int value)
 {
-   LOG("%s: 0x%x\n",label,value);
+   LOG_RAW("%s: 0x%x\n",label,value);
 }
 
 void DumpPtd(const char *msg,u32 *p)
@@ -1010,7 +936,7 @@ void DumpPtd(const char *msg,u32 *p)
    };
    int EndPt;
 
-   LOG("%s\n",msg);
+   LOG_RAW("%s\n",msg);
    EndPt = ((p[0] >> 31) & 1) + ((p[1] & 07) << 1);
 
    print_1cr("V",p[0] & 1);
@@ -1036,8 +962,8 @@ void DumpPtd(const char *msg,u32 *p)
    print_1cr("EndPt",EndPt);
    print_1cr("DevAdr",(p[1] >> 3) & 0x7f);
 
-   LOG("Token: %s\n",TokenTbl[(p[1] >> 10) & 0x3]);
-   LOG("EpType: %s\n",EpTypeTbl[(p[1] >> 12) & 0x3]);
+   LOG_RAW("Token: %s\n",TokenTbl[(p[1] >> 10) & 0x3]);
+   LOG_RAW("EpType: %s\n",EpTypeTbl[(p[1] >> 12) & 0x3]);
 
    print_1cr("Split",(p[1] >> 14) & 0x1);
 
@@ -1151,13 +1077,13 @@ void Dump1760Mem()
    int i;
    u32 Value;
 
-   LOG("1760 Memdump:\n");
+   LOG_RAW("1760 Memdump:\n");
 
    isp1760_write32(HC_MEMORY_REG,0x400);
    for(i = 0; i < 16128; i++) {
       Value = isp1760_read32(0x400);
       if(Value != 0) {
-         LOG("0x%x => 0x%x\n",0x400 + (i * 4),Value);
+         LOG_RAW("0x%x => 0x%x\n",0x400 + (i * 4),Value);
       }
    }
 }
@@ -1560,21 +1486,18 @@ int _DoTransfer(u32 *ptd,const char *Func,int Line)
    return Ret;
 }
 
-int SetupTransaction(uint8_t Adr,SetupPkt *p,int8_t *pResponse,int ResponseLen)
+void InitPtd(u32 *Ptd,uint8_t Adr,uint8_t Token,u16 PayLoadAdr,int Len)
 {
-   u32 Ptd[8];
-   u16 CmdPayloadAdr = 0x2000;
-   u16 RespPayloadAdr = 0x2008;
    PanoUsbDevice *pDev = &gUsbDevice[Adr];
 
    Ptd[0] = DW0_VALID_BIT;
-   Ptd[0] |= TO_DW0_LENGTH(sizeof(SetupPkt));
-   Ptd[0] |= TO_DW0_MAXPACKET(pDev->MaxPacket);
+   Ptd[0] |= TO_DW0_LENGTH(Len);
+   Ptd[0] |= TO_DW0_MAXPACKET(pDev->bMaxPacketSize0);
    // Ptd[0] |= TO_DW0_ENDPOINT(0);
 
    Ptd[1] = 0;
    Ptd[1] |= TO_DW1_DEVICE_ADDR(Adr);
-   Ptd[1] |= TO_DW1_PID_TOKEN(3); // Setup
+   Ptd[1] |= TO_DW1_PID_TOKEN(Token);
 
    if(pDev->UsbSpeed != USB_SPEED_HIGH) {
       /* split transaction */
@@ -1597,13 +1520,16 @@ int SetupTransaction(uint8_t Adr,SetupPkt *p,int8_t *pResponse,int ResponseLen)
          ptd->dw3 |= TO_DW3_PING(qh->ping);
 #endif
    }
+   else {
+      Ptd[0] |= TO_DW0_MULTI(1);
+   }
 
    Ptd[2] = 0;
-   Ptd[2] |= TO_DW2_DATA_START_ADDR(base_to_chip(CmdPayloadAdr));
+   Ptd[2] |= TO_DW2_DATA_START_ADDR(base_to_chip(PayLoadAdr));
    Ptd[2] |= TO_DW2_RL(8);
 
    /* DW3 */
-   Ptd[3] |= TO_DW3_NAKCOUNT(0);
+   Ptd[3] = TO_DW3_NAKCOUNT(0);
    Ptd[3] |= TO_DW3_DATA_TOGGLE(pDev->Toggle);
 
 #if 0
@@ -1615,14 +1541,41 @@ int SetupTransaction(uint8_t Adr,SetupPkt *p,int8_t *pResponse,int ResponseLen)
    }
 #endif
 
+   Ptd[3] |= TO_DW3_DATA_TOGGLE(1); //??
+
    Ptd[3] |= DW3_ACTIVE_BIT;
    /* Cerr */
    Ptd[3] |= TO_DW3_CERR(ERR_COUNTER);
+}
 
+int SetupTransaction(uint8_t Adr,SetupPkt *p,int8_t *pResponse,int ResponseLen)
+{
+   u32 Ptd[8];
+   u16 CmdPayloadAdr = 0x2000;
+   u16 RespPayloadAdr = 0x2008;
+   PanoUsbDevice *pDev = &gUsbDevice[Adr];
+   int Ret = 0;   // assume the best
+
+   do {
+   // copy setup packet into payload memory
+      mem_writes8(CmdPayloadAdr,p,sizeof(SetupPkt));
+      InitPtd(&Ptd,Adr,USB_TOKEN_SETUP,CmdPayloadAdr,sizeof(SetupPkt));
+
+      if((Ret = DoTransfer(Ptd)) != 0) {
+         break;
+      }
+      InitPtd(&Ptd,Adr,USB_TOKEN_IN,RespPayloadAdr,ResponseLen);
+      if((Ret = DoTransfer(Ptd)) != 0) {
+         break;
+      }
+      mem_reads8(RespPayloadAdr,pResponse,ResponseLen);
+   } while(false);
+
+   return Ret;
 }
 
 u32 base_to_chip(u32 base)
 {
-	return ((base - 0x400) >> 3);
+   return ((base - 0x400) >> 3);
 }
 
