@@ -16,8 +16,8 @@ case class GmiiRxCtrl() extends Component {
     val gmiiRxDomain = ClockDomain(
         clock       = io.rx.clk,
         frequency   = FixedFrequency(125 MHz),
-        config = ClockDomainConfig(
-                    resetKind = BOOT
+        config      = ClockDomainConfig(
+                        resetKind = BOOT
         )
     )
 

@@ -24,6 +24,8 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
 
         val gmii                = master(Gmii())
 
+        val ulpi                = slave(Ulpi())
+
         val vo                  = out(VgaData())
     }
 
@@ -45,6 +47,26 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
     u_cpu_top.io.switch_                <> io.switch_
 
     var cpuDomain = ClockDomain.current
+
+    val rawUlpiDomain = ClockDomain(
+        clock       = io.ulpi.clk,
+        frequency   = FixedFrequency(60 MHz),
+        config      = ClockDomainConfig(
+                        resetKind = BOOT
+        )
+    )
+
+    val ulpi_reset_ = rawUlpiDomain(RegNext(True) init(False))
+
+    val ulpiDomain = ClockDomain(
+        clock = io.ulpi.clk,
+        reset = ulpi_reset_,
+        config = ClockDomainConfig(
+                    resetKind = SYNC,
+                    resetActiveLevel = LOW
+        )
+    )
+
 
     val vo_area = new ClockingArea(voClkDomain) {
 
@@ -206,8 +228,40 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
     //============================================================
 
     val u_gmii_ctrl = GmiiCtrl()
-    u_gmii_ctrl.io.apb                  <> u_cpu_top.io.gmii_ctrl_apb
-    u_gmii_ctrl.io.gmii                 <> io.gmii
+    u_gmii_ctrl.io.apb              <> u_cpu_top.io.gmii_ctrl_apb
+    u_gmii_ctrl.io.gmii             <> io.gmii
+
+    //============================================================
+    // ULPI
+    //============================================================
+
+    val u_ulpi_ctrl = UlpiCtrl()
+    u_ulpi_ctrl.io.ulpi             <> io.ulpi
+
+    val ulpi_ctrl = new ClockingArea(cpuDomain) {
+        val busCtrl = Apb3SlaveFactory(u_cpu_top.io.ulpi_apb)
+
+        val apb_regs = u_ulpi_ctrl.driveFrom(busCtrl, 0x0)
+    }
+
+    //============================================================
+    // USB Host
+    //============================================================
+
+    val usb_host_apb = Apb3(UsbHost.getApb3Config())
+
+    val u_apb2usb_host = new Apb3CC(UsbHost.getApb3Config, ClockDomain.current, ulpiDomain)
+    u_apb2usb_host.io.src           <> u_cpu_top.io.usb_host_apb
+    u_apb2usb_host.io.dest          <> usb_host_apb
+
+    val usb_host_domain = new ClockingArea(ulpiDomain) {
+        val u_usb_host = UsbHost()
+
+        val busCtrl = Apb3SlaveFactory(usb_host_apb)
+
+        val apb_regs = u_usb_host.driveFrom(busCtrl, 0x0)
+    }
+
 
     //============================================================
     // LED control

@@ -1,0 +1,128 @@
+[*]
+[*] GTKWave Analyzer v3.3.66 (w)1999-2015 BSI
+[*] Sat Jan 12 05:23:24 2019
+[*]
+[dumpfile] "/home/ubuntu/projects/panologic-g2/spinal/formal/ulpi/check/engine_0/trace.vcd"
+[dumpfile_mtime] "Sat Jan 12 05:22:33 2019"
+[dumpfile_size] 39108
+[savefile] "/home/ubuntu/projects/panologic-g2/spinal/formal/ulpi/waves.gtkw"
+[timestart] 0
+[size] 1920 1151
+[pos] -1 -1
+*-4.935745 200 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] UlpiCtrlFormalTb.
+[sst_width] 358
+[signals_width] 395
+[sst_expanded] 1
+[sst_vpaned_height] 738
+@28
+UlpiCtrlFormalTb.io_ulpi_clk
+@200
+-
+@28
+UlpiCtrlFormalTb.io_apb_PENABLE
+UlpiCtrlFormalTb.io_apb_PSEL
+UlpiCtrlFormalTb.io_apb_PREADY
+UlpiCtrlFormalTb.io_apb_PWRITE
+@22
+UlpiCtrlFormalTb.io_apb_PADDR[5:0]
+UlpiCtrlFormalTb.io_apb_PWDATA[31:0]
+UlpiCtrlFormalTb.io_apb_PRDATA[31:0]
+@200
+-
+@c00200
+-regs
+@28
+UlpiCtrlFormalTb.apb_regs_u_reg_cmd_fifo.io_push_valid
+UlpiCtrlFormalTb.apb_regs_u_reg_cmd_fifo.io_push_ready
+UlpiCtrlFormalTb.apb_regs_u_reg_cmd_fifo.io_push_payload
+@24
+UlpiCtrlFormalTb.apb_regs_u_reg_cmd_fifo.io_pushOccupancy[1:0]
+@200
+-
+@28
+UlpiCtrlFormalTb.core_u_ulpi_ctrl.io_reg_wr
+UlpiCtrlFormalTb.core_u_ulpi_ctrl.io_reg_rd
+UlpiCtrlFormalTb.core_u_ulpi_ctrl.io_reg_done
+@22
+UlpiCtrlFormalTb.core_u_ulpi_ctrl.io_reg_addr[5:0]
+UlpiCtrlFormalTb.core_u_ulpi_ctrl.io_reg_wr_data[7:0]
+@200
+-
+@22
+UlpiCtrlFormalTb.core_u_ulpi_ctrl.io_reg_rd_data[7:0]
+@200
+-
+@28
+UlpiCtrlFormalTb.core_u_ulpi_ctrl.io_rx_cmd_changed
+@22
+UlpiCtrlFormalTb.core_u_ulpi_ctrl.io_rx_cmd[7:0]
+@200
+-
+-
+@28
+UlpiCtrlFormalTb.apb_regs_u_reg_cmd_fifo.io_pop_valid
+UlpiCtrlFormalTb.apb_regs_u_reg_cmd_fifo.io_pop_ready
+UlpiCtrlFormalTb.apb_regs_u_reg_cmd_fifo.io_pop_payload
+@24
+UlpiCtrlFormalTb.apb_regs_u_reg_cmd_fifo.io_popOccupancy[1:0]
+@1401200
+-regs
+@200
+-
+@c00200
+-rx_cmd
+@28
+UlpiCtrlFormalTb.apb_regs_rx_cmd_changed_sticky
+UlpiCtrlFormalTb.apb_regs_rx_cmd_changed_sync
+@1401200
+-rx_cmd
+@200
+-
+@c00201
+-TX
+@28
+UlpiCtrlFormalTb.apb_regs_u_tx_data_fifo.io_push_valid
+UlpiCtrlFormalTb.apb_regs_u_tx_data_fifo.io_push_ready
+@22
+UlpiCtrlFormalTb.apb_regs_u_tx_data_fifo.io_push_payload[7:0]
+@24
+UlpiCtrlFormalTb.apb_regs_u_tx_data_fifo.io_pushOccupancy[10:0]
+@200
+-
+@28
+UlpiCtrlFormalTb.apb_regs_u_tx_data_fifo.io_pop_valid
+UlpiCtrlFormalTb.apb_regs_u_tx_data_fifo.io_pop_ready
+@22
+UlpiCtrlFormalTb.apb_regs_u_tx_data_fifo.io_pop_payload[7:0]
+@24
+UlpiCtrlFormalTb.apb_regs_u_tx_data_fifo.io_popOccupancy[10:0]
+@200
+-
+@28
+UlpiCtrlFormalTb.apb_regs_tx_data_fifo_empty
+@1401201
+-TX
+@200
+-
+@28
+UlpiCtrlFormalTb.io_ulpi_clk
+@200
+-
+@22
+UlpiCtrlFormalTb.core_u_ulpi_ctrl.ulpi_domain_cur_state[3:0]
+@200
+-
+@28
+UlpiCtrlFormalTb.io_ulpi_direction
+UlpiCtrlFormalTb.io_ulpi_nxt
+UlpiCtrlFormalTb.io_ulpi_stp
+@22
+UlpiCtrlFormalTb.io_ulpi_data_writeEnable[7:0]
+UlpiCtrlFormalTb.io_ulpi_data_write[7:0]
+UlpiCtrlFormalTb.io_ulpi_data_read[7:0]
+@200
+-
+-
+[pattern_trace] 1
+[pattern_trace] 0

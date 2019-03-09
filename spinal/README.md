@@ -1,4 +1,14 @@
 
+** IMPORTANT: I'm currently using SpinalHDL  1.3.2 which is the 'dev' branch instead of an officially released branch **
+
+To use the `dev` branch: 
+
+* git clone https://github.com/SpinalHDL/SpinalHDL.git 
+* git checkout c3b555afb39144
+* `sbt publishLocal`
+
+# Pano Logic G2
+
 Most of the bringup of the Pano Logic G2 happens here.
 
 Instead of pure Verilog, I'm using SpinalHDL (which converts to Verilog) because

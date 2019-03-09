@@ -5,7 +5,7 @@ import spinal.core._
 import spinal.lib._
 import spinal.lib.bus.amba3.apb._
 import spinal.lib.bus.misc.SizeMapping
-import spinal.lib.misc.{HexTools}
+import spinal.lib.bus.simple._
 
 import scala.collection.mutable.ArrayBuffer
 import vexriscv.plugin.{NONE, _}
@@ -108,14 +108,14 @@ case class CpuComplex(config : CpuComplexConfig) extends Component
         val timerInterrupt          = in(Bool)
     }
 
-    val simpleBusConfig = SimpleBusConfig(
+    val pipelinedMemoryBusConfig = PipelinedMemoryBusConfig(
         addressWidth = 32,
         dataWidth = 32
     )
 
     // Arbiter of the cpu dBus/iBus to drive the mainBus
     // Priority to dBus, !! cmd transactions can change on the fly !!
-    val mainBusArbiter = new MuraxMasterArbiter(simpleBusConfig)
+    val mainBusArbiter = new MuraxMasterArbiter(pipelinedMemoryBusConfig)
 
     //Instanciate the CPU
     val cpu = new VexRiscv(
@@ -143,32 +143,29 @@ case class CpuComplex(config : CpuComplexConfig) extends Component
     }
 
     //****** MainBus slaves ********
-    val mainBusMapping = ArrayBuffer[(SimpleBus,SizeMapping)]()
-    val ram = new MuraxSimpleBusRam(
+    val mainBusMapping = ArrayBuffer[(PipelinedMemoryBus,SizeMapping)]()
+    val ram = new MuraxPipelinedMemoryBusRam(
         onChipRamSize = onChipRamSize,
-        onChipRamHexFile = null,
-        simpleBusConfig = simpleBusConfig
+        onChipRamHexFile = onChipRamHexFile,
+        pipelinedMemoryBusConfig = pipelinedMemoryBusConfig
     )
-    if(onChipRamHexFile != null){
-        HexTools.initRam(ram.ram, onChipRamHexFile, 0x00000000l)
-    }
 
     mainBusMapping += ram.io.bus -> (0x00000000l, onChipRamSize)
 
-    val apbBridge = new MuraxSimpleBusToApbBridge(
+    val apbBridge = new PipelinedMemoryBusToApbBridge(
         apb3Config = Apb3Config(
             addressWidth = 20,
             dataWidth = 32
         ),
         pipelineBridge = pipelineApbBridge,
-        simpleBusConfig = simpleBusConfig
+        pipelinedMemoryBusConfig = pipelinedMemoryBusConfig
     )
-    mainBusMapping += apbBridge.io.simpleBus -> (0x80000000l, 1 MB)
+    mainBusMapping += apbBridge.io.pipelinedMemoryBus -> (0x80000000l, 1 MB)
 
     io.apb <> apbBridge.io.apb
 
     val mainBusDecoder = new Area {
-        val logic = new MuraxSimpleBusDecoder(
+        val logic = new MuraxPipelinedMemoryBusDecoder(
             master = mainBusArbiter.io.masterBus,
             specification = mainBusMapping,
             pipelineMaster = pipelineMainBus

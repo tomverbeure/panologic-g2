@@ -22,6 +22,8 @@ case class CpuTop() extends Component {
         val gmii_ctrl_apb       = master(Apb3(GmiiCtrl.getApb3Config()))
         val test_patt_apb       = master(Apb3(VideoTestPattern.getApb3Config()))
         val txt_gen_apb         = master(Apb3(VideoTxtGen.getApb3Config()))
+        val ulpi_apb            = master(Apb3(UlpiCtrl.getApb3Config()))
+        val usb_host_apb        = master(Apb3(UsbHost.getApb3Config()))
 
         val switch_             = in(Bool)
     }
@@ -35,6 +37,8 @@ case class CpuTop() extends Component {
     apbMapping += io.led_ctrl_apb       -> (0x00000, 256 Byte)
     apbMapping += io.dvi_ctrl_apb       -> (0x00100, 256 Byte)
     apbMapping += io.test_patt_apb      -> (0x00200, 256 Byte)
+    apbMapping += io.ulpi_apb           -> (0x00300, 256 Byte)
+    apbMapping += io.usb_host_apb       -> (0x00400, 256 Byte)
     apbMapping += io.gmii_ctrl_apb      -> (0x10000, 4 kB)
     apbMapping += io.txt_gen_apb        -> (0x20000, 64 kB)
 

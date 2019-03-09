@@ -1,0 +1,54 @@
+[*]
+[*] GTKWave Analyzer v3.3.66 (w)1999-2015 BSI
+[*] Thu Jan 24 05:13:24 2019
+[*]
+[dumpfile] "/home/ubuntu/projects/panologic-g2/spinal/formal/usbh/cover/engine_0/trace0.vcd"
+[dumpfile_mtime] "Thu Jan 24 05:09:56 2019"
+[dumpfile_size] 18817
+[savefile] "/home/ubuntu/projects/panologic-g2/spinal/formal/usbh/cover.gtkw"
+[timestart] 0
+[size] 1523 855
+[pos] -1 -1
+*-4.935745 33 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] UsbHostFormalTb.
+[sst_width] 392
+[signals_width] 423
+[sst_expanded] 1
+[sst_vpaned_height] 267
+@28
+UsbHostFormalTb.io_clk
+UsbHostFormalTb.io_reset_
+@200
+-
+@28
+UsbHostFormalTb.io_apb_PSEL
+UsbHostFormalTb.io_apb_PENABLE
+UsbHostFormalTb.io_apb_PWRITE
+UsbHostFormalTb.io_apb_PREADY
+@22
+UsbHostFormalTb.io_apb_PADDR[6:0]
+UsbHostFormalTb.io_apb_PWDATA[31:0]
+UsbHostFormalTb.io_apb_PRDATA[31:0]
+@200
+-
+@28
+UsbHostFormalTb.apb_regs_setup_fifo_wr_ptr[2:0]
+@200
+-
+@800201
+-cpu_fifo_bus
+@29
+UsbHostFormalTb.u_usb_host.io_cpu_fifo_bus_cmd_valid
+UsbHostFormalTb.u_usb_host.io_cpu_fifo_bus_cmd_ready
+UsbHostFormalTb.u_usb_host.io_cpu_fifo_bus_cmd_payload_write
+@23
+UsbHostFormalTb.u_usb_host.io_cpu_fifo_bus_cmd_payload_address[8:0]
+UsbHostFormalTb.u_usb_host.io_cpu_fifo_bus_cmd_payload_data[7:0]
+@29
+UsbHostFormalTb.u_usb_host.io_cpu_fifo_bus_rsp_valid
+@23
+UsbHostFormalTb.u_usb_host.io_cpu_fifo_bus_rsp_payload_data[7:0]
+@1000201
+-cpu_fifo_bus
+[pattern_trace] 1
+[pattern_trace] 0

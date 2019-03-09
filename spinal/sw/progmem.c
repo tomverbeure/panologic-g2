@@ -7,6 +7,7 @@
 #include "i2c.h"
 #include "gmii.h"
 #include "dvi.h"
+#include "usb.h"
 
 static inline uint32_t rdcycle(void) {
     uint32_t cycle;
@@ -69,19 +70,25 @@ int main() {
     print("Code at github.com/tomverbeure/panologic-g2\n");
 #endif
 
-#if 1
+    ulpi_print_id();
+
+    ulpi_reset_bus();
+
+    ulpi_monitor_rx_cmd();
+
+#if 0
     gmii_mdio_init();
     gmii_reg_dump(0);
     gmii_print_phy_id(0);
     gmii_wait_auto_neg_complete(0);
 #endif
-#if 1
+#if 0
     gmii_reg_dump(0);
 #endif
 #if 0
     gmii_monitor_regs(0);
 #endif
-#if 1
+#if 0
     gmii_dump_packets(0);
 #endif
 

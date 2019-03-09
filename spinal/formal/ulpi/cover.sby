@@ -1,0 +1,13 @@
+[options]
+mode cover
+depth 100
+
+[engines]
+smtbmc boolector
+
+[script]
+read_verilog -sv -formal UlpiCtrlFormalTb.sv
+prep -nordff -top UlpiCtrlFormalTb
+
+[files]
+../../UlpiCtrlFormalTb.sv
