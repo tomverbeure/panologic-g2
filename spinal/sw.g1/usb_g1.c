@@ -121,6 +121,10 @@ typedef struct {
 #define USB_SPEED_USB11    1  // 12 Mb
 #define USB_SPEED_HIGH     2  // 480 Mb
 
+#define PTYPE_BULK         0
+#define PTYPE_INT          1
+#define PTYPE_CONTROL      2
+
 typedef struct {
    uint16_t CtrlOutBuf;
    uint16_t CtrlInBuf;
@@ -128,14 +132,17 @@ typedef struct {
    uint8_t HubDevnum;
    uint8_t bDeviceClass;      // Class code (assigned by the USB-IF). 0xFF-Vendor specific.
    uint8_t bDeviceSubClass;   // Subclass code (assigned by the USB-IF).
-   uint16_t bMaxPacketSize0;
+   uint16_t MaxPacketSize;
    uint32_t UsbSpeed:2;
    uint32_t Toggle:1;
    uint32_t Ping:1;
    uint32_t Present:1;        // This device is present
+   uint32_t PipeType:2;
+   uint32_t LastPacket:1;
 } GCC_PACKED PanoUsbDevice;
 
 uint8_t gDumpPtd = 0;
+uint8_t gSlowKludge = 0;
 
 // Indexed by USB address
 PanoUsbDevice gUsbDevice[MAX_USB_DEVICES + 1];
@@ -158,10 +165,6 @@ struct ptd {
 #define ATL_PTD_OFFSET     0x0c00
 #define PAYLOAD_OFFSET     0x1000
 
-#define USB_TOKEN_OUT      0
-#define USB_TOKEN_IN       1
-#define USB_TOKEN_SETUP    2
-#define USB_TOKEN_PING     3
 /* ATL */
 /* DW0 */
 #define DW0_VALID_BIT         1
@@ -278,7 +281,7 @@ int SetInterface(uint8_t Adr,uint16_t AltSetting,uint16_t Interface);
 int DumpPortStatus(uint16_t Port,uint32_t Status);
 int GetPortStatus(uint8_t Adr,uint16_t Port,uint32_t *pStatus);
 int GetHubDesc(uint16_t Adr);
-void InitPtd(u32 *Ptd,uint8_t Adr,uint8_t EndPoint,uint8_t Token,u16 PayLoadAdr,int Len);
+void InitPtd(u32 *Ptd,uint8_t Adr,uint8_t EndPoint,uint8_t Pid,u16 PayLoadAdr,int Len);
 int SetupTransaction(uint8_t Adr,SetupPkt *p,int8_t *pResponse,int ResponseLen);
 int GetDevDesc(uint8_t Adr);
 int SetUsbAddress(uint8_t Adr);
@@ -578,10 +581,14 @@ void UsbTest()
    isp1760_write32(HC_ATL_IRQ_MASK_OR_REG,1);
    isp1760_write32(HC_INTERRUPT_ENABLE,HC_ATL_INT | HC_SOT_INT);
 
+#if 1
+   LOG("Waiting for button press\n");
+   while(!button_pressed());
+#endif
 
 // Get device descriptor from the root hub
    LOG("Get root hub device desc\n");
-   gUsbDevice[0].bMaxPacketSize0 = 64;
+   gUsbDevice[0].MaxPacketSize = 64;
    gUsbDevice[0].UsbSpeed = USB_SPEED_HIGH;
    GetDevDesc(0);
    LOG("Set root hub address\n");
@@ -645,6 +652,11 @@ void UsbTest()
          GetPortStatus(EXTERNAL_HUB_ADR,i+1,&PortStatus);
          DumpPortStatus(i+1,PortStatus);
          LOG("Get device desc\n");
+         {
+            uint32_t Leds = REG_RD(GPIO_READ_ADDR);
+            Leds &= ~GPIO_BIT_LED_RED;
+            REG_WR(GPIO_WRITE_ADDR,Leds);
+         }
 
          gUsbDevice[0].TTPort = (uint8_t) i;
          gUsbDevice[0].HubDevnum = EXTERNAL_HUB_ADR;
@@ -656,18 +668,19 @@ void UsbTest()
       // Maximum data payload size low-speed: 8 bytes, full-speed: 64 bytes,
       // high-speed: 1024 bytes
          if(PortStatus & bmHUB_PORT_STATUS_PORT_LOW_SPEED) {
-            gUsbDevice[0].bMaxPacketSize0 = 8;
+            gUsbDevice[0].MaxPacketSize = 8;
             gUsbDevice[0].UsbSpeed = USB_SPEED_LOW;
          }
          else if(PortStatus & bmHUB_PORT_STATUS_PORT_HIGH_SPEED) {
-            gUsbDevice[0].bMaxPacketSize0 = 1024;
+            gUsbDevice[0].MaxPacketSize = 1024;
             gUsbDevice[0].UsbSpeed = USB_SPEED_HIGH;
          }
          else {
-            gUsbDevice[0].bMaxPacketSize0 = 8;
+            gUsbDevice[0].MaxPacketSize = 8;
             gUsbDevice[0].UsbSpeed = USB_SPEED_USB11;
          }
-         gDumpPtd = 1;
+         gDumpPtd = 0;
+         gSlowKludge = 0;
          GetDevDesc(0);
          gDumpPtd = 0;
          LOG("Set adr to %d\n",EXTERNAL_HUB_ADR + i + 1);
@@ -876,7 +889,7 @@ int GetDevDesc(uint8_t Adr)
 
       pDev->bDeviceClass = DevDesc.bDeviceClass;
       pDev->bDeviceSubClass = DevDesc.bDeviceSubClass;
-      pDev->bMaxPacketSize0 = DevDesc.bMaxPacketSize0;
+      pDev->MaxPacketSize = DevDesc.bMaxPacketSize0;
 
       print_1cr("  bLength",DevDesc.bLength);
       print_1cr("  bDescriptorType",DevDesc.bDescriptorType);
@@ -896,84 +909,6 @@ int GetDevDesc(uint8_t Adr)
 
    return Err;
 }
-
-
-#if 0
-static void create_ptd_atl(struct isp1760_qh *qh,
-         struct isp1760_qtd *qtd, struct ptd *ptd)
-{
-   u32 maxpacket;
-   u32 multi;
-   u32 rl = RL_COUNTER;
-   u32 nak = NAK_COUNTER;
-
-   memset(ptd, 0, sizeof(*ptd));
-
-   /* according to 3.6.2, max packet len can not be > 0x400 */
-   maxpacket = usb_maxpacket(qtd->urb->dev, qtd->urb->pipe,
-                  usb_pipeout(qtd->urb->pipe));
-   multi =  1 + ((maxpacket >> 11) & 0x3);
-   maxpacket &= 0x7ff;
-
-   /* DW0 */
-   ptd->dw0 = DW0_VALID_BIT;
-   ptd->dw0 |= TO_DW0_LENGTH(qtd->length);
-   ptd->dw0 |= TO_DW0_MAXPACKET(maxpacket);
-   ptd->dw0 |= TO_DW0_ENDPOINT(usb_pipeendpoint(qtd->urb->pipe));
-
-   /* DW1 */
-   ptd->dw1 = usb_pipeendpoint(qtd>urb->pipe) >> 1;
-   ptd->dw1 |= TO_DW1_DEVICE_ADDR(usb_pipedevice(qtd->urb->pipe));
-   ptd->dw1 |= TO_DW1_PID_TOKEN(qtd->packet_type);
-
-   if (usb_pipebulk(qtd->urb->pipe))
-      ptd->dw1 |= DW1_TRANS_BULK;
-   else if  (usb_pipeint(qtd->urb->pipe))
-      ptd->dw1 |= DW1_TRANS_INT;
-
-   if (qtd->urb->dev->speed != USB_SPEED_HIGH) {
-      /* split transaction */
-
-      ptd->dw1 |= DW1_TRANS_SPLIT;
-      if (qtd->urb->dev->speed == USB_SPEED_LOW)
-         ptd->dw1 |= DW1_SE_USB_LOSPEED;
-
-      ptd->dw1 |= TO_DW1_PORT_NUM(qtd->urb->dev->ttport);
-      ptd->dw1 |= TO_DW1_HUB_NUM(qtd->urb->dev->tt->hub->devnum);
-
-      /* SE bit for Split INT transfers */
-      if (usb_pipeint(qtd->urb->pipe) &&
-            (qtd->urb->dev->speed == USB_SPEED_LOW))
-         ptd->dw1 |= 2 << 16;
-
-      rl = 0;
-      nak = 0;
-   } else {
-      ptd->dw0 |= TO_DW0_MULTI(multi);
-      if (usb_pipecontrol(qtd->urb->pipe) ||
-                  usb_pipebulk(qtd->urb->pipe))
-         ptd->dw3 |= TO_DW3_PING(qh->ping);
-   }
-   /* DW2 */
-   ptd->dw2 = 0;
-   ptd->dw2 |= TO_DW2_DATA_START_ADDR(base_to_chip(qtd->payload_addr));
-   ptd->dw2 |= TO_DW2_RL(rl);
-
-   /* DW3 */
-   ptd->dw3 |= TO_DW3_NAKCOUNT(nak);
-   ptd->dw3 |= TO_DW3_DATA_TOGGLE(qh->toggle);
-   if (usb_pipecontrol(qtd->urb->pipe)) {
-      if (qtd->data_buffer == qtd->urb->setup_packet)
-         ptd->dw3 &= ~TO_DW3_DATA_TOGGLE(1);
-      else if (last_qtd_of_urb(qtd, qh))
-         ptd->dw3 |= TO_DW3_DATA_TOGGLE(1);
-   }
-
-   ptd->dw3 |= DW3_ACTIVE_BIT;
-   /* Cerr */
-   ptd->dw3 |= TO_DW3_CERR(ERR_COUNTER);
-}
-#endif
 
 void print_1cr(const char *label,int value)
 {
@@ -1055,101 +990,6 @@ void DumpPtd(const char *msg,u32 *p)
       LOG_RAW("DW%d: 0x%08x\n",i,p[i]);
    }
 }
-
-
-#if 0
-uint8_t ctrlReq(
-   uint8_t addr, 
-   uint8_t ep, 
-   uint8_t bmReqType, 
-   uint8_t bRequest, 
-   uint8_t wValLo, 
-   uint8_t wValHi,
-   uint16_t wInd, 
-   uint16_t total, 
-   uint16_t nbytes, 
-   uint8_t* dataptr, 
-   USBReadParser *p) 
-{
-   bool direction = false; //request direction, IN or OUT
-   uint8_t rcode;
-   SETUP_PKT setup_pkt;
-
-   EpInfo *pep = NULL;
-   uint16_t nak_limit = 0;
-
-   do {
-      if((rcode = SetAddress(addr, ep, &pep, &nak_limit)) != 0) {
-         break;
-      }
-      direction = ((bmReqType & 0x80) > 0);
-
-      /* fill in setup packet */
-      setup_pkt.ReqType_u.bmRequestType = bmReqType;
-      setup_pkt.bRequest = bRequest;
-      setup_pkt.wVal_u.wValueLo = wValLo;
-      setup_pkt.wVal_u.wValueHi = wValHi;
-      setup_pkt.wIndex = wInd;
-      setup_pkt.wLength = total;
-
-#if 0
-      bytesWr(rSUDFIFO, 8, (uint8_t*) & setup_pkt); //transfer to setup packet FIFO
-#endif
-
-      //dispatch packet
-      if((rcode = dispatchPkt(tokSETUP, ep, nak_limit) != 0) {
-         break;
-      }
-
-      if(dataptr != NULL) { //data stage, if present
-         if(direction) { //IN transfer
-            uint16_t left = total;
-
-            pep->bmRcvToggle = 1; //bmRCVTOG1;
-
-            while(left) {
-               // Bytes read into buffer
-               uint16_t read = nbytes;
-               //uint16_t read = (left<nbytes) ? left : nbytes;
-
-               rcode = InTransfer(pep, nak_limit, &read, dataptr);
-               if(rcode == hrTOGERR) {
-                  // yes, we flip it wrong here so that next time it is actually correct!
-                  pep->bmRcvToggle = (regRd(rHRSL) & bmSNDTOGRD) ? 0 : 1;
-                  continue;
-               }
-
-               if(rcode) {
-                  break;
-               }
-
-               // Invoke callback function if inTransfer completed successfully and callback function pointer is specified
-               if(!rcode && p)
-                  ((USBReadParser*)p)->Parse(read, dataptr, total - left);
-
-               left -= read;
-
-               if(read < nbytes)
-                  break;
-            }
-         }
-         else { //OUT transfer
-            pep->bmSndToggle = 1; //bmSNDTOG1;
-            rcode = OutTransfer(pep, nak_limit, nbytes, dataptr);
-         }
-
-         if(rcode != 0) {
-            break;
-         }
-      }
-      // Status stage
-      rcode = dispatchPkt((direction) ? tokOUTHS : tokINHS, ep, nak_limit); //GET if direction
-   } while(false);
-
-   return rcode;
-}
-#endif
-
 
 void Dump1760Mem()
 {
@@ -1463,6 +1303,9 @@ int _DoTransfer(u32 *ptd,const char *Func,int Line)
    int Ret = 1;   // assume the worse
    u32 PtdBuf[8];
 
+   if(gDumpPtd) {
+      DumpPtd("Ptd before execution:",ptd);
+   }
    mem_writes8(ATL_PTD_OFFSET+4,&ptd[1],28);
    mem_writes8(ATL_PTD_OFFSET,ptd,4);
 
@@ -1556,30 +1399,56 @@ int _DoTransfer(u32 *ptd,const char *Func,int Line)
 
    if(Ret != 0) {
       LOG("%s#%d: ",Func,Line);
-      DumpPtd("Transfer failed, ptd before:\n",ptd);
-      DumpPtd("\nafter",PtdBuf);
+      LOG("Transfer failed!\n");
+      if(!gDumpPtd) {
+         DumpPtd("Ptd before execution:",ptd);
+      }
+      DumpPtd("\nPtd after execution:",PtdBuf);
       Dump1760Mem();
       UsbRegDump();
    }
+   else if(gDumpPtd) {
+      DumpPtd("Ptd after execution",ptd);
+   }
+
+// Copy the PTD read from 1760 back into the orginal buffer
+   memcpy(ptd,PtdBuf,sizeof(PtdBuf));
 
    return Ret;
 }
 
-void InitPtd(u32 *Ptd,uint8_t Adr,uint8_t EndPoint,uint8_t Token,u16 PayLoadAdr,int Len)
+void InitPtd(u32 *Ptd,uint8_t Adr,uint8_t EndPoint,uint8_t Pid,u16 PayLoadAdr,int Len)
 {
    PanoUsbDevice *pDev = &gUsbDevice[Adr];
+   u32 maxpacket;
+   u32 multi;
    u32 rl = RL_COUNTER;
    u32 nak = NAK_COUNTER;
 
    memset(Ptd,0,8 * sizeof(u32));
+
+   /* according to 3.6.2, max packet len can not be > 0x400 */
+   maxpacket = pDev->MaxPacketSize;
+   multi =  1 + ((maxpacket >> 11) & 0x3);
+   maxpacket &= 0x7ff;
+
+   /* DW0 */
    Ptd[0] = DW0_VALID_BIT;
    Ptd[0] |= TO_DW0_LENGTH(Len);
-   Ptd[0] |= TO_DW0_MAXPACKET(pDev->bMaxPacketSize0);
+   Ptd[0] |= TO_DW0_MAXPACKET(maxpacket);
    Ptd[0] |= TO_DW0_ENDPOINT(EndPoint);
 
+   /* DW1 */
    Ptd[1] = EndPoint >> 1;
    Ptd[1] |= TO_DW1_DEVICE_ADDR(Adr);
-   Ptd[1] |= TO_DW1_PID_TOKEN(Token);
+   Ptd[1] |= TO_DW1_PID_TOKEN(Pid);
+
+   if(pDev->PipeType == PTYPE_BULK) {
+      Ptd[1] |= DW1_TRANS_BULK;
+   }
+   if(pDev->PipeType == PTYPE_INT) {
+      Ptd[1] |= DW1_TRANS_INT;
+   }
 
    if(pDev->UsbSpeed != USB_SPEED_HIGH) {
       /* split transaction */
@@ -1590,53 +1459,47 @@ void InitPtd(u32 *Ptd,uint8_t Adr,uint8_t EndPoint,uint8_t Token,u16 PayLoadAdr,
       Ptd[1] |= TO_DW1_PORT_NUM(pDev->TTPort);
       Ptd[1] |= TO_DW1_HUB_NUM(pDev->HubDevnum);
 
-      if(Token == USB_TOKEN_IN) {
-      // end split ???
-         Ptd[3] |= DW3_SC_BIT;
-      }
-
-#if 0
       /* SE bit for Split INT transfers */
-   if(usb_pipeint(qtd->urb->pipe) && (pDev->UsbSpeed == USB_SPEED_LOW))
-         ptd->dw1 |= 2 << 16;
-   }
-   else {
-      ptd->dw0 |= TO_DW0_MULTI(multi);
-      if (usb_pipecontrol(qtd->urb->pipe) ||
-                  usb_pipebulk(qtd->urb->pipe))
-         ptd->dw3 |= TO_DW3_PING(qh->ping);
-
-/////
-      Ptd[3] |= TO_DW3_PING(pDev->Ping);
-
+      // sh: not necessary?  Already set above for all pipe types...
+      if(pDev->PipeType == PTYPE_INT && pDev->UsbSpeed == USB_SPEED_LOW) {
+         Ptd[1] |= DW1_SE_USB_LOSPEED;
+      }
+#if 0
+      if(Pid == IN_PID) {
+      // end split ???
+//         Ptd[3] |= DW3_SC_BIT;
+         Ptd[1] |= DW1_TRANS_BULK;
+         Ptd[1] &= ~DW1_TRANS_SPLIT;
+      }
 #endif
+
       rl = 0;
       nak = 0;
    }
    else {
-      Ptd[0] |= TO_DW0_MULTI(1);
+   // High speed
+      Ptd[0] |= TO_DW0_MULTI(multi);
+      if(pDev->PipeType == PTYPE_CONTROL || pDev->PipeType == PTYPE_BULK) {
+         Ptd[3] |= TO_DW3_PING(pDev->Ping);
+      }
    }
 
+   /* DW2 */
    Ptd[2] |= TO_DW2_DATA_START_ADDR(base_to_chip(PayLoadAdr));
+//   Ptd[2] |= TO_DW2_RL(rl);
    Ptd[2] |= TO_DW2_RL(8);
 
    /* DW3 */
-   Ptd[3] |= TO_DW3_NAKCOUNT(0);
-
+   Ptd[3] |= TO_DW3_NAKCOUNT(nak);
    Ptd[3] |= TO_DW3_DATA_TOGGLE(pDev->Toggle);
-// for setup packet only  ... fix me
-   Ptd[3] &= ~TO_DW3_DATA_TOGGLE(1);
-
-#if 0
-   if (usb_pipecontrol(qtd->urb->pipe)) {
-      if (qtd->data_buffer == qtd->urb->setup_packet)
+   if(pDev->PipeType == PTYPE_CONTROL) {
+      if(Pid == SETUP_PID) {
          Ptd[3] &= ~TO_DW3_DATA_TOGGLE(1);
-      else if (last_qtd_of_urb(qtd, qh))
+      }
+      else if(pDev->LastPacket) {
          Ptd[3] |= TO_DW3_DATA_TOGGLE(1);
+      }
    }
-#endif
-
-   Ptd[3] |= TO_DW3_DATA_TOGGLE(1); //??
 
    Ptd[3] |= DW3_ACTIVE_BIT;
    /* Cerr */
@@ -1651,22 +1514,36 @@ int SetupTransaction(uint8_t Adr,SetupPkt *p,int8_t *pResponse,int ResponseLen)
    PanoUsbDevice *pDev = &gUsbDevice[Adr];
    int Ret = 0;   // assume the best
 
+// Temp kludges
+   pDev->PipeType = PTYPE_CONTROL;
+   pDev->LastPacket = true;
+
    do {
    // copy setup packet into payload memory
       mem_writes8(CmdPayloadAdr,p,sizeof(SetupPkt));
-      InitPtd(&Ptd,Adr,0,USB_TOKEN_SETUP,CmdPayloadAdr,sizeof(SetupPkt));
+      InitPtd(&Ptd,Adr,0,SETUP_PID,CmdPayloadAdr,sizeof(SetupPkt));
 
       if(gDumpPtd) {
 #if 0
          LOG("Waiting for button press\n");
          while(!button_pressed());
-#endif
          DumpPtd("Setup ptd:\n",Ptd);
+#endif
       }
       if((Ret = DoTransfer(Ptd)) != 0) {
          break;
       }
-      InitPtd(&Ptd,Adr,0,USB_TOKEN_IN,RespPayloadAdr,ResponseLen);
+
+      if(gSlowKludge) {
+         LOG("Waiting for slow transfer\n");
+         msleep(1000);
+      }
+   // Update the toggle an ping bits
+      pDev->Toggle = FROM_DW3_DATA_TOGGLE(Ptd[3]);
+      pDev->Ping = FROM_DW3_PING(Ptd[3]);
+
+      pDev->PipeType = PTYPE_BULK;
+      InitPtd(&Ptd,Adr,0,IN_PID,RespPayloadAdr,ResponseLen);
       if((Ret = DoTransfer(Ptd)) != 0) {
          break;
       }
