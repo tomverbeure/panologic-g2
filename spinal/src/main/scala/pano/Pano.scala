@@ -10,8 +10,22 @@ import spartan6._
 
 import gmii._
 
+case class PanoConfig(
+              isG1              : Boolean,
+              isG2              : Boolean,
+              includeDvi        : Boolean,
+              includeHdmi       : Boolean,
+              includeVga        : Boolean,
+              includeGmii       : Boolean,
+              includeUlpi       : Boolean,
+              includeUart       : Boolean
+      )
+{
+    def includeDviI2C = includeDvi || includeHdmi
+}
 
-class Pano extends Component {
+
+class Pano(config : PanoConfig) extends Component {
 
     val io = new Bundle {
         val osc_clk             = in(Bool)
@@ -23,22 +37,22 @@ class Pano extends Component {
         val pano_button         = in(Bool)
 
         // I2C control for both Chrontel chips
-        val dvi_spc             = master(TriState(Bool))
-        val dvi_spd             = master(TriState(Bool))
+        val dvi_spc             = if (config.includeDviI2C) master(TriState(Bool)) else null
+        val dvi_spd             = if (config.includeDviI2C) master(TriState(Bool)) else null
 
-        val dvi                 = out(ChrontelIntfc(includeXClkN = true))
-        val hdmi                = out(ChrontelIntfc(includeXClkN = false))
+        val dvi                 = if (config.includeDvi)  out(ChrontelIntfc(includeXClkN = true))  else null
+        val hdmi                = if (config.includeHdmi) out(ChrontelIntfc(includeXClkN = false)) else null
 
         // MII interface
-        val gmii_rst_           = out(Bool)
-        val gmii                = master(Gmii())
+        val gmii_rst_           = if (config.isG2) out(Bool)              else null
+        val gmii                = if (config.includeGmii) master(Gmii())  else null
 
         // USB clock and reset
-        val usb_reset_          = out(Bool)
-        val usb_clk             = out(Bool)
+        val usb_reset_          = if (config.includeUlpi) out(Bool) else null
+        val usb_clk             = if (config.includeUlpi) out(Bool) else null
 
         // ULPI Interface
-        val ulpi                = slave(Ulpi())
+        val ulpi                = if (config.includeUlpi) slave(Ulpi()) else null
     }
 
     noIoPrefix()
@@ -47,16 +61,18 @@ class Pano extends Component {
     // When True, you will get a 125MHz fixed clock on io.osc_clk.
     // When False, you get 25MHz instead.
     // https://github.com/tomverbeure/panologic-g2#fpga-external-clocking-architecture
-    io.gmii_rst_    := True
+    if (config.isG2)
+        io.gmii_rst_    := True
 
-    io.usb_reset_   := True
+    if (config.includeUlpi)
+        io.usb_reset_   := True
 
     //============================================================
     // Create osc_clk clock domain
     //============================================================
     val oscClkDomain = ClockDomain(
         clock = io.osc_clk,
-        frequency = FixedFrequency(125 MHz),
+        frequency = FixedFrequency(if (config.isG2) 125 MHz else 100 MHz),
         config = ClockDomainConfig(
                     resetKind = BOOT
         )
@@ -68,18 +84,26 @@ class Pano extends Component {
 
     val main_clk_raw = Bool
 
-    val u_main_clk_gen = new DCM_CLKGEN(
-            clkfx_divide    = 20,
-            clkfx_multiply  = 4,
-            clkin_period    = "8.0"
-        )
-    u_main_clk_gen.io.CLKIN       <> io.osc_clk
-    u_main_clk_gen.io.CLKFX       <> main_clk_raw
-    u_main_clk_gen.io.RST         <> False
-    u_main_clk_gen.io.FREEZEDCM   <> False
-    u_main_clk_gen.io.PROGCLK     <> False
-    u_main_clk_gen.io.PROGDATA    <> False
-    u_main_clk_gen.io.PROGEN      <> False
+    val u_main_clk_gen = if (config.isG2) new Area {
+        val u_main_clk_pll = new DCM_CLKGEN(
+                clkfx_divide    = 20,
+                clkfx_multiply  = 4,
+                clkin_period    = "8.0"
+            )
+        u_main_clk_pll.io.CLKIN       <> io.osc_clk
+        u_main_clk_pll.io.CLKFX       <> main_clk_raw
+        u_main_clk_pll.io.RST         <> False
+        u_main_clk_pll.io.FREEZEDCM   <> False
+        u_main_clk_pll.io.PROGCLK     <> False
+        u_main_clk_pll.io.PROGDATA    <> False
+        u_main_clk_pll.io.PROGEN      <> False
+    }
+    else new ClockingArea(oscClkDomain) {
+        // Create div4 clock
+        val clk_cntr = Reg(UInt(2 bits)) init(0)
+        clk_cntr      := clk_cntr + 1
+        main_clk_raw  := RegNext(clk_cntr(1))
+    }
 
     val mainClkRawDomain = ClockDomain(
         clock = main_clk_raw,
@@ -123,87 +147,95 @@ class Pano extends Component {
     // vo_clk and vo clock domain
     //============================================================
 
-    val vo_clk      = Bool
-    val vo_reset_   = Bool
 
-    val u_vo_clk_gen = new DCM_CLKGEN(
-            clkfx_divide    = 125,
-            clkfx_multiply  = 148,
-            clkin_period    = "8.0"
-        )
+    var voClkDomain : ClockDomain = null;
 
-    u_vo_clk_gen.io.CLKIN       <> io.osc_clk
-    u_vo_clk_gen.io.CLKFX       <> vo_clk
-    u_vo_clk_gen.io.RST         <> False
-    u_vo_clk_gen.io.FREEZEDCM   <> False
-    u_vo_clk_gen.io.PROGCLK     <> False
-    u_vo_clk_gen.io.PROGDATA    <> False
-    u_vo_clk_gen.io.PROGEN      <> False
+    val u_vo_clk_gen = if (config.isG2) new Area {
 
-    val voClkRawDomain = ClockDomain(
-        clock = vo_clk,
-        frequency = FixedFrequency(148.5 MHz),
-        config = ClockDomainConfig(
-                    resetKind = BOOT
-        )
-    )
+        val vo_clk      = Bool
+        val vo_reset_   = Bool
 
-    val vo_reset_gen = new ClockingArea(voClkRawDomain) {
-        val reset_unbuffered_ = True
+        val u_vo_clk_pll = new DCM_CLKGEN(
+                clkfx_divide    = 125,
+                clkfx_multiply  = 148,
+                clkin_period    = "8.0"
+            )
 
-        val reset_cntr = Reg(UInt(5 bits)) init(0)
-        when(reset_cntr =/= U(reset_cntr.range -> true)){
-            reset_cntr := reset_cntr + 1
-            reset_unbuffered_ := False
-        }
+        u_vo_clk_pll.io.CLKIN       <> io.osc_clk
+        u_vo_clk_pll.io.CLKFX       <> vo_clk
+        u_vo_clk_pll.io.RST         <> False
+        u_vo_clk_pll.io.FREEZEDCM   <> False
+        u_vo_clk_pll.io.PROGCLK     <> False
+        u_vo_clk_pll.io.PROGDATA    <> False
+        u_vo_clk_pll.io.PROGEN      <> False
 
-        vo_reset_ := RegNext(reset_unbuffered_)
-    }
-
-    val voClkDomain = ClockDomain(
+        val voClkRawDomain = ClockDomain(
             clock = vo_clk,
-            reset = vo_reset_,
+            frequency = FixedFrequency(148.5 MHz),
             config = ClockDomainConfig(
-                resetKind = SYNC,
-                resetActiveLevel = LOW
+                        resetKind = BOOT
             )
         )
+
+        val vo_reset_gen = new ClockingArea(voClkRawDomain) {
+            val reset_unbuffered_ = True
+
+            val reset_cntr = Reg(UInt(5 bits)) init(0)
+            when(reset_cntr =/= U(reset_cntr.range -> true)){
+                reset_cntr := reset_cntr + 1
+                reset_unbuffered_ := False
+            }
+
+            vo_reset_ := RegNext(reset_unbuffered_)
+        }
+
+        voClkDomain = ClockDomain(
+                clock = vo_clk,
+                reset = vo_reset_,
+                config = ClockDomainConfig(
+                    resetKind = SYNC,
+                    resetActiveLevel = LOW
+                )
+            )
+    } else null
 
     //============================================================
     // GMII RX CLK
     //============================================================
 
-    val gmiiRxClkDomain = ClockDomain(
+    val gmiiRxClkDomain = if (config.includeGmii) ClockDomain(
             clock = io.gmii.rx.clk,
             config = ClockDomainConfig(
                 resetKind = BOOT
             )
-        )
+        ) else null
 
-    val gmii_rx = new ClockingArea(gmiiRxClkDomain) {
+    val gmii_rx = if (config.includeGmii) new ClockingArea(gmiiRxClkDomain) {
         val green_counter   = Reg(UInt(24 bits))
         green_counter     := green_counter + 1
         //io.led_green      := green_counter.msb
-    }
+    } else null
 
     //============================================================
     // USB 24MHz clock
     //============================================================
 
-    val u_usb_clk_gen = new DCM_CLKGEN(
-            clkfx_divide    = 125,
-            clkfx_multiply  = 24,
-            clkin_period    = "8.0"
-        )
+    val u_usb_clk_gen = if (config.includeUlpi) new Area {
 
-    u_usb_clk_gen.io.CLKIN      <> io.osc_clk
-    u_usb_clk_gen.io.CLKFX      <> io.usb_clk
-    u_usb_clk_gen.io.RST        <> False
-    u_usb_clk_gen.io.FREEZEDCM  <> False
-    u_usb_clk_gen.io.PROGCLK    <> False
-    u_usb_clk_gen.io.PROGDATA   <> False
-    u_usb_clk_gen.io.PROGEN     <> False
+        val u_usb_clk_pll = new DCM_CLKGEN(
+                clkfx_divide    = 125,
+                clkfx_multiply  = 24,
+                clkin_period    = "8.0"
+            )
 
+        u_usb_clk_pll.io.CLKIN      <> io.osc_clk
+        u_usb_clk_pll.io.CLKFX      <> io.usb_clk
+        u_usb_clk_pll.io.RST        <> False
+        u_usb_clk_pll.io.FREEZEDCM  <> False
+        u_usb_clk_pll.io.PROGCLK    <> False
+        u_usb_clk_pll.io.PROGDATA   <> False
+        u_usb_clk_pll.io.PROGEN     <> False
+    }
 
     //============================================================
     // Core logic
@@ -241,28 +273,34 @@ class Pano extends Component {
         //============================================================
         // Chrontel Pads DVI
         //============================================================
-    
-        val u_dvi = new ChrontelPads(voClkDomain, includeXClkN = true)
-        u_dvi.io.pads             <> io.dvi
-        u_dvi.io.vsync            <> vo.vsync
-        u_dvi.io.hsync            <> vo.hsync
-        u_dvi.io.de               <> vo.de
-        u_dvi.io.r                <> vo.r
-        u_dvi.io.g                <> vo.g
-        u_dvi.io.b                <> vo.b
+
+        val u_dvi = if (config.includeDvi) new ChrontelPads(voClkDomain, includeXClkN = true) else null
+
+        if (config.includeDvi) {
+            u_dvi.io.pads             <> io.dvi
+            u_dvi.io.vsync            <> vo.vsync
+            u_dvi.io.hsync            <> vo.hsync
+            u_dvi.io.de               <> vo.de
+            u_dvi.io.r                <> vo.r
+            u_dvi.io.g                <> vo.g
+            u_dvi.io.b                <> vo.b
+        }
 
         //============================================================
         // Chrontel Pads HDMI
         //============================================================
-    
-        val u_hdmi = new ChrontelPads(voClkDomain, includeXClkN = false)
-        u_hdmi.io.pads            <> io.hdmi
-        u_hdmi.io.vsync           <> vo.vsync
-        u_hdmi.io.hsync           <> vo.hsync
-        u_hdmi.io.de              <> vo.de
-        u_hdmi.io.r               <> vo.r
-        u_hdmi.io.g               <> vo.g
-        u_hdmi.io.b               <> vo.b
+
+        val u_hdmi = if (config.includeHdmi) new ChrontelPads(voClkDomain, includeXClkN = false) else null
+
+        if (config.includeHdmi) {
+            u_hdmi.io.pads            <> io.hdmi
+            u_hdmi.io.vsync           <> vo.vsync
+            u_hdmi.io.hsync           <> vo.hsync
+            u_hdmi.io.de              <> vo.de
+            u_hdmi.io.r               <> vo.r
+            u_hdmi.io.g               <> vo.g
+            u_hdmi.io.b               <> vo.b
+        }
 
     }
 
@@ -273,7 +311,20 @@ object PanoVerilog{
 
         val config = SpinalConfig(anonymSignalUniqueness = true)
         config.generateVerilog({
-            val toplevel = new Pano()
+
+            def panoConfig = PanoConfig(
+              isG1              = false,
+              isG2              = true,
+              includeDvi        = true,
+              includeHdmi       = true,
+              includeVga        = false,
+              includeGmii       = true,
+              includeUlpi       = true,
+              includeUart       = false
+            )
+
+
+            val toplevel = new Pano(panoConfig)
             InOutWrapper(toplevel)
         })
         println("DONE")
