@@ -5,6 +5,12 @@ import spinal.core._
 import spinal.lib._
 import spinal.lib.bus.amba3.apb._
 
+//============================================================
+//
+// APB3 Clock Crossing block
+//
+//============================================================
+
 object Apb3CC {
 }
 
