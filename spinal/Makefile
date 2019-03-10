@@ -15,7 +15,7 @@ syn_usbh:
 	sbt "runMain pano.UsbHostVerilog"
 
 syn-g1:
-	sbt "run-main pano.PanoG1Verilog"
+	sbt "runMain pano.PanoG1Verilog"
 
 waves:
 	gtkwave -o simWorkspace/PanoCoreDut/test.vcd &
