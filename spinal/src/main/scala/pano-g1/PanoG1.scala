@@ -6,6 +6,8 @@ import spinal.core._
 import spinal.lib._
 import spinal.lib.io._
 
+import mii._
+
 class PanoG1 extends Component {
 
     val io = new Bundle {
@@ -16,9 +18,21 @@ class PanoG1 extends Component {
         val led_blue            = out(Bool)
 
         val pano_button         = in(Bool)
+
+        // MII interface
+        val mii_rst_           = out(Bool)
+        val mii                = master(Mii())
     }
 
     noIoPrefix()
+
+    io.mii_rst_     := True
+    io.mii.tx.er    := False
+    io.mii.tx.en    := False
+    io.mii.tx.d     := 0
+    io.mii.mdio.mdc := False
+    io.mii.mdio.mdio.write        := False
+    io.mii.mdio.mdio.writeEnable  := False
 
     //============================================================
     // Create osc_clk clock domain
@@ -84,6 +98,22 @@ class PanoG1 extends Component {
         )
     )
 
+    //============================================================
+    // MII RX CLK
+    //============================================================
+
+    val miiRxClkDomain = ClockDomain(
+            clock = io.mii.rx.clk,
+            config = ClockDomainConfig(
+                resetKind = BOOT
+            )
+        )
+
+    val mii_rx = new ClockingArea(miiRxClkDomain) {
+        val green_counter   = Reg(UInt(22 bits))
+        green_counter     := green_counter + 1
+        io.led_green      := green_counter.msb
+    }
 
     //============================================================
     // Core logic
@@ -94,7 +124,7 @@ class PanoG1 extends Component {
         val u_pano_core = new PanoCoreG1(clkMainDomain)
 
         u_pano_core.io.led_red      <> io.led_red
-        u_pano_core.io.led_green    <> io.led_green
+//        u_pano_core.io.led_green    <> io.led_green
         u_pano_core.io.led_blue     <> io.led_blue
 
         u_pano_core.io.switch_      <> io.pano_button

@@ -220,6 +220,38 @@ NET "led_red" IOSTANDARD = LVCMOS33;
 NET "pano_button" LOC = R7;
 NET "pano_button" IOSTANDARD = LVCMOS33;
 #NET "b2b_aa[16]" LOC = B7  | IOSTANDARD = LVCMOS33;          # B2B A'[16]
+#
+#============================================================
+# Ethernet PHY - Micrel KSZ8721BL
+#============================================================
+
+NET "mii_rst_"          LOC = K3   |IOSTANDARD = LVCMOS33;       # Pin 48, goes to RC circuit
+
+NET "mii_mdio_mdio"     LOC = M5   |IOSTANDARD = LVCMOS33;       # Pin 1
+NET "mii_mdio_mdc"      LOC = T2   |IOSTANDARD = LVCMOS33;       # Pin 2
+
+NET "mii_rx_clk"        LOC = K4   |IOSTANDARD = LVCMOS33;       # Pin 10
+NET "mii_rx_d[3]"       LOC = K7   |IOSTANDARD = LVCMOS33;       # Pin 3
+NET "mii_rx_d[2]"       LOC = M1   |IOSTANDARD = LVCMOS33;       # Pin 4
+NET "mii_rx_d[1]"       LOC = N1   |IOSTANDARD = LVCMOS33;       # Pin 5
+NET "mii_rx_d[0]"       LOC = N2   |IOSTANDARD = LVCMOS33;       # Pin 6
+NET "mii_rx_dv"         LOC = R1   |IOSTANDARD = LVCMOS33;       # Pin 9
+NET "mii_rx_er"         LOC = U1   |IOSTANDARD = LVCMOS33;       # Pin 11
+
+NET "mii_tx_clk"        LOC = K5   |IOSTANDARD = LVCMOS33;       # Pin 15
+NET "mii_tx_er"         LOC = R2   |IOSTANDARD = LVCMOS33;       # Pin 14
+NET "mii_tx_en"         LOC = R3   |IOSTANDARD = LVCMOS33;       # Pin 16
+NET "mii_tx_d[0]"       LOC = P4   |IOSTANDARD = LVCMOS33;       # Pin 17
+NET "mii_tx_d[1]"       LOC = P1   |IOSTANDARD = LVCMOS33;       # Pin 18
+NET "mii_tx_d[2]"       LOC = P2   |IOSTANDARD = LVCMOS33;       # Pin 19
+NET "mii_tx_d[3]"       LOC = P3   |IOSTANDARD = LVCMOS33;       # Pin 20
+
+NET "mii_col"           LOC = N5   |IOSTANDARD = LVCMOS33;       # Pin 21
+NET "mii_crs"           LOC = N4   |IOSTANDARD = LVCMOS33;       # Pin 22
+
+#NET "mii_int_"          LOC = T1   |IOSTANDARD = LVCMOS33;       # Pin 25
+#NET "mii_led[0]"        LOC = K2   |IOSTANDARD = LVCMOS33;       # Pin 26
+#NET "mii_x1"            LOC = J1   |IOSTANDARD = LVCMOS33;       # Pin 46
 
 INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol0" LOC = RAMB16_X0Y11;
 INST "core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol1" LOC = RAMB16_X0Y4;
