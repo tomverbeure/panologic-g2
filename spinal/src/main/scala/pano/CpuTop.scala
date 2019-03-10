@@ -12,6 +12,7 @@ import vexriscv.demo.MuraxApb3Timer
 import scala.collection.mutable.ArrayBuffer
 
 import cc._
+import gmii._
 
 case class CpuTop() extends Component {
 

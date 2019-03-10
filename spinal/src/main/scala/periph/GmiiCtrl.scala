@@ -1,5 +1,5 @@
 
-package pano
+package gmii
 
 import spinal.core._
 import spinal.lib._
@@ -33,7 +33,7 @@ case class GmiiRxCtrl() extends Component {
     u_rx_fifo.io.pop  >> io.rx_fifo_rd
 
     io.rx_fifo_rd_count := u_rx_fifo.io.popOccupancy.resize(16 bits)
-    
+
 }
 
 case class GmiiTxCtrl() extends Component {

@@ -8,6 +8,9 @@ import spinal.lib.io._
 
 import spartan6._
 
+import gmii._
+
+
 class Pano extends Component {
 
     val io = new Bundle {

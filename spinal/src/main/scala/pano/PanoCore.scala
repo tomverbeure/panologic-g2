@@ -9,6 +9,7 @@ import spinal.lib.bus.misc.SizeMapping
 import scala.collection.mutable.ArrayBuffer
 
 import cc._
+import gmii._
 
 class PanoCore(voClkDomain: ClockDomain) extends Component {
 
