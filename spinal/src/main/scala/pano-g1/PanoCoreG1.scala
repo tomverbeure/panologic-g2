@@ -45,7 +45,7 @@ class PanoCoreG1(voClkDomain: ClockDomain) extends Component {
     // 3 - Pano button
     //============================================================
 
-    val u_led_ctrl = Apb3Gpio(4)
+    val u_led_ctrl = Apb3Gpio(4, withReadSync = true)
     u_led_ctrl.io.apb                       <> u_cpu_top.io.led_ctrl_apb
     u_led_ctrl.io.gpio.write(0)             <> io.led_green
     // u_led_ctrl.io.gpio.write(1)             <> io.led_blue
