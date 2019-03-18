@@ -7,6 +7,7 @@ import spinal.lib.io._
 import spinal.lib.bus.amba3.apb._
 import spinal.lib.bus.misc.SizeMapping
 import scala.collection.mutable.ArrayBuffer
+import spinal.lib.com.uart._
 
 import cc._
 import gmii._
@@ -279,9 +280,13 @@ class PanoCore(voClkDomain: ClockDomain, panoConfig: PanoConfig) extends Compone
     val u_led_ctrl = Apb3Gpio(3, withReadSync = true)
     u_led_ctrl.io.apb                       <> u_cpu_top.io.led_ctrl_apb
     u_led_ctrl.io.gpio.write(0)             <> io.led_green
-    u_led_ctrl.io.gpio.write(1)             <> io.led_blue
     u_led_ctrl.io.gpio.read(0)              := io.led_green
-    u_led_ctrl.io.gpio.read(1)              := io.led_blue
+
+    if (!panoConfig.includeUart){
+        u_led_ctrl.io.gpio.write(1)         <> io.led_blue
+        u_led_ctrl.io.gpio.read(1)          := io.led_blue
+    }
+
     u_led_ctrl.io.gpio.read(2)              := False
 
 
@@ -300,6 +305,28 @@ class PanoCore(voClkDomain: ClockDomain, panoConfig: PanoConfig) extends Compone
         io.dvi_ctrl_sda.writeEnable     <> !u_dvi_ctrl.io.gpio.write(1)
         io.dvi_ctrl_sda.write           <> u_dvi_ctrl.io.gpio.write(1)
         io.dvi_ctrl_sda.read            <> u_dvi_ctrl.io.gpio.read(1)
+    }
+
+    if (panoConfig.includeUart){
+        //============================================================
+        // UART
+        //============================================================
+
+        val uartCtrlConfig = UartCtrlMemoryMappedConfig(
+            uartCtrlConfig = UartCtrlGenerics(
+                dataWidthMax      = 9,
+                clockDividerWidth = 20,
+                preSamplingSize   = 1,
+                samplingSize      = 5,
+                postSamplingSize  = 2
+            ),
+            txFifoDepth = 255,        // Uart is for debugging, max size fifo
+            rxFifoDepth = 2           // Rx is a human
+        )
+        val uartCtrl = Apb3UartCtrl(uartCtrlConfig)
+        uartCtrl.io.apb         <> u_cpu_top.io.uart_ctrl_apb
+        uartCtrl.io.uart.txd    <> io.led_blue
+        uartCtrl.io.uart.rxd    := True
     }
 
 }

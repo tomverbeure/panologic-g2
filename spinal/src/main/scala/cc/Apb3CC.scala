@@ -1,5 +1,5 @@
 
-package pano
+package cc
 
 import spinal.core._
 import spinal.lib._
@@ -118,33 +118,33 @@ case class Apb3CCFormalTb() extends Component
     }
 
 
-    val domain = new ClockingArea(ClockDomain(io.clk, io.reset_, 
+    val domain = new ClockingArea(ClockDomain(io.clk, io.reset_,
                                                 config = ClockDomainConfig(resetKind = SYNC, resetActiveLevel = LOW)))
     {
        val apb3Config = Apb3Config(addressWidth = 6, dataWidth = 32)
-   
+
        val src     = Apb3(apb3Config)
        val dest    = Apb3(apb3Config)
-   
+
        val u_apb3cc = new Apb3CC(apb3Config, ClockDomain.current, ClockDomain.current)
        u_apb3cc.io.src         <> src
        u_apb3cc.io.dest        <> dest
-   
+
        val src_xfer_cntr = Reg(UInt(8 bits)) init(0)
        val dest_xfer_cntr = Reg(UInt(8 bits)) init(0)
-   
+
        when(src.PENABLE && src.PREADY){
            src_xfer_cntr := src_xfer_cntr + 1
        }
-   
+
        when(dest.PENABLE && dest.PREADY){
            dest_xfer_cntr := dest_xfer_cntr + 1
        }
-   
-   
+
+
        import spinal.core.GenerationFlags._
        import spinal.core.Formal._
-   
+
        GenerationFlags.formal{
             import pano.lib._
 
@@ -171,7 +171,7 @@ case class Apb3CCFormalTb() extends Component
 
             assume(rose(dest.PREADY)   |-> dest.PENABLE)
             assume(rose(dest.PREADY)   |=> fell(dest.PREADY))
-   
+
             when(!initstate()){
                 assert(src_xfer_cntr === dest_xfer_cntr || src_xfer_cntr+1 === dest_xfer_cntr)
             }
