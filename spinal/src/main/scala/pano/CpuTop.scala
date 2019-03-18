@@ -13,6 +13,7 @@ import scala.collection.mutable.ArrayBuffer
 
 import cc._
 import gmii._
+import ulpi._
 
 case class CpuTop(panoConfig: PanoConfig) extends Component {
 

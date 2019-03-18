@@ -10,6 +10,7 @@ import scala.collection.mutable.ArrayBuffer
 
 import cc._
 import gmii._
+import ulpi._
 
 class PanoCore(voClkDomain: ClockDomain, panoConfig: PanoConfig) extends Component {
 
