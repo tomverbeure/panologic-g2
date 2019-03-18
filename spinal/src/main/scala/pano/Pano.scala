@@ -253,7 +253,7 @@ class Pano(config : PanoConfig) extends Component {
         // Core logic
         //============================================================
 
-        val u_pano_core = new PanoCore(voClkDomain)
+        val u_pano_core = new PanoCore(voClkDomain, config)
 
         u_pano_core.io.led_red      <> io.led_red
         u_pano_core.io.led_green    <> io.led_green
@@ -261,8 +261,10 @@ class Pano(config : PanoConfig) extends Component {
 
         u_pano_core.io.switch_      <> io.pano_button
 
-        u_pano_core.io.dvi_ctrl_scl <> io.dvi_spc
-        u_pano_core.io.dvi_ctrl_sda <> io.dvi_spd
+        if (config.includeDviI2C){
+            u_pano_core.io.dvi_ctrl_scl <> io.dvi_spc
+            u_pano_core.io.dvi_ctrl_sda <> io.dvi_spd
+        }
 
         u_pano_core.io.gmii         <> io.gmii
 
@@ -315,7 +317,7 @@ object PanoVerilog{
             def panoConfig = PanoConfig(
               isG1              = false,
               isG2              = true,
-              includeDvi        = true,
+              includeDvi        = false,
               includeHdmi       = true,
               includeVga        = false,
               includeGmii       = true,

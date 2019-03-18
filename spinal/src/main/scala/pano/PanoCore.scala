@@ -11,7 +11,7 @@ import scala.collection.mutable.ArrayBuffer
 import cc._
 import gmii._
 
-class PanoCore(voClkDomain: ClockDomain) extends Component {
+class PanoCore(voClkDomain: ClockDomain, panoConfig: PanoConfig) extends Component {
 
     val io = new Bundle {
         val led_red             = out(Bool)
@@ -20,8 +20,8 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
 
         val switch_             = in(Bool)
 
-        val dvi_ctrl_scl        = master(TriState(Bool))
-        val dvi_ctrl_sda        = master(TriState(Bool))
+        val dvi_ctrl_scl        = if (panoConfig.includeDviI2C) master(TriState(Bool)) else null
+        val dvi_ctrl_sda        = if (panoConfig.includeDviI2C) master(TriState(Bool)) else null
 
         val gmii                = master(Gmii())
 
@@ -44,7 +44,7 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
         io.led_red  := led_cntr.msb
     }
 
-    val u_cpu_top = CpuTop()
+    val u_cpu_top = CpuTop(panoConfig)
     u_cpu_top.io.switch_                <> io.switch_
 
     var cpuDomain = ClockDomain.current
@@ -280,16 +280,18 @@ class PanoCore(voClkDomain: ClockDomain) extends Component {
     // DVI Config I2C control
     //============================================================
 
-    val u_dvi_ctrl = CCGpio(2)
-    u_dvi_ctrl.io.apb               <> u_cpu_top.io.dvi_ctrl_apb
+    if (panoConfig.includeDviI2C){
+        val u_dvi_ctrl = CCGpio(2)
+        u_dvi_ctrl.io.apb               <> u_cpu_top.io.dvi_ctrl_apb
 
-    io.dvi_ctrl_scl.writeEnable     <> !u_dvi_ctrl.io.gpio.write(0)
-    io.dvi_ctrl_scl.write           <> u_dvi_ctrl.io.gpio.write(0)
-    io.dvi_ctrl_scl.read            <> u_dvi_ctrl.io.gpio.read(0)
+        io.dvi_ctrl_scl.writeEnable     <> !u_dvi_ctrl.io.gpio.write(0)
+        io.dvi_ctrl_scl.write           <> u_dvi_ctrl.io.gpio.write(0)
+        io.dvi_ctrl_scl.read            <> u_dvi_ctrl.io.gpio.read(0)
 
-    io.dvi_ctrl_sda.writeEnable     <> !u_dvi_ctrl.io.gpio.write(1)
-    io.dvi_ctrl_sda.write           <> u_dvi_ctrl.io.gpio.write(1)
-    io.dvi_ctrl_sda.read            <> u_dvi_ctrl.io.gpio.read(1)
+        io.dvi_ctrl_sda.writeEnable     <> !u_dvi_ctrl.io.gpio.write(1)
+        io.dvi_ctrl_sda.write           <> u_dvi_ctrl.io.gpio.write(1)
+        io.dvi_ctrl_sda.read            <> u_dvi_ctrl.io.gpio.read(1)
+    }
 
 }
 

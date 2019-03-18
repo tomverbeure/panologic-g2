@@ -14,12 +14,12 @@ import scala.collection.mutable.ArrayBuffer
 import cc._
 import gmii._
 
-case class CpuTop() extends Component {
+case class CpuTop(panoConfig: PanoConfig) extends Component {
 
     val io = new Bundle {
 
         val led_ctrl_apb        = master(Apb3(Apb3Gpio.getApb3Config()))
-        val dvi_ctrl_apb        = master(Apb3(CCGpio.getApb3Config()))
+        val dvi_ctrl_apb        = if (panoConfig.includeDviI2C) master(Apb3(CCGpio.getApb3Config())) else null
         val gmii_ctrl_apb       = master(Apb3(GmiiCtrl.getApb3Config()))
         val test_patt_apb       = master(Apb3(VideoTestPattern.getApb3Config()))
         val txt_gen_apb         = master(Apb3(VideoTxtGen.getApb3Config()))
@@ -36,7 +36,11 @@ case class CpuTop() extends Component {
     val apbMapping = ArrayBuffer[(Apb3, SizeMapping)]()
 
     apbMapping += io.led_ctrl_apb       -> (0x00000, 256 Byte)
-    apbMapping += io.dvi_ctrl_apb       -> (0x00100, 256 Byte)
+
+    if (panoConfig.includeDviI2C){
+        apbMapping += io.dvi_ctrl_apb       -> (0x00100, 256 Byte)
+    }
+
     apbMapping += io.test_patt_apb      -> (0x00200, 256 Byte)
     apbMapping += io.ulpi_apb           -> (0x00300, 256 Byte)
     apbMapping += io.usb_host_apb       -> (0x00400, 256 Byte)
