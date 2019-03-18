@@ -2,7 +2,11 @@
 #sim:
 #	sbt "test-only rt.PanoTester"
 
-syn:
+.PHONE: submodule
+submodule:
+	cd ../ & git submodule update
+
+syn: submodule
 	sbt "runMain pano.PanoVerilog"
 
 syn_ulpi:
@@ -14,7 +18,7 @@ syn_apb3cc:
 syn_usbh:
 	sbt "runMain pano.UsbHostVerilog"
 
-syn-g1:
+syn-g1: submodule
 	sbt "runMain pano.PanoG1Verilog"
 
 waves:
