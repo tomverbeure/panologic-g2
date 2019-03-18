@@ -148,7 +148,7 @@ class Pano(config : PanoConfig) extends Component {
     //============================================================
 
 
-    var voClkDomain : ClockDomain = null;
+    var voClkDomain : ClockDomain = null
 
     val u_vo_clk_gen = if (config.isG2) new Area {
 
@@ -266,9 +266,13 @@ class Pano(config : PanoConfig) extends Component {
             u_pano_core.io.dvi_ctrl_sda <> io.dvi_spd
         }
 
-        u_pano_core.io.gmii         <> io.gmii
+        if (config.includeGmii){
+            u_pano_core.io.gmii         <> io.gmii
+        }
 
-        u_pano_core.io.ulpi         <> io.ulpi
+        if (config.includeUlpi){
+            u_pano_core.io.ulpi         <> io.ulpi
+        }
 
         u_pano_core.io.vo           <> vo
 
@@ -317,7 +321,7 @@ object PanoVerilog{
             def panoConfig = PanoConfig(
               isG1              = false,
               isG2              = true,
-              includeDvi        = false,
+              includeDvi        = true,
               includeHdmi       = true,
               includeVga        = false,
               includeGmii       = true,

@@ -23,9 +23,9 @@ class PanoCore(voClkDomain: ClockDomain, panoConfig: PanoConfig) extends Compone
         val dvi_ctrl_scl        = if (panoConfig.includeDviI2C) master(TriState(Bool)) else null
         val dvi_ctrl_sda        = if (panoConfig.includeDviI2C) master(TriState(Bool)) else null
 
-        val gmii                = master(Gmii())
+        val gmii                = if (panoConfig.includeGmii)   master(Gmii())         else null
 
-        val ulpi                = slave(Ulpi())
+        val ulpi                = if (panoConfig.includeUlpi)   slave(Ulpi())          else null
 
         val vo                  = out(VgaData())
     }
@@ -49,24 +49,28 @@ class PanoCore(voClkDomain: ClockDomain, panoConfig: PanoConfig) extends Compone
 
     var cpuDomain = ClockDomain.current
 
-    val rawUlpiDomain = ClockDomain(
-        clock       = io.ulpi.clk,
-        frequency   = FixedFrequency(60 MHz),
-        config      = ClockDomainConfig(
-                        resetKind = BOOT
-        )
-    )
+    var ulpiDomain: ClockDomain = null
 
-    val ulpi_reset_ = rawUlpiDomain(RegNext(True) init(False))
-
-    val ulpiDomain = ClockDomain(
-        clock = io.ulpi.clk,
-        reset = ulpi_reset_,
-        config = ClockDomainConfig(
-                    resetKind = SYNC,
-                    resetActiveLevel = LOW
+    if (panoConfig.includeUlpi){
+        val rawUlpiDomain = ClockDomain(
+            clock       = io.ulpi.clk,
+            frequency   = FixedFrequency(60 MHz),
+            config      = ClockDomainConfig(
+                            resetKind = BOOT
+            )
         )
-    )
+
+        val ulpi_reset_ = rawUlpiDomain(RegNext(True) init(False))
+
+        ulpiDomain = ClockDomain(
+            clock = io.ulpi.clk,
+            reset = ulpi_reset_,
+            config = ClockDomainConfig(
+                        resetKind = SYNC,
+                        resetActiveLevel = LOW
+            )
+        )
+    }
 
 
     val vo_area = new ClockingArea(voClkDomain) {
@@ -224,45 +228,48 @@ class PanoCore(voClkDomain: ClockDomain, panoConfig: PanoConfig) extends Compone
         u_vo.io.vga_out             <> io.vo
     }
 
-    //============================================================
-    // GMII
-    //============================================================
+    if (panoConfig.includeGmii){
+        //============================================================
+        // GMII
+        //============================================================
 
-    val u_gmii_ctrl = GmiiCtrl()
-    u_gmii_ctrl.io.apb              <> u_cpu_top.io.gmii_ctrl_apb
-    u_gmii_ctrl.io.gmii             <> io.gmii
-
-    //============================================================
-    // ULPI
-    //============================================================
-
-    val u_ulpi_ctrl = UlpiCtrl()
-    u_ulpi_ctrl.io.ulpi             <> io.ulpi
-
-    val ulpi_ctrl = new ClockingArea(cpuDomain) {
-        val busCtrl = Apb3SlaveFactory(u_cpu_top.io.ulpi_apb)
-
-        val apb_regs = u_ulpi_ctrl.driveFrom(busCtrl, 0x0)
+        val u_gmii_ctrl = GmiiCtrl()
+        u_gmii_ctrl.io.apb              <> u_cpu_top.io.gmii_ctrl_apb
+        u_gmii_ctrl.io.gmii             <> io.gmii
     }
 
-    //============================================================
-    // USB Host
-    //============================================================
+    if (panoConfig.includeUlpi){
+        //============================================================
+        // ULPI
+        //============================================================
 
-    val usb_host_apb = Apb3(UsbHost.getApb3Config())
+        val u_ulpi_ctrl = UlpiCtrl()
+        u_ulpi_ctrl.io.ulpi             <> io.ulpi
 
-    val u_apb2usb_host = new Apb3CC(UsbHost.getApb3Config, ClockDomain.current, ulpiDomain)
-    u_apb2usb_host.io.src           <> u_cpu_top.io.usb_host_apb
-    u_apb2usb_host.io.dest          <> usb_host_apb
+        val ulpi_ctrl = new ClockingArea(cpuDomain) {
+            val busCtrl = Apb3SlaveFactory(u_cpu_top.io.ulpi_apb)
 
-    val usb_host_domain = new ClockingArea(ulpiDomain) {
-        val u_usb_host = UsbHost()
+            val apb_regs = u_ulpi_ctrl.driveFrom(busCtrl, 0x0)
+        }
 
-        val busCtrl = Apb3SlaveFactory(usb_host_apb)
+        //============================================================
+        // USB Host
+        //============================================================
 
-        val apb_regs = u_usb_host.driveFrom(busCtrl, 0x0)
+        val usb_host_apb = Apb3(UsbHost.getApb3Config())
+
+        val u_apb2usb_host = new Apb3CC(UsbHost.getApb3Config, ClockDomain.current, ulpiDomain)
+        u_apb2usb_host.io.src           <> u_cpu_top.io.usb_host_apb
+        u_apb2usb_host.io.dest          <> usb_host_apb
+
+        val usb_host_domain = new ClockingArea(ulpiDomain) {
+            val u_usb_host = UsbHost()
+
+            val busCtrl = Apb3SlaveFactory(usb_host_apb)
+
+            val apb_regs = u_usb_host.driveFrom(busCtrl, 0x0)
+        }
     }
-
 
     //============================================================
     // LED control
@@ -276,11 +283,12 @@ class PanoCore(voClkDomain: ClockDomain, panoConfig: PanoConfig) extends Compone
     u_led_ctrl.io.gpio.read(1)              := io.led_blue
     u_led_ctrl.io.gpio.read(2)              := False
 
-    //============================================================
-    // DVI Config I2C control
-    //============================================================
 
     if (panoConfig.includeDviI2C){
+        //============================================================
+        // DVI Config I2C control
+        //============================================================
+
         val u_dvi_ctrl = CCGpio(2)
         u_dvi_ctrl.io.apb               <> u_cpu_top.io.dvi_ctrl_apb
 
