@@ -10,7 +10,7 @@ case class VideoTimings() extends Bundle {
     val h_bp                = UInt(9 bits)
     val h_sync_positive     = Bool
 
-    val h_total_m1          = UInt(12 bits)
+    def h_total_m1          : UInt = h_active + h_fp + h_sync + h_bp - 1
 
     val v_active            = UInt(11 bits)
     val v_fp                = UInt(9 bits)
@@ -18,7 +18,7 @@ case class VideoTimings() extends Bundle {
     val v_bp                = UInt(9 bits)
     val v_sync_positive     = Bool
 
-    val v_total_m1          = UInt(12 bits)
+    def v_total_m1          : UInt = v_active + v_fp + v_sync + v_bp - 1
 }
 
 case class VgaData() extends Bundle {

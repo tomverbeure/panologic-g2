@@ -86,14 +86,12 @@ class PanoCore(voClkDomain: ClockDomain, panoConfig: PanoConfig) extends Compone
             timings.h_sync          := 96
             timings.h_bp            := 48
             timings.h_sync_positive := False
-            timings.h_total_m1      := (timings.h_active + timings.h_fp + timings.h_sync + timings.h_bp -1).resize(timings.h_total_m1.getWidth)
 
             timings.v_active        := 480
             timings.v_fp            := 11
             timings.v_sync          := 2
             timings.v_bp            := 31
             timings.v_sync_positive := False
-            timings.v_total_m1      := (timings.v_active + timings.v_fp + timings.v_sync + timings.v_bp -1).resize(timings.v_total_m1.getWidth)
         }
         else if (false) {
             // 1024x768@60
@@ -103,14 +101,12 @@ class PanoCore(voClkDomain: ClockDomain, panoConfig: PanoConfig) extends Compone
             timings.h_sync          := 136
             timings.h_bp            := 160
             timings.h_sync_positive := True
-            timings.h_total_m1      := (timings.h_active + timings.h_fp + timings.h_sync + timings.h_bp -1).resize(timings.h_total_m1.getWidth)
 
             timings.v_active        := 768
             timings.v_fp            := 3
             timings.v_sync          := 6
             timings.v_bp            := 29
             timings.v_sync_positive := True
-            timings.v_total_m1      := (timings.v_active + timings.v_fp + timings.v_sync + timings.v_bp -1).resize(timings.v_total_m1.getWidth)
         }
         else if (false) {
             // 1152x864@60
@@ -120,14 +116,12 @@ class PanoCore(voClkDomain: ClockDomain, panoConfig: PanoConfig) extends Compone
             timings.h_sync          := 120
             timings.h_bp            := 184
             timings.h_sync_positive := True
-            timings.h_total_m1      := (timings.h_active + timings.h_fp + timings.h_sync + timings.h_bp -1).resize(timings.h_total_m1.getWidth)
 
             timings.v_active        := 864
             timings.v_fp            := 1
             timings.v_sync          := 3
             timings.v_bp            := 27
             timings.v_sync_positive := True
-            timings.v_total_m1      := (timings.v_active + timings.v_fp + timings.v_sync + timings.v_bp -1).resize(timings.v_total_m1.getWidth)
         }
         else if (false) {
             // 1280x1024@60
@@ -137,14 +131,12 @@ class PanoCore(voClkDomain: ClockDomain, panoConfig: PanoConfig) extends Compone
             timings.h_sync          := 112
             timings.h_bp            := 248
             timings.h_sync_positive := True
-            timings.h_total_m1      := (timings.h_active + timings.h_fp + timings.h_sync + timings.h_bp -1).resize(timings.h_total_m1.getWidth)
 
             timings.v_active        := 1024
             timings.v_fp            := 1
             timings.v_sync          := 3
             timings.v_bp            := 38
             timings.v_sync_positive := True
-            timings.v_total_m1      := (timings.v_active + timings.v_fp + timings.v_sync + timings.v_bp -1).resize(timings.v_total_m1.getWidth)
         }
         else if (true) {
             // 1080p@60
@@ -154,14 +146,12 @@ class PanoCore(voClkDomain: ClockDomain, panoConfig: PanoConfig) extends Compone
             timings.h_sync          := 44
             timings.h_bp            := 148
             timings.h_sync_positive := True
-            timings.h_total_m1      := (timings.h_active + timings.h_fp + timings.h_sync + timings.h_bp -1).resize(timings.h_total_m1.getWidth)
 
             timings.v_active        := 1080
             timings.v_fp            := 4
             timings.v_sync          := 5
             timings.v_bp            := 36
             timings.v_sync_positive := True
-            timings.v_total_m1      := (timings.v_active + timings.v_fp + timings.v_sync + timings.v_bp -1).resize(timings.v_total_m1.getWidth)
         }
         else  {
             // 1680x1050@60
@@ -171,14 +161,12 @@ class PanoCore(voClkDomain: ClockDomain, panoConfig: PanoConfig) extends Compone
             timings.h_sync          := 184
             timings.h_bp            := 288
             timings.h_sync_positive := True
-            timings.h_total_m1      := (timings.h_active + timings.h_fp + timings.h_sync + timings.h_bp -1).resize(timings.h_total_m1.getWidth)
 
             timings.v_active        := 1050
             timings.v_fp            := 1
             timings.v_sync          := 3
             timings.v_bp            := 33
             timings.v_sync_positive := True
-            timings.v_total_m1      := (timings.v_active + timings.v_fp + timings.v_sync + timings.v_bp -1).resize(timings.v_total_m1.getWidth)
         }
 
         val vi_gen_pixel_out = PixelStream()
