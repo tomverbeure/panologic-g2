@@ -56,10 +56,13 @@ case class Pixel() extends Bundle {
 }
 
 case class PixelStream() extends Bundle {
-    val vsync   = Bool
-    val req     = Bool
-    val eol     = Bool
-    val eof     = Bool
-    val pixel   = Pixel()
+    val vsync     = Bool
+    val req       = Bool
+    val last_col  = Bool
+    val last_line = Bool
+    val pixel     = Pixel()
+
+    def eol = last_col 
+    def eof = last_col && last_line
 }
 
