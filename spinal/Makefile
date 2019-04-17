@@ -3,6 +3,7 @@
 #	sbt "test-only rt.PanoTester"
 
 syn:
+	git submodule update --init
 	sbt "runMain pano.PanoVerilog"
 
 syn_ulpi:
