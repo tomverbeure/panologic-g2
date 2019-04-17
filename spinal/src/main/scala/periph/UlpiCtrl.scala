@@ -1,5 +1,5 @@
 
-package pano
+package ulpi
 
 import spinal.core._
 import spinal.lib._

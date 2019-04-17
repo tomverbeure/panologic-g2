@@ -7,9 +7,11 @@ import spinal.lib.io._
 import spinal.lib.bus.amba3.apb._
 import spinal.lib.bus.misc.SizeMapping
 import scala.collection.mutable.ArrayBuffer
+import spinal.lib.com.uart._
 
 import cc._
 import gmii._
+import ulpi._
 
 class PanoCore(voClkDomain: ClockDomain, panoConfig: PanoConfig) extends Component {
 
@@ -77,107 +79,7 @@ class PanoCore(voClkDomain: ClockDomain, panoConfig: PanoConfig) extends Compone
 
         // http://tinyvga.com/vga-timing
         val timings = VideoTimings()
-        if (false){
-            // 640x480@60
-            timings.h_active        := 640
-            timings.h_fp            := 16
-            timings.h_sync          := 96
-            timings.h_bp            := 48
-            timings.h_sync_positive := False
-            timings.h_total_m1      := (timings.h_active + timings.h_fp + timings.h_sync + timings.h_bp -1).resize(timings.h_total_m1.getWidth)
-
-            timings.v_active        := 480
-            timings.v_fp            := 11
-            timings.v_sync          := 2
-            timings.v_bp            := 31
-            timings.v_sync_positive := False
-            timings.v_total_m1      := (timings.v_active + timings.v_fp + timings.v_sync + timings.v_bp -1).resize(timings.v_total_m1.getWidth)
-        }
-        else if (false) {
-            // 1024x768@60
-            // Clock: 65MHz
-            timings.h_active        := 1024
-            timings.h_fp            := 24
-            timings.h_sync          := 136
-            timings.h_bp            := 160
-            timings.h_sync_positive := True
-            timings.h_total_m1      := (timings.h_active + timings.h_fp + timings.h_sync + timings.h_bp -1).resize(timings.h_total_m1.getWidth)
-
-            timings.v_active        := 768
-            timings.v_fp            := 3
-            timings.v_sync          := 6
-            timings.v_bp            := 29
-            timings.v_sync_positive := True
-            timings.v_total_m1      := (timings.v_active + timings.v_fp + timings.v_sync + timings.v_bp -1).resize(timings.v_total_m1.getWidth)
-        }
-        else if (false) {
-            // 1152x864@60
-            // Clock: 81.62MHz
-            timings.h_active        := 1152
-            timings.h_fp            := 64
-            timings.h_sync          := 120
-            timings.h_bp            := 184
-            timings.h_sync_positive := True
-            timings.h_total_m1      := (timings.h_active + timings.h_fp + timings.h_sync + timings.h_bp -1).resize(timings.h_total_m1.getWidth)
-
-            timings.v_active        := 864
-            timings.v_fp            := 1
-            timings.v_sync          := 3
-            timings.v_bp            := 27
-            timings.v_sync_positive := True
-            timings.v_total_m1      := (timings.v_active + timings.v_fp + timings.v_sync + timings.v_bp -1).resize(timings.v_total_m1.getWidth)
-        }
-        else if (false) {
-            // 1280x1024@60
-            // Clock: 108.0
-            timings.h_active        := 1280
-            timings.h_fp            := 48
-            timings.h_sync          := 112
-            timings.h_bp            := 248
-            timings.h_sync_positive := True
-            timings.h_total_m1      := (timings.h_active + timings.h_fp + timings.h_sync + timings.h_bp -1).resize(timings.h_total_m1.getWidth)
-
-            timings.v_active        := 1024
-            timings.v_fp            := 1
-            timings.v_sync          := 3
-            timings.v_bp            := 38
-            timings.v_sync_positive := True
-            timings.v_total_m1      := (timings.v_active + timings.v_fp + timings.v_sync + timings.v_bp -1).resize(timings.v_total_m1.getWidth)
-        }
-        else if (true) {
-            // 1080p@60
-            // Clock: 147.5
-            timings.h_active        := 1920
-            timings.h_fp            := 88
-            timings.h_sync          := 44
-            timings.h_bp            := 148
-            timings.h_sync_positive := True
-            timings.h_total_m1      := (timings.h_active + timings.h_fp + timings.h_sync + timings.h_bp -1).resize(timings.h_total_m1.getWidth)
-
-            timings.v_active        := 1080
-            timings.v_fp            := 4
-            timings.v_sync          := 5
-            timings.v_bp            := 36
-            timings.v_sync_positive := True
-            timings.v_total_m1      := (timings.v_active + timings.v_fp + timings.v_sync + timings.v_bp -1).resize(timings.v_total_m1.getWidth)
-        }
-        else  {
-            // 1680x1050@60
-            // Clock: 147MHz
-            timings.h_active        := 1680
-            timings.h_fp            := 104
-            timings.h_sync          := 184
-            timings.h_bp            := 288
-            timings.h_sync_positive := True
-            timings.h_total_m1      := (timings.h_active + timings.h_fp + timings.h_sync + timings.h_bp -1).resize(timings.h_total_m1.getWidth)
-
-            timings.v_active        := 1050
-            timings.v_fp            := 1
-            timings.v_sync          := 3
-            timings.v_bp            := 33
-            timings.v_sync_positive := True
-            timings.v_total_m1      := (timings.v_active + timings.v_fp + timings.v_sync + timings.v_bp -1).resize(timings.v_total_m1.getWidth)
-        }
+        timings.timing_1080p_60
 
         val vi_gen_pixel_out = PixelStream()
 
@@ -278,9 +180,13 @@ class PanoCore(voClkDomain: ClockDomain, panoConfig: PanoConfig) extends Compone
     val u_led_ctrl = Apb3Gpio(3, withReadSync = true)
     u_led_ctrl.io.apb                       <> u_cpu_top.io.led_ctrl_apb
     u_led_ctrl.io.gpio.write(0)             <> io.led_green
-    u_led_ctrl.io.gpio.write(1)             <> io.led_blue
     u_led_ctrl.io.gpio.read(0)              := io.led_green
-    u_led_ctrl.io.gpio.read(1)              := io.led_blue
+
+    if (!panoConfig.includeUart){
+        u_led_ctrl.io.gpio.write(1)         <> io.led_blue
+        u_led_ctrl.io.gpio.read(1)          := io.led_blue
+    }
+
     u_led_ctrl.io.gpio.read(2)              := False
 
 
@@ -299,6 +205,28 @@ class PanoCore(voClkDomain: ClockDomain, panoConfig: PanoConfig) extends Compone
         io.dvi_ctrl_sda.writeEnable     <> !u_dvi_ctrl.io.gpio.write(1)
         io.dvi_ctrl_sda.write           <> u_dvi_ctrl.io.gpio.write(1)
         io.dvi_ctrl_sda.read            <> u_dvi_ctrl.io.gpio.read(1)
+    }
+
+    if (panoConfig.includeUart){
+        //============================================================
+        // UART
+        //============================================================
+
+        val uartCtrlConfig = UartCtrlMemoryMappedConfig(
+            uartCtrlConfig = UartCtrlGenerics(
+                dataWidthMax      = 9,
+                clockDividerWidth = 20,
+                preSamplingSize   = 1,
+                samplingSize      = 5,
+                postSamplingSize  = 2
+            ),
+            txFifoDepth = 255,        // Uart is for debugging, max size fifo
+            rxFifoDepth = 2           // Rx is a human
+        )
+        val uartCtrl = Apb3UartCtrl(uartCtrlConfig)
+        uartCtrl.io.apb         <> u_cpu_top.io.uart_ctrl_apb
+        uartCtrl.io.uart.txd    <> io.led_blue
+        uartCtrl.io.uart.rxd    := True
     }
 
 }
