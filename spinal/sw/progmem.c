@@ -70,28 +70,26 @@ int main() {
     print("Code at github.com/tomverbeure/panologic-g2\n");
 #endif
 
-    ulpi_print_id();
-
-    ulpi_reset_bus();
-
-    ulpi_monitor_rx_cmd();
-
 #if 0
+    // Basis ULPI bus monitoring.
+    ulpi_print_id();
+    ulpi_reset_bus();
+    ulpi_monitor_rx_cmd();      // This is an endless loop
+#endif
+
+#if 1
+    // Basic test that dumps received packets on the GMII interface
     gmii_mdio_init();
     gmii_reg_dump(0);
     gmii_print_phy_id(0);
     gmii_wait_auto_neg_complete(0);
-#endif
-#if 0
     gmii_reg_dump(0);
-#endif
-#if 0
-    gmii_monitor_regs(0);
-#endif
-#if 0
+
     gmii_dump_packets(0);
 #endif
 
+#if 0
+    // This test simply loops through test patterns.
     int pattern_nr = 0;
     int const_color_nr = 0;
 
@@ -112,6 +110,7 @@ int main() {
             }
         }
     }
+#endif
 
     while(1){
         if (!button_pressed()){
