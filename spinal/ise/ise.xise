@@ -59,7 +59,7 @@
     <property xil_pn:name="Configuration Rate spartan6" xil_pn:value="2" xil_pn:valueState="default"/>
     <property xil_pn:name="Correlate Output to Input Design" xil_pn:value="false" xil_pn:valueState="default"/>
     <property xil_pn:name="Create ASCII Configuration File" xil_pn:value="false" xil_pn:valueState="default"/>
-    <property xil_pn:name="Create Binary Configuration File" xil_pn:value="false" xil_pn:valueState="default"/>
+    <property xil_pn:name="Create Binary Configuration File" xil_pn:value="true" xil_pn:valueState="non-default"/>
     <property xil_pn:name="Create Bit File" xil_pn:value="true" xil_pn:valueState="default"/>
     <property xil_pn:name="Create I/O Pads from Ports" xil_pn:value="false" xil_pn:valueState="default"/>
     <property xil_pn:name="Create IEEE 1532 Configuration File spartan6" xil_pn:value="false" xil_pn:valueState="default"/>
@@ -84,7 +84,7 @@
     <property xil_pn:name="Enable Internal Done Pipe" xil_pn:value="false" xil_pn:valueState="default"/>
     <property xil_pn:name="Enable Message Filtering" xil_pn:value="false" xil_pn:valueState="default"/>
     <property xil_pn:name="Enable Multi-Pin Wake-Up Suspend Mode spartan6" xil_pn:value="false" xil_pn:valueState="default"/>
-    <property xil_pn:name="Enable Multi-Threading" xil_pn:value="Off" xil_pn:valueState="default"/>
+    <property xil_pn:name="Enable Multi-Threading" xil_pn:value="2" xil_pn:valueState="non-default"/>
     <property xil_pn:name="Enable Multi-Threading par spartan6" xil_pn:value="Off" xil_pn:valueState="default"/>
     <property xil_pn:name="Enable Outputs (Output Events)" xil_pn:value="Default (5)" xil_pn:valueState="default"/>
     <property xil_pn:name="Enable Suspend/Wake Global Set/Reset spartan6" xil_pn:value="false" xil_pn:valueState="default"/>
@@ -205,10 +205,10 @@
     <property xil_pn:name="Perform Advanced Analysis" xil_pn:value="false" xil_pn:valueState="default"/>
     <property xil_pn:name="Perform Advanced Analysis Post Trace" xil_pn:value="false" xil_pn:valueState="default"/>
     <property xil_pn:name="Perform Timing-Driven Packing and Placement" xil_pn:value="false" xil_pn:valueState="default"/>
-    <property xil_pn:name="Place &amp; Route Effort Level (Overall)" xil_pn:value="High" xil_pn:valueState="default"/>
+    <property xil_pn:name="Place &amp; Route Effort Level (Overall)" xil_pn:value="Standard" xil_pn:valueState="non-default"/>
     <property xil_pn:name="Place And Route Mode" xil_pn:value="Normal Place and Route" xil_pn:valueState="default"/>
     <property xil_pn:name="Place MultiBoot Settings into Bitstream spartan6" xil_pn:value="false" xil_pn:valueState="default"/>
-    <property xil_pn:name="Placer Effort Level Map" xil_pn:value="High" xil_pn:valueState="default"/>
+    <property xil_pn:name="Placer Effort Level Map" xil_pn:value="Standard" xil_pn:valueState="non-default"/>
     <property xil_pn:name="Placer Extra Effort Map" xil_pn:value="None" xil_pn:valueState="default"/>
     <property xil_pn:name="Port to be used" xil_pn:value="Auto - default" xil_pn:valueState="default"/>
     <property xil_pn:name="Post Map Simulation Model Name" xil_pn:value="Pano_map.v" xil_pn:valueState="default"/>
