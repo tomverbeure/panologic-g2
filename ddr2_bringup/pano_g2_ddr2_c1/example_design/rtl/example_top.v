@@ -105,8 +105,13 @@ module example_top #
 )	
 
 (
-   output                                           calib_done,
-   output                                           error,
+//   output                                           calib_done,
+//   output                                           error,
+   output                                           gmii_rst_,
+   output                                           led_red,
+   output                                           led_green,
+   output                                           led_blue,
+
    inout  [C1_NUM_DQ_PINS-1:0]                      mcb1_dram_dq,
    output [C1_MEM_ADDR_WIDTH-1:0]                   mcb1_dram_a,
    output [C1_MEM_BANKADDR_WIDTH-1:0]               mcb1_dram_ba,
@@ -122,7 +127,6 @@ module example_top #
    inout                                            mcb1_zio,
    output                                           mcb1_dram_udm,
    input                                            c1_sys_clk,
-   input                                            c1_sys_rst_i,
    inout                                            mcb1_dram_dqs,
    inout                                            mcb1_dram_dqs_n,
    output                                           mcb1_dram_ck,
@@ -266,6 +270,7 @@ module example_top #
 
   wire                              c1_sys_clk_p;
   wire                              c1_sys_clk_n;
+  wire                              c1_clk_orig;
   wire                              c1_error;
   wire                              c1_calib_done;
   wire                              c1_clk0;
@@ -472,8 +477,36 @@ assign calib_done = c1_calib_done;
 assign  c1_sys_clk_p = 1'b0;
 assign  c1_sys_clk_n = 1'b0;
 
+assign gmii_rst_ = 1'b1;
+
+//============================================================
+
+reg c1_sys_rst_i;
+reg [23:0] rst_cntr;
+
+initial rst_cntr = 0;
+initial c1_sys_rst_i = 1'b1;
+always @(posedge c1_clk_orig) begin
+    rst_cntr <= rst_cntr + 1;
+
+    if (rst_cntr[23]) begin
+        c1_sys_rst_i = 1'b0;
+    end
+end
+
+//============================================================
+
+reg [23:0] led_cntr;
+
+initial led_cntr = 0;
+always @(posedge c1_clk0) begin
+    led_cntr <= led_cntr + 1;
+end
+assign led_red = led_cntr[23];
 
 
+assign led_green = calib_done;
+assign led_blue = error;
 
 // Infrastructure-1 instantiation
       infrastructure #
@@ -494,6 +527,7 @@ assign  c1_sys_clk_n = 1'b0;
          .sys_clk_n                      (c1_sys_clk_n),  // [input] differential n type clock from board
          .sys_clk                        (c1_sys_clk),    // [input] single ended input clock from board
          .sys_rst_i                      (c1_sys_rst_i),  
+         .clk_orig                       (c1_clk_orig),
          .clk0                           (c1_clk0),       // [output] user clock which determines the operating frequency of user interface ports
          .rst0                           (c1_rst0),
          .async_rst                      (c1_async_rst),

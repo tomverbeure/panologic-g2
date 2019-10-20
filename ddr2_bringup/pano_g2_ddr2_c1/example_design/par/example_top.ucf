@@ -74,10 +74,15 @@ NET "mcb1_dram_udqs_n"                                IN_TERM = NONE;
 # Status Signals 
 ############################################################################
 
-NET  "error"                                    IOSTANDARD = LVCMOS18 ;
-NET  "calib_done"                               IOSTANDARD = LVCMOS18 ;
-NET  "calib_done"                               LOC = "C5" ;
-NET  "error"                                    LOC = "A5" ;
+#NET  "error"                                    IOSTANDARD = LVCMOS18 ;
+#NET  "calib_done"                               IOSTANDARD = LVCMOS18 ;
+#NET  "calib_done"                               LOC = "C5" ;
+#NET  "error"                                    LOC = "A5" ;
+
+NET "gmii_rst_"                                 LOC = R11 | IOSTANDARD = LVCMOS33;
+NET "led_red"                                   LOC = E12 | IOSTANDARD = LVCMOS33;
+NET "led_blue"                                  LOC = H13 | IOSTANDARD = LVCMOS33;
+NET "led_green"                                 LOC = F13 | IOSTANDARD = LVCMOS33;
 
 ############################################################################
 # I/O STANDARDS 
@@ -101,8 +106,8 @@ NET  "mcb1_dram_dm"                                  IOSTANDARD = SSTL18_II ;
 NET  "mcb1_dram_udm"                                 IOSTANDARD = SSTL18_II ;
 NET  "mcb1_rzq"                                      IOSTANDARD = SSTL18_II ;
 NET  "mcb1_zio"                                      IOSTANDARD = SSTL18_II ;
-NET  "c1_sys_clk"                                  IOSTANDARD = LVCMOS25 ;
-NET  "c1_sys_rst_i"                                IOSTANDARD = LVCMOS18 ;
+NET  "c1_sys_clk"                                  IOSTANDARD = LVCMOS33 ;
+#NET  "c1_sys_rst_i"                                IOSTANDARD = LVCMOS18 ;
 ############################################################################
 # MCB 1
 # Pin Location Constraints for Clock, Masks, Address, and Controls
@@ -148,8 +153,8 @@ NET  "mcb1_dram_dqs"                             LOC = "L20" ;
 NET  "mcb1_dram_dqs_n"                           LOC = "L22" ;
 NET  "mcb1_dram_odt"                             LOC = "G22" ;
 NET  "mcb1_dram_ras_n"                           LOC = "H21" ;
-NET  "c1_sys_clk"                                LOC = "B10" ;
-NET  "c1_sys_rst_i"                              LOC = "C13" ;
+NET  "c1_sys_clk"                                LOC = "Y13" ;
+#NET  "c1_sys_rst_i"                              LOC = "C13" ;
 NET  "mcb1_dram_udm"                             LOC = "M20" ;
 NET  "mcb1_dram_udqs"                            LOC = "T21" ;
 NET  "mcb1_dram_udqs_n"                          LOC = "T22" ;

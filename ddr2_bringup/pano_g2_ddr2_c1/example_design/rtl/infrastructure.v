@@ -84,6 +84,7 @@ module infrastructure #
    input  sys_clk_n,
    input  sys_clk,
    input  sys_rst_i,
+   output clk_orig,
    output clk0,
    output rst0,
    output async_rst,
@@ -160,6 +161,8 @@ module infrastructure #
            );
    end
   endgenerate
+
+  assign clk_orig = sys_clk_ibufg;
 
   //***************************************************************************
   // Global clock generation and distribution
