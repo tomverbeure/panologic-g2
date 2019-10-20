@@ -83,7 +83,7 @@ module sim_tb_top;
    localparam C1_PORT_CONFIG             =  "B32_B32_B32_B32";
    	parameter C1_MEMCLK_PERIOD     = 8000;
    parameter C1_RST_ACT_LOW        = 0;
-   parameter C1_INPUT_CLK_TYPE     = "DIFFERENTIAL";
+   parameter C1_INPUT_CLK_TYPE     = "SINGLE_ENDED";
    parameter C1_NUM_DQ_PINS        = 16;
    parameter C1_MEM_ADDR_WIDTH     = 13;
    parameter C1_MEM_BANKADDR_WIDTH = 2;   
@@ -401,8 +401,7 @@ pano_g2_ddr2_c1 #(
 design_top (
 
 
-    .c1_sys_clk_p           (c1_sys_clk_p),
-  .c1_sys_clk_n           (c1_sys_clk_n),
+    .c1_sys_clk           (c1_sys_clk),
   .c1_sys_rst_i           (c1_sys_rst_i),                        
 
   .mcb1_dram_dq           (mcb1_dram_dq),  

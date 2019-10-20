@@ -1,10 +1,10 @@
 # Output products list for <pano_g2_ddr2_c1>
-mig.prj
 pano_g2_ddr2_c1/docs/ug388.pdf
 pano_g2_ddr2_c1/docs/ug416.pdf
 pano_g2_ddr2_c1/example_design/datasheet.txt
 pano_g2_ddr2_c1/example_design/mig.prj
 pano_g2_ddr2_c1/example_design/par/create_ise.sh
+pano_g2_ddr2_c1/example_design/par/example_top.cdc
 pano_g2_ddr2_c1/example_design/par/example_top.ucf
 pano_g2_ddr2_c1/example_design/par/icon_coregen.xco
 pano_g2_ddr2_c1/example_design/par/ila_coregen.xco
@@ -63,6 +63,7 @@ pano_g2_ddr2_c1/user_design/par/ise_flow.sh
 pano_g2_ddr2_c1/user_design/par/ise_run.txt
 pano_g2_ddr2_c1/user_design/par/makeproj.sh
 pano_g2_ddr2_c1/user_design/par/mem_interface_top.ut
+pano_g2_ddr2_c1/user_design/par/pano_g2_ddr2_c1.cdc
 pano_g2_ddr2_c1/user_design/par/pano_g2_ddr2_c1.ucf
 pano_g2_ddr2_c1/user_design/par/readme.txt
 pano_g2_ddr2_c1/user_design/par/rem_files.sh

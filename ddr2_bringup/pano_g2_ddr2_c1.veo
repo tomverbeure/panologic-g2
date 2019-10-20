@@ -72,12 +72,12 @@
     .C1_P0_DATA_PORT_SIZE(32),
     .C1_P1_MASK_SIZE(4),
     .C1_P1_DATA_PORT_SIZE(32),
-    .DEBUG_EN(0),
+    .DEBUG_EN(1),
     .C1_MEMCLK_PERIOD(8000),
     .C1_CALIB_SOFT_IP("TRUE"),
     .C1_SIMULATION("FALSE"),
     .C1_RST_ACT_LOW(0),
-    .C1_INPUT_CLK_TYPE("DIFFERENTIAL"),
+    .C1_INPUT_CLK_TYPE("SINGLE_ENDED"),
     .C1_MEM_ADDR_ORDER("ROW_BANK_COLUMN"),
     .C1_NUM_DQ_PINS(16),
     .C1_MEM_ADDR_WIDTH(13),
@@ -85,8 +85,7 @@
 )
 u_pano_g2_ddr2_c1 (
 
-    .c1_sys_clk_p           (c1_sys_clk_p),
-  .c1_sys_clk_n           (c1_sys_clk_n),
+    .c1_sys_clk           (c1_sys_clk),
   .c1_sys_rst_i           (c1_sys_rst_i),                        
 
   .mcb1_dram_dq           (mcb1_dram_dq),  

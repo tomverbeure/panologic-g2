@@ -1,7 +1,6 @@
 
 
-* Launch ISE Project Navigator
-* Tools -> Core Generator
+* In VM: 'coregen'
 * Open -> ./ddr2_bringup/Pano.cgp
 * IP Catalog: Memories & Storage Elements -> MIG Virtex-6 and Spartan-6 (3.92) : double-click
 * Next -> Create Design

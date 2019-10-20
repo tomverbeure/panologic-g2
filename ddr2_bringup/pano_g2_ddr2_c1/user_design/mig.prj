@@ -35,10 +35,10 @@
         <CalibrationRowAddress></CalibrationRowAddress>
         <CalibrationColumnAddress></CalibrationColumnAddress>
         <CalibrationBankAddress></CalibrationBankAddress>
-        <SystemClock>Differential</SystemClock>
+        <SystemClock>Single-Ended</SystemClock>
         <BypassCalibration>1</BypassCalibration>
-        <DebugSignals>Disable</DebugSignals>
-        <SystemClock>Differential</SystemClock>
+        <DebugSignals>Enable</DebugSignals>
+        <SystemClock>Single-Ended</SystemClock>
         <Configuration>Four 32-bit bi-directional ports</Configuration>
         <RzqPin>C19</RzqPin>
         <ZioPin>M19</ZioPin>

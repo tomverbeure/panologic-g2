@@ -66,7 +66,10 @@
 
 ./rem_files.sh
 
-
+coregen -b makeproj.sh
+coregen -p . -b ila_coregen.xco
+coregen -p . -b icon_coregen.xco
+coregen -p . -b vio_coregen.xco
 
 
 echo Synthesis Tool: XST

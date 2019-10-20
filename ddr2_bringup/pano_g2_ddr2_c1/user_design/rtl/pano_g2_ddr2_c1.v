@@ -66,14 +66,14 @@
 //*****************************************************************************
 `timescale 1ns/1ps
 
-(* X_CORE_INFO = "mig_v3_92_ddr2_ddr2_s6, Coregen 14.7" , CORE_GENERATION_INFO = "ddr2_ddr2_s6,mig_v3_92,{component_name=pano_g2_ddr2_c1, C1_MEM_INTERFACE_TYPE=DDR2_SDRAM, C1_CLK_PERIOD=8000, C1_MEMORY_PART=mt47h32m16xx-25e-it, C1_MEMORY_DEVICE_WIDTH=16, C1_OUTPUT_DRV=FULL, C1_RTT_NOM=50OHMS, C1_DQS#_ENABLE=YES, C1_HIGH_TEMP_SR=NORMAL, C1_PORT_CONFIG=Four 32-bit bi-directional ports, C1_MEM_ADDR_ORDER=ROW_BANK_COLUMN, C1_PORT_ENABLE=Port0_Port1_Port2_Port3, C1_CLASS_ADDR=II, C1_CLASS_DATA=II, C1_INPUT_PIN_TERMINATION=CALIB_TERM, C1_DATA_TERMINATION=25 Ohms, C1_CLKFBOUT_MULT_F=4, C1_CLKOUT_DIVIDE=2, C1_DEBUG_PORT=0, INPUT_CLK_TYPE=Differential, LANGUAGE=Verilog, SYNTHESIS_TOOL=Foundation_ISE, NO_OF_CONTROLLERS=1}" *)
+(* X_CORE_INFO = "mig_v3_92_ddr2_ddr2_s6, Coregen 14.7" , CORE_GENERATION_INFO = "ddr2_ddr2_s6,mig_v3_92,{component_name=pano_g2_ddr2_c1, C1_MEM_INTERFACE_TYPE=DDR2_SDRAM, C1_CLK_PERIOD=8000, C1_MEMORY_PART=mt47h32m16xx-25e-it, C1_MEMORY_DEVICE_WIDTH=16, C1_OUTPUT_DRV=FULL, C1_RTT_NOM=50OHMS, C1_DQS#_ENABLE=YES, C1_HIGH_TEMP_SR=NORMAL, C1_PORT_CONFIG=Four 32-bit bi-directional ports, C1_MEM_ADDR_ORDER=ROW_BANK_COLUMN, C1_PORT_ENABLE=Port0_Port1_Port2_Port3, C1_CLASS_ADDR=II, C1_CLASS_DATA=II, C1_INPUT_PIN_TERMINATION=CALIB_TERM, C1_DATA_TERMINATION=25 Ohms, C1_CLKFBOUT_MULT_F=4, C1_CLKOUT_DIVIDE=2, C1_DEBUG_PORT=1, INPUT_CLK_TYPE=Single-Ended, LANGUAGE=Verilog, SYNTHESIS_TOOL=Foundation_ISE, NO_OF_CONTROLLERS=1}" *)
 module pano_g2_ddr2_c1 #
 (
    parameter C1_P0_MASK_SIZE           = 4,
    parameter C1_P0_DATA_PORT_SIZE      = 32,
    parameter C1_P1_MASK_SIZE           = 4,
    parameter C1_P1_DATA_PORT_SIZE      = 32,
-   parameter DEBUG_EN                = 0,       
+   parameter DEBUG_EN                = 1,       
                                        // # = 1, Enable debug signals/controls,
                                        //   = 0, Disable debug signals/controls.
    parameter C1_MEMCLK_PERIOD        = 8000,       
@@ -87,7 +87,7 @@ module pano_g2_ddr2_c1 #
    parameter C1_RST_ACT_LOW          = 0,       
                                        // # = 1 for active low reset,
                                        // # = 0 for active high reset.
-   parameter C1_INPUT_CLK_TYPE       = "DIFFERENTIAL",       
+   parameter C1_INPUT_CLK_TYPE       = "SINGLE_ENDED",       
                                        // input clock type DIFFERENTIAL or SINGLE_ENDED
    parameter C1_MEM_ADDR_ORDER       = "ROW_BANK_COLUMN",       
                                        // The order in which user address is provided to the memory controller,
@@ -116,8 +116,7 @@ module pano_g2_ddr2_c1 #
    inout                                            mcb1_rzq,
    inout                                            mcb1_zio,
    output                                           mcb1_dram_udm,
-   input                                            c1_sys_clk_p,
-   input                                            c1_sys_clk_n,
+   input                                            c1_sys_clk,
    input                                            c1_sys_rst_i,
    output                                           c1_calib_done,
    output                                           c1_clk0,
@@ -323,7 +322,8 @@ module pano_g2_ddr2_c1 #
    localparam C1_ARB_TIME10_SLOT  = {3'b000, 3'b000, C1_ARB_TIME_SLOT_10[11:9], C1_ARB_TIME_SLOT_10[8:6], C1_ARB_TIME_SLOT_10[5:3], C1_ARB_TIME_SLOT_10[2:0]};
    localparam C1_ARB_TIME11_SLOT  = {3'b000, 3'b000, C1_ARB_TIME_SLOT_11[11:9], C1_ARB_TIME_SLOT_11[8:6], C1_ARB_TIME_SLOT_11[5:3], C1_ARB_TIME_SLOT_11[2:0]};
 
-  wire                              c1_sys_clk;
+  wire                              c1_sys_clk_p;
+  wire                              c1_sys_clk_n;
   wire                              c1_async_rst;
   wire                              c1_sysclk_2x;
   wire                              c1_sysclk_2x_180;
@@ -386,6 +386,14 @@ wire[6:0]			c1_p5_rd_count;
 wire				c1_p5_rd_overflow;
 wire				c1_p5_rd_error;
 
+// debug signals declarations
+   wire [255:0] c1_dbg_data;
+   wire [1:0]  c1_dbg_trig;
+   wire [35:0] c1_control0;
+   wire [35:0] c1_control1;
+   wire [6:0] c1_vio_out;
+
+
 
    reg   c1_aresetn;
    reg   c3_aresetn;
@@ -394,7 +402,8 @@ wire				c1_p5_rd_error;
 
 
 
-assign  c1_sys_clk = 1'b0;
+assign  c1_sys_clk_p = 1'b0;
+assign  c1_sys_clk_n = 1'b0;
 
 
 
@@ -752,7 +761,97 @@ assign  c1_sys_clk = 1'b0;
 
 
 
+  generate 
+  if(DEBUG_EN == 1) begin:gen_dbg_enable
+    // controller 1
+    assign c1_dbg_data[255:0] = 
+			     {122'b0,
+			      c1_p0_cmd_en,
+			      c1_p0_cmd_instr,
+			      c1_p0_cmd_bl,
+			      c1_p0_cmd_byte_addr,
+			      c1_p0_cmd_empty,
+			      c1_p0_cmd_full,
+			      c1_p0_rd_en,
+			      c1_p0_rd_data[31:0],
+			      c1_p0_rd_full,
+			      c1_p0_rd_empty,
+			      c1_p0_rd_count,
+			      c1_p0_rd_overflow,
+			      c1_p0_rd_error,
+			      c1_p0_wr_en,
+			      c1_p0_wr_mask[3:0],
+			      c1_p0_wr_data[31:0],
+			      c1_p0_wr_full,
+			      c1_p0_wr_empty,
+			      c1_p0_wr_count,
+			      c1_p0_wr_underrun,
+			      c1_p0_wr_error
+				};
+  assign c1_dbg_trig[1:0] = { c1_calib_done,1'b0 };
+
+   //---------------------------------------------------------------------------
+   //  ICON core instance
+   //---------------------------------------------------------------------------
+   icon my_icon_c1
+     (
+      .CONTROL0 ( c1_control0 ),
+      .CONTROL1 ( c1_control1 )
+      );
+   //---------------------------------------------------------------------------
+   //  ILA core instance
+   //---------------------------------------------------------------------------
+   ila my_ila_c1
+     (
+      .CONTROL ( c1_control0 ),
+      .CLK     ( c1_clk0 ),
+      .DATA    ( c1_dbg_data ),
+      .TRIG0   ( c1_dbg_trig )
+      );
+	
+   //---------------------------------------------------------------------------
+   //  VIO core instance
+   //---------------------------------------------------------------------------
+   vio my_vio_c1     (
+      .CONTROL    ( c1_control1 ),
+      .ASYNC_OUT  ( c1_vio_out )
+      );  
+  end
+  endgenerate 
+
 
 endmodule   
 
  
+//------------------------------------------------------------------------------
+//  ICON core module declaration
+//------------------------------------------------------------------------------
+module icon
+  (
+   inout [35:0] CONTROL0,
+   inout [35:0] CONTROL1
+   )/* synthesis syn_black_box syn_noprune=1 */;
+endmodule
+
+//------------------------------------------------------------------------------
+//  ILA core module declaration
+//------------------------------------------------------------------------------
+module ila
+  (
+   input CLK,
+   inout [35:0] CONTROL,
+   input [1:0]  TRIG0,
+   input [255:0] DATA
+   )/* synthesis syn_black_box syn_noprune=1 */;
+endmodule
+
+//------------------------------------------------------------------------------
+//  VIO core module declaration
+//------------------------------------------------------------------------------
+module vio
+  (
+   inout [35:0] CONTROL,
+   output [6:0] ASYNC_OUT
+   )/* synthesis syn_black_box syn_noprune=1 */;
+endmodule
+
