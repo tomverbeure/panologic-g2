@@ -1,0 +1,34 @@
+verilog  work  ../rtl/infrastructure.v
+verilog  work  ../rtl/memc_wrapper.v
+verilog  work  ../rtl/pano_g2_ddr2_c1.v
+verilog  work  ../rtl/mcb_controller/iodrp_controller.v
+verilog  work  ../rtl/mcb_controller/iodrp_mcb_controller.v
+verilog  work  ../rtl/mcb_controller/mcb_raw_wrapper.v
+verilog  work  ../rtl/mcb_controller/mcb_soft_calibration.v
+verilog  work  ../rtl/mcb_controller/mcb_soft_calibration_top.v
+verilog  work  ../rtl/mcb_controller/mcb_ui_top.v
+verilog  work  ./afifo.v
+verilog  work  ./cmd_gen.v
+verilog  work  ./cmd_prbs_gen.v
+verilog  work  ./data_prbs_gen.v
+verilog  work  ./init_mem_pattern_ctr.v
+verilog  work  ./mcb_flow_control.v
+verilog  work  ./mcb_traffic_gen.v
+verilog  work  ./rd_data_gen.v
+verilog  work  ./read_data_path.v
+verilog  work  ./read_posted_fifo.v
+verilog  work  ./sp6_data_gen.v
+verilog  work  ./tg_status.v
+verilog  work  ./v6_data_gen.v
+verilog  work  ./wr_data_gen.v
+verilog  work  ./write_data_path.v
+verilog  work  ./memc_tb_top.v
+
+verilog  work  $XILINX/verilog/src/glbl.v
+verilog  work  ./sim_tb_top.v
+verilog  work  ./ddr2_model_c1.v -d x512Mb -d sg25E -d x16 -i ./
+
+
+
+
+

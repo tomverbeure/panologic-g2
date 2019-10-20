@@ -1,0 +1,9 @@
+verilog  work  ../rtl/infrastructure.v
+verilog  work  ../rtl/memc_wrapper.v
+verilog  work  ../rtl/pano_g2_ddr2_c1.v
+verilog work  ../rtl/mcb_controller/iodrp_controller.v
+verilog work  ../rtl/mcb_controller/iodrp_mcb_controller.v
+verilog work  ../rtl/mcb_controller/mcb_raw_wrapper.v
+verilog work  ../rtl/mcb_controller/mcb_soft_calibration.v
+verilog work  ../rtl/mcb_controller/mcb_soft_calibration_top.v
+verilog work  ../rtl/mcb_controller/mcb_ui_top.v

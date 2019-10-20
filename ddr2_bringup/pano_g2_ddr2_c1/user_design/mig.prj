@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project NoOfControllers="1" >
+    <ModuleName>pano_g2_ddr2_c1</ModuleName>
+    <TargetFPGA>xc6slx150-fgg484/-2</TargetFPGA>
+    <Version>3.92</Version>
+    <Controller number="1" >
+        <MemoryDevice>DDR2_SDRAM/Components/MT47H32M16XX-25E-IT</MemoryDevice>
+        <TimePeriod>8000</TimePeriod>
+        <EnableVoltageRange>0</EnableVoltageRange>
+        <DataMask>1</DataMask>
+        <CustomPart>FALSE</CustomPart>
+        <NewPartName></NewPartName>
+        <RowAddress>13</RowAddress>
+        <ColAddress>10</ColAddress>
+        <BankAddress>2</BankAddress>
+        <TimingParameters>
+            <Parameters twtr="7.5" trefi="3.9" twr="15" trtp="7.5" trfc="105" trp="12.5" tras="40" trcd="12.5" />
+        </TimingParameters>
+        <mrBurstLength name="Burst Length" >4(010)</mrBurstLength>
+        <mrCasLatency name="CAS Latency" >3</mrCasLatency>
+        <emrDllEnable name="DLL Enable" >Enable-Normal</emrDllEnable>
+        <emrOutputDriveStrength name="Output Drive Strength" >Fullstrength</emrOutputDriveStrength>
+        <emrRTT name="RTT (nominal) - ODT" >50ohms</emrRTT>
+        <emrPosted name="Additive Latency (AL)" >0</emrPosted>
+        <emrOCD name="OCD Operation" >OCD Exit</emrOCD>
+        <emrDQS name="DQS# Enable" >Enable</emrDQS>
+        <emrRDQS name="RDQS Enable" >Disable</emrRDQS>
+        <emrOutputs name="Outputs" >Enable</emrOutputs>
+        <mr2SelfRefreshTempRange name="High Temparature Self Refresh Rate" >Disable</mr2SelfRefreshTempRange>
+        <PortInterface>NATIVE,NATIVE,NATIVE,NATIVE</PortInterface>
+        <Class>Class II</Class>
+        <DataClass>Class II</DataClass>
+        <InputPinTermination>CALIB_TERM</InputPinTermination>
+        <DataTermination>25 Ohms</DataTermination>
+        <CalibrationRowAddress></CalibrationRowAddress>
+        <CalibrationColumnAddress></CalibrationColumnAddress>
+        <CalibrationBankAddress></CalibrationBankAddress>
+        <SystemClock>Differential</SystemClock>
+        <BypassCalibration>1</BypassCalibration>
+        <DebugSignals>Disable</DebugSignals>
+        <SystemClock>Differential</SystemClock>
+        <Configuration>Four 32-bit bi-directional ports</Configuration>
+        <RzqPin>C19</RzqPin>
+        <ZioPin>M19</ZioPin>
+        <PortsSelected>Port0,Port1,Port2,Port3</PortsSelected>
+        <PortDirections>Bi-directional,Bi-directional,Bi-directional,Bi-directional</PortDirections>
+        <UserMemoryAddressMap>ROW_BANK_COLUMN</UserMemoryAddressMap>
+        <ArbitrationAlgorithm>Round Robin</ArbitrationAlgorithm>
+        <TimeSlot0>0123</TimeSlot0>
+        <TimeSlot1>1230</TimeSlot1>
+        <TimeSlot2>2301</TimeSlot2>
+        <TimeSlot3>3012</TimeSlot3>
+        <TimeSlot4>0123</TimeSlot4>
+        <TimeSlot5>1230</TimeSlot5>
+        <TimeSlot6>2301</TimeSlot6>
+        <TimeSlot7>3012</TimeSlot7>
+        <TimeSlot8>0123</TimeSlot8>
+        <TimeSlot9>1230</TimeSlot9>
+        <TimeSlot10>2301</TimeSlot10>
+        <TimeSlot11>3012</TimeSlot11>
+    </Controller>
+</Project>
