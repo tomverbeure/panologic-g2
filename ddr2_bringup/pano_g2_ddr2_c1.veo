@@ -111,8 +111,7 @@ u_pano_g2_ddr2_c1 (
   .c1_calib_done          (c1_calib_done),
      .mcb1_rzq               (rzq1),
                
-     .mcb1_zio               (zio1),
-               
+         
      .c1_p0_cmd_clk                          (c1_p0_cmd_clk),
    .c1_p0_cmd_en                           (c1_p0_cmd_en),
    .c1_p0_cmd_instr                        (c1_p0_cmd_instr),

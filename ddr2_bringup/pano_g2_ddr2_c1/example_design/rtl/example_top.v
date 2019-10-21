@@ -66,7 +66,7 @@
 //*****************************************************************************
 `timescale 1ns/1ps
 
-(* X_CORE_INFO = "mig_v3_92_ddr2_s6, Coregen 14.7" , CORE_GENERATION_INFO = "ddr2_s6,mig_v3_92,{component_name=pano_g2_ddr2_c1, C1_MEM_INTERFACE_TYPE=DDR2_SDRAM, C1_CLK_PERIOD=8000, C1_MEMORY_PART=mt47h32m16xx-25e-it, C1_MEMORY_DEVICE_WIDTH=16, C1_OUTPUT_DRV=FULL, C1_RTT_NOM=50OHMS, C1_DQS#_ENABLE=YES, C1_HIGH_TEMP_SR=NORMAL, C1_PORT_CONFIG=Four 32-bit bi-directional ports, C1_MEM_ADDR_ORDER=ROW_BANK_COLUMN, C1_PORT_ENABLE=Port0_Port1_Port2_Port3, C1_CLASS_ADDR=II, C1_CLASS_DATA=II, C1_INPUT_PIN_TERMINATION=CALIB_TERM, C1_DATA_TERMINATION=25 Ohms, C1_CLKFBOUT_MULT_F=4, C1_CLKOUT_DIVIDE=2, C1_DEBUG_PORT=1, INPUT_CLK_TYPE=Single-Ended, LANGUAGE=Verilog, SYNTHESIS_TOOL=Foundation_ISE, NO_OF_CONTROLLERS=1}" *)
+(* X_CORE_INFO = "mig_v3_92_ddr2_s6, Coregen 14.7" , CORE_GENERATION_INFO = "ddr2_s6,mig_v3_92,{component_name=pano_g2_ddr2_c1, C1_MEM_INTERFACE_TYPE=DDR2_SDRAM, C1_CLK_PERIOD=8000, C1_MEMORY_PART=mt47h32m16xx-25e-it, C1_MEMORY_DEVICE_WIDTH=16, C1_OUTPUT_DRV=FULL, C1_RTT_NOM=50OHMS, C1_DQS#_ENABLE=YES, C1_HIGH_TEMP_SR=NORMAL, C1_PORT_CONFIG=Four 32-bit bi-directional ports, C1_MEM_ADDR_ORDER=ROW_BANK_COLUMN, C1_PORT_ENABLE=Port0_Port1_Port2_Port3, C1_CLASS_ADDR=II, C1_CLASS_DATA=II, C1_INPUT_PIN_TERMINATION=UNCALIB_TERM, C1_DATA_TERMINATION=50 Ohms, C1_CLKFBOUT_MULT_F=4, C1_CLKOUT_DIVIDE=2, C1_DEBUG_PORT=1, INPUT_CLK_TYPE=Single-Ended, LANGUAGE=Verilog, SYNTHESIS_TOOL=Foundation_ISE, NO_OF_CONTROLLERS=1}" *)
 module example_top #
 (
    parameter C1_P0_MASK_SIZE           = 4,
@@ -124,9 +124,9 @@ module example_top #
    inout                                            mcb1_dram_udqs,
    inout                                            mcb1_dram_udqs_n,
    inout                                            mcb1_rzq,
-   inout                                            mcb1_zio,
    output                                           mcb1_dram_udm,
    input                                            c1_sys_clk,
+//   input                                            c1_sys_rst_i,
    inout                                            mcb1_dram_dqs,
    inout                                            mcb1_dram_dqs_n,
    output                                           mcb1_dram_ck,
@@ -196,7 +196,7 @@ module example_top #
    localparam C1_MC_CALIB_BYPASS      = "NO";       
    localparam C1_MC_CALIBRATION_MODE  = "CALIBRATION";       
    localparam C1_MC_CALIBRATION_DELAY  = "HALF";       
-   localparam C1_SKIP_IN_TERM_CAL     = 0;       
+   localparam C1_SKIP_IN_TERM_CAL     = 1;       
    localparam C1_SKIP_DYNAMIC_CAL     = 0;       
    localparam C1_LDQSP_TAP_DELAY_VAL  = 0;       
    localparam C1_LDQSN_TAP_DELAY_VAL  = 0;       
@@ -503,10 +503,12 @@ always @(posedge c1_clk0) begin
     led_cntr <= led_cntr + 1;
 end
 assign led_red = led_cntr[23];
-
-
+ 
+ 
 assign led_green = calib_done;
 assign led_blue = error;
+
+
 
 // Infrastructure-1 instantiation
       infrastructure #

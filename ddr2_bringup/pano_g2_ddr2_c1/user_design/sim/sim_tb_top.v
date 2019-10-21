@@ -331,7 +331,6 @@ wire				c1_p5_rd_error;
    wire                             error;
    wire                             calib_done;
    wire				    rzq1;
-        wire				    zio1;
      
    
 // ========================================================================== //
@@ -365,10 +364,7 @@ assign calib_done = c1_calib_done;
 
    
 
-   
-   // The PULLDOWN component is connected to the ZIO signal primarily to avoid the
-// unknown state in simulation. In real hardware, ZIO should be a no connect(NC) pin.
-   PULLDOWN zio_pulldown1 (.O(zio1));   PULLDOWN rzq_pulldown1 (.O(rzq1));
+   PULLDOWN rzq_pulldown1 (.O(rzq1));
    
 
 // ========================================================================== //
@@ -427,8 +423,7 @@ design_top (
   .c1_calib_done          (c1_calib_done),
      .mcb1_rzq               (rzq1),
                
-     .mcb1_zio               (zio1),
-               
+         
      .c1_p0_cmd_clk                          (c1_clk0),
    .c1_p0_cmd_en                           (c1_p0_cmd_en),
    .c1_p0_cmd_instr                        (c1_p0_cmd_instr),

@@ -30,8 +30,8 @@
         <PortInterface>NATIVE,NATIVE,NATIVE,NATIVE</PortInterface>
         <Class>Class II</Class>
         <DataClass>Class II</DataClass>
-        <InputPinTermination>CALIB_TERM</InputPinTermination>
-        <DataTermination>25 Ohms</DataTermination>
+        <InputPinTermination>UNCALIB_TERM</InputPinTermination>
+        <DataTermination>50 Ohms</DataTermination>
         <CalibrationRowAddress></CalibrationRowAddress>
         <CalibrationColumnAddress></CalibrationColumnAddress>
         <CalibrationBankAddress></CalibrationBankAddress>
@@ -40,7 +40,7 @@
         <DebugSignals>Enable</DebugSignals>
         <SystemClock>Single-Ended</SystemClock>
         <Configuration>Four 32-bit bi-directional ports</Configuration>
-        <RzqPin>C19</RzqPin>
+        <RzqPin>M19</RzqPin>
         <ZioPin>M19</ZioPin>
         <PortsSelected>Port0,Port1,Port2,Port3</PortsSelected>
         <PortDirections>Bi-directional,Bi-directional,Bi-directional,Bi-directional</PortDirections>

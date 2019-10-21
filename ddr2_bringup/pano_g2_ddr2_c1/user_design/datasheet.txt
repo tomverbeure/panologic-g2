@@ -64,8 +64,8 @@ User Interface Parameters :
 FPGA Options :
    Class for Address and Control       : II
    Class for Data                      : II
-   Memory Interface Pin Termination    : CALIB_TERM
-   DQ/DQS                              : 25 Ohms
+   Memory Interface Pin Termination    : UNCALIB_TERM
+   DQ/DQS                              : 50 Ohms
    Bypass Calibration                  : enabled
    Debug Signals for Memory Controller : Enable
    Input Clock Type                    : Single-Ended 

@@ -122,7 +122,6 @@ module sim_tb_top;
    wire                             error;
    wire                             calib_done;
    wire				    rzq1;
-        wire				    zio1;
      
    
 // ========================================================================== //
@@ -156,10 +155,7 @@ module sim_tb_top;
 
    
 
-   
-   // The PULLDOWN component is connected to the ZIO signal primarily to avoid the
-// unknown state in simulation. In real hardware, ZIO should be a no connect(NC) pin.
-   PULLDOWN zio_pulldown1 (.O(zio1));   PULLDOWN rzq_pulldown1 (.O(rzq1));
+   PULLDOWN rzq_pulldown1 (.O(rzq1));
    
 
 // ========================================================================== //
@@ -215,8 +211,7 @@ design_top (
   .mcb1_dram_dm           (mcb1_dram_dm),
      .mcb1_rzq               (rzq1),
                
-     .mcb1_zio               (zio1),
-               
+         
   .mcb1_dram_dqs          (mcb1_dram_dqs)
 );      
 
