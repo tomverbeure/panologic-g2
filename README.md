@@ -1,5 +1,7 @@
 # Pano Logic Zero Client G2 
 
+Questions? Try the Pano Logic gitter.im chat room! https://gitter.im/panologic/community
+
 ## Introduction
 
 This project contains the reverse engineering results of the Pano Logic Zero Client G2.
