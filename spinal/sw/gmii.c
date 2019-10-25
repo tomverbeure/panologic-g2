@@ -190,7 +190,8 @@ void gmii_dump_packets()
 
     while(1){
         unsigned int rx_data = REG_RD(GMII_RX_FIFO_RD);
-        if ((rx_data>>16) == 0){
+        int rx_has_data = (rx_data >> GMII_RX_FIFO_RD_VALID_BIT) & 1;
+        if (!rx_has_data){
             if (had_data){
                 print_int(had_data, 1);
                 print("\n\n");
