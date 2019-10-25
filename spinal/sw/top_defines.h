@@ -18,6 +18,9 @@
 #define GMII_MDIO_RD_BIT                3
 
 #define GMII_RX_FIFO_RD_ADDR        0x00010004
+#define GMII_RX_FIFO_RD_PAYLOAD_BIT     0
+#define GMII_RX_FIFO_RD_VALID_BIT       16
+
 #define GMII_RX_FIFO_RD_COUNT_ADDR  0x00010008
 
 #define TEST_PATTERN_NR_ADDR                    0x00000200
