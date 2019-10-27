@@ -1,50 +1,98 @@
 
-ADDRESS_SPACE progmem RAMB16 [0x00000000:0x0000FFFF]
+ADDRESS_SPACE progmem RAMB16 [0x00000000:0x0001FFFF]
 
-    // ISE infers a 16K x 32 RAM as 32 16K x 1 RAMs.
+    // ISE infers a 32K x 32 RAM (128KB for CPU) as 64 16K x 1 RAMs.
     //
     // The way I found out about this is by generating a post-mapping
     // netlist (Map -> Generate Post-Map Simulations Model) and checking
     // how bits were allocated.
     //
-    // There must be a smarter way to figure this out?
+    // In the past, I'd manually assign a location for each RAM and add it
+    // in this file here with a '... LOC = X1Y10' placement constraint.
+    //
+    // That becomes *really* tedious when you have 64 RAMs.
+    //
+    // So here's the alternative:
+    // - Let the Xilinx placer figure it out by not providing any constraints in this progmem.bmm file.
+    // - After everything is done, Xilinx will output a back-annotated progmem_bd.bmm file, which
+    //   contains '... PLACED=X1Y10' placement statements.
+    // - When running data2mem to update the RAM, use the progmem_bd.bmm instead of the progmem.bmm file.
+    // - Done!
 
     BUS_BLOCK
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol38 [31] LOC=X2Y56;
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol37 [30] LOC=X2Y58;
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol36 [29] LOC=X2Y60;
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol35 [28] LOC=X2Y62;
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol34 [27] LOC=X2Y64;
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol33 [26] LOC=X2Y66;
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol32 [25] LOC=X2Y68;
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol31 [24] LOC=X2Y70;
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol315 [31];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol313 [30];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol311 [29];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol39  [28];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol37  [27];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol35  [26];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol33  [25];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol31  [24];
 
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol28 [23] LOC=X1Y56;
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol27 [22] LOC=X1Y58;
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol26 [21] LOC=X1Y60;
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol25 [20] LOC=X1Y62;
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol24 [19] LOC=X1Y64;
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol23 [18] LOC=X1Y66;
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol22 [17] LOC=X1Y68;
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol21 [16] LOC=X1Y70;
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol215 [23];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol213 [22];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol211 [21];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol29  [20];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol27  [19];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol25  [18];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol23  [17];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol21  [16];
 
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol18 [15] LOC=X3Y56;
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol17 [14] LOC=X3Y58;
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol16 [13] LOC=X3Y60;
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol15 [12] LOC=X3Y62;
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol14 [11] LOC=X3Y64;
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol13 [10] LOC=X3Y66;
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol12 [ 9] LOC=X3Y68;
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol11 [ 8] LOC=X3Y70;
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol115 [15];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol113 [14];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol111 [13];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol19  [12];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol17  [11];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol15  [10];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol13  [ 9];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol11  [ 8];
 
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol08 [ 7] LOC=X4Y56;
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol07 [ 6] LOC=X4Y58;
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol06 [ 5] LOC=X4Y60;
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol05 [ 4] LOC=X4Y62;
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol04 [ 3] LOC=X4Y64;
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol03 [ 2] LOC=X4Y66;
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol02 [ 1] LOC=X4Y68;
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol01 [ 0] LOC=X4Y70;
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol015 [ 7];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol013 [ 6];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol011 [ 5];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol09  [ 4];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol07  [ 3];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol05  [ 2];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol03  [ 1];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol01  [ 0];
+    END_BUS_BLOCK;
+
+    BUS_BLOCK
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol316 [31];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol314 [30];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol312 [29];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol310 [28];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol38  [27];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol36  [26];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol34  [25];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol32  [24];
+
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol216 [23];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol214 [22];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol212 [21];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol210 [20];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol28  [19];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol26  [18];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol24  [17];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol22  [16];
+
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol116 [15];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol114 [14];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol112 [13];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol110 [12];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol18  [11];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol16  [10];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol14  [ 9];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol12  [ 8];
+
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol016 [ 7];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol014 [ 6];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol012 [ 5];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol010 [ 4];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol08  [ 3];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol06  [ 2];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol04  [ 1];
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol02  [ 0];
     END_BUS_BLOCK;
 
 END_ADDRESS_SPACE;

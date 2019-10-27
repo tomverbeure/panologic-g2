@@ -4,7 +4,7 @@
 
 start:
 	/* set stack pointer */
-	lui sp,(64*1024)>>12
+	lui sp,(128*1024)>>12
 
 	/* jump to main C code */
 	jal ra,main

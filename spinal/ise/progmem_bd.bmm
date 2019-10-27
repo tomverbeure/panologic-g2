@@ -1,0 +1,84 @@
+// BMM LOC annotation file.
+//
+// Release 14.6 -  P.20160913, build 3.0.10 Apr 3, 2013
+// Copyright (c) 1995-2019 Xilinx, Inc.  All rights reserved.
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Address space 'progmem' 0x00000000:0x0001FFFF (128 KBytes).
+//
+///////////////////////////////////////////////////////////////////////////////
+
+ADDRESS_SPACE progmem RAMB16 [0x00000000:0x0001FFFF]
+    BUS_BLOCK
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol315 RAMB16 [31:31] [0:16383] PLACED = X1Y90;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol313 RAMB16 [30:30] [0:16383] PLACED = X2Y40;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol311 RAMB16 [29:29] [0:16383] PLACED = X2Y30;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol39 RAMB16 [28:28] [0:16383] PLACED = X3Y48;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol37 RAMB16 [27:27] [0:16383] PLACED = X4Y42;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol35 RAMB16 [26:26] [0:16383] PLACED = X4Y36;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol33 RAMB16 [25:25] [0:16383] PLACED = X3Y62;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol31 RAMB16 [24:24] [0:16383] PLACED = X2Y50;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol215 RAMB16 [23:23] [0:16383] PLACED = X2Y10;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol213 RAMB16 [22:22] [0:16383] PLACED = X2Y12;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol211 RAMB16 [21:21] [0:16383] PLACED = X5Y10;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol29 RAMB16 [20:20] [0:16383] PLACED = X5Y36;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol27 RAMB16 [19:19] [0:16383] PLACED = X4Y44;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol25 RAMB16 [18:18] [0:16383] PLACED = X2Y48;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol23 RAMB16 [17:17] [0:16383] PLACED = X4Y22;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol21 RAMB16 [16:16] [0:16383] PLACED = X4Y24;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol115 RAMB16 [15:15] [0:16383] PLACED = X3Y78;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol113 RAMB16 [14:14] [0:16383] PLACED = X3Y74;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol111 RAMB16 [13:13] [0:16383] PLACED = X5Y90;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol19 RAMB16 [12:12] [0:16383] PLACED = X3Y72;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol17 RAMB16 [11:11] [0:16383] PLACED = X5Y62;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol15 RAMB16 [10:10] [0:16383] PLACED = X3Y44;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol13 RAMB16 [9:9] [0:16383] PLACED = X2Y36;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol11 RAMB16 [8:8] [0:16383] PLACED = X3Y66;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol015 RAMB16 [7:7] [0:16383] PLACED = X4Y78;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol013 RAMB16 [6:6] [0:16383] PLACED = X4Y86;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol011 RAMB16 [5:5] [0:16383] PLACED = X1Y94;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol09 RAMB16 [4:4] [0:16383] PLACED = X4Y70;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol07 RAMB16 [3:3] [0:16383] PLACED = X3Y50;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol05 RAMB16 [2:2] [0:16383] PLACED = X4Y32;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol03 RAMB16 [1:1] [0:16383] PLACED = X2Y64;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol01 RAMB16 [0:0] [0:16383] PLACED = X4Y68;
+    END_BUS_BLOCK;
+
+    BUS_BLOCK
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol316 RAMB16 [31:31] [16384:32767] PLACED = X1Y82;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol314 RAMB16 [30:30] [16384:32767] PLACED = X2Y38;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol312 RAMB16 [29:29] [16384:32767] PLACED = X2Y32;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol310 RAMB16 [28:28] [16384:32767] PLACED = X2Y34;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol38 RAMB16 [27:27] [16384:32767] PLACED = X3Y46;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol36 RAMB16 [26:26] [16384:32767] PLACED = X4Y40;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol34 RAMB16 [25:25] [16384:32767] PLACED = X2Y56;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol32 RAMB16 [24:24] [16384:32767] PLACED = X2Y58;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol216 RAMB16 [23:23] [16384:32767] PLACED = X1Y6;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol214 RAMB16 [22:22] [16384:32767] PLACED = X4Y14;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol212 RAMB16 [21:21] [16384:32767] PLACED = X4Y18;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol210 RAMB16 [20:20] [16384:32767] PLACED = X4Y12;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol28 RAMB16 [19:19] [16384:32767] PLACED = X4Y38;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol26 RAMB16 [18:18] [16384:32767] PLACED = X3Y52;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol24 RAMB16 [17:17] [16384:32767] PLACED = X2Y14;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol22 RAMB16 [16:16] [16384:32767] PLACED = X4Y26;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol116 RAMB16 [15:15] [16384:32767] PLACED = X4Y72;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol114 RAMB16 [14:14] [16384:32767] PLACED = X3Y70;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol112 RAMB16 [13:13] [16384:32767] PLACED = X4Y76;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol110 RAMB16 [12:12] [16384:32767] PLACED = X5Y94;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol18 RAMB16 [11:11] [16384:32767] PLACED = X4Y62;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol16 RAMB16 [10:10] [16384:32767] PLACED = X3Y58;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol14 RAMB16 [9:9] [16384:32767] PLACED = X1Y50;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol12 RAMB16 [8:8] [16384:32767] PLACED = X2Y62;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol016 RAMB16 [7:7] [16384:32767] PLACED = X4Y90;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol014 RAMB16 [6:6] [16384:32767] PLACED = X4Y82;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol012 RAMB16 [5:5] [16384:32767] PLACED = X1Y86;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol010 RAMB16 [4:4] [16384:32767] PLACED = X5Y80;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol08 RAMB16 [3:3] [16384:32767] PLACED = X4Y58;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol06 RAMB16 [2:2] [16384:32767] PLACED = X4Y46;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol04 RAMB16 [1:1] [16384:32767] PLACED = X3Y26;
+        core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol02 RAMB16 [0:0] [16384:32767] PLACED = X4Y66;
+    END_BUS_BLOCK;
+END_ADDRESS_SPACE;
+

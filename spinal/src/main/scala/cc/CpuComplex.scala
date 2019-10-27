@@ -34,7 +34,7 @@ object CpuComplexConfig{
         // - ./spinal/ise/progmem.bmm (it's complicated...)
         // - ./spinal/src/main/scala/cc/CpuComplex.scala (onChipRamSize)
 
-        onChipRamSize         = 64 kB,
+        onChipRamSize         = 128 kB,
         onChipRamHexFile      = null,
         pipelineDBus          = true,
         pipelineMainBus       = true,
