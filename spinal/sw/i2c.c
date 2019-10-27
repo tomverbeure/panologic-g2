@@ -4,9 +4,12 @@
 #include "i2c.h"
 #include "reg.h"
 
-#define IOWR_ALTERA_AVALON_PIO_SET_BITS(addr, bits)     (REG_WR(DVI_CTRL_SET, (bits)))
-#define IOWR_ALTERA_AVALON_PIO_CLEAR_BITS(addr, bits)   (REG_WR(DVI_CTRL_CLR, (bits)))
-#define IORD_ALTERA_AVALON_PIO_DATA(addr)               (REG_RD(DVI_CTRL_RD))
+#define IOWR_ALTERA_AVALON_PIO_SET_BITS(addr, bits) \
+   (*(volatile uint32_t *)(0x80000000 |(addr + CCGPIO_SET_OFFSET)) = bits)
+#define IOWR_ALTERA_AVALON_PIO_CLEAR_BITS(addr, bits) \
+      (*(volatile uint32_t *)(0x80000000 |(addr + CCGPIO_CLR_OFFSET)) = bits)
+#define IORD_ALTERA_AVALON_PIO_DATA(addr) \
+         *((volatile uint32_t *)(0x80000000 |(addr + DVI_CTRL_RD_ADDR)))
 
 void i2c_set_scl(i2c_ctx_t *ctx, int bit)
 {
@@ -46,7 +49,7 @@ void i2c_dly()
 {
     int i;
     for(i=0;i<15;++i){
-        IOWR_ALTERA_AVALON_PIO_SET_BITS(PIO_0_BASE, 0x80);
+        IOWR_ALTERA_AVALON_PIO_SET_BITS(DVI_CTRL_SET_ADDR, 0x80);
     }
 }
 
