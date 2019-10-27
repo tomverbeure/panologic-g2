@@ -11,7 +11,7 @@ i2c_ctx_t dvi_ctrl_i2c_ctx;
 
 void dvi_ctrl_init()
 {
-    dvi_ctrl_i2c_ctx.base_addr = 0;
+    dvi_ctrl_i2c_ctx.base_addr = DVI_CTRL_BASE_ADDR;
     dvi_ctrl_i2c_ctx.scl_pin_nr = 0;
     dvi_ctrl_i2c_ctx.sda_pin_nr = 1;
 
