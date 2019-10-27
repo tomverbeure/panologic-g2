@@ -5,7 +5,7 @@
 # - ./spinal/ise/progmem.bmm (it's complicated...)
 # - ./spinal/src/main/scala/cc/CpuComplex.scala (onChipRamSize)
 
-MEM_WORDS       = 8192
+MEM_WORDS       = 16384
 
 OBJ_FILES       = start.o progmem.o print.o i2c.o gmii.o dvi.o usb.o
 
