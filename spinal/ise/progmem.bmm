@@ -1,12 +1,38 @@
 
-ADDRESS_SPACE progmem RAMB16 [0x00000000:0x00001FFF]
+ADDRESS_SPACE progmem RAMB16 [0x00000000:0x00007FFF]
+
+    // ISE infers a 8K x 32 RAM as 16 8K x 2 RAMs.
+    //
+    // Initially, I expected it to be 16 2K x 8 RAMs, which would have
+    // worked just as well (though it's probably less efficient since it
+    // would require a MUX to select which RAM data was coming from.)
+    //
+    // The way I found out about this is by generating a post-mapping
+    // netlist (Map -> Generate Post-Map Simulations Model) and checking
+    // how bits were allocated.
+    //
+    // There must be a smarter way to figure this out?
 
     BUS_BLOCK
-      // The order of the RAMs and bus data is wrong. But if I don't this, it doesn't work.
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol3 [31:24] LOC=X3Y80;
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol2 [23:16] LOC=X3Y82;
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol1 [15:8]  LOC=X3Y84;
-      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol0 [7:0]   LOC=X3Y86;
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol34 [31:30] LOC=X2Y64;
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol33 [29:28] LOC=X2Y66;
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol32 [27:26] LOC=X2Y68;
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol31 [25:24] LOC=X2Y70;
+
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol24 [23:22] LOC=X1Y64;
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol23 [21:20] LOC=X1Y66;
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol22 [19:18] LOC=X1Y68;
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol21 [17:16] LOC=X1Y70;
+
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol14 [15:14] LOC=X2Y72;
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol13 [13:12] LOC=X2Y74;
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol12 [11:10] LOC=X2Y76;
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol11 [ 9: 8] LOC=X2Y78;
+
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol04 [ 7: 6] LOC=X1Y72;
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol03 [ 5: 4] LOC=X1Y74;
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol02 [ 3: 2] LOC=X1Y76;
+      core_u_pano_core/u_cpu_top/u_cpu/ram/Mram_ram_symbol01 [ 1: 0] LOC=X1Y78;
     END_BUS_BLOCK;
 
 END_ADDRESS_SPACE;

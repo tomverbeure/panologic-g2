@@ -1,5 +1,5 @@
 // Generator : SpinalHDL v1.3.2    git head : 41815ceafff4e72c2e3a3e1ff7e9ada5202a0d26
-// Date      : 03/06/2019, 22:44:03
+// Date      : 27/10/2019, 13:28:23
 // Component : Pano
 
 
@@ -3078,19 +3078,19 @@ module MuraxPipelinedMemoryBusRam (
       input   toplevel_main_clk,
       input   toplevel_main_reset_);
   reg [31:0] _zz_MuraxPipelinedMemoryBusRam_4_;
-  wire [10:0] _zz_MuraxPipelinedMemoryBusRam_5_;
+  wire [12:0] _zz_MuraxPipelinedMemoryBusRam_5_;
   reg  _zz_MuraxPipelinedMemoryBusRam_1_;
   wire [29:0] _zz_MuraxPipelinedMemoryBusRam_2_;
   wire [31:0] _zz_MuraxPipelinedMemoryBusRam_3_;
-  reg [7:0] ram_symbol0 [0:2047];
-  reg [7:0] ram_symbol1 [0:2047];
-  reg [7:0] ram_symbol2 [0:2047];
-  reg [7:0] ram_symbol3 [0:2047];
+  reg [7:0] ram_symbol0 [0:8191];
+  reg [7:0] ram_symbol1 [0:8191];
+  reg [7:0] ram_symbol2 [0:8191];
+  reg [7:0] ram_symbol3 [0:8191];
   reg [7:0] _zz_MuraxPipelinedMemoryBusRam_6_;
   reg [7:0] _zz_MuraxPipelinedMemoryBusRam_7_;
   reg [7:0] _zz_MuraxPipelinedMemoryBusRam_8_;
   reg [7:0] _zz_MuraxPipelinedMemoryBusRam_9_;
-  assign _zz_MuraxPipelinedMemoryBusRam_5_ = _zz_MuraxPipelinedMemoryBusRam_2_[10:0];
+  assign _zz_MuraxPipelinedMemoryBusRam_5_ = _zz_MuraxPipelinedMemoryBusRam_2_[12:0];
   always @ (*) begin
     _zz_MuraxPipelinedMemoryBusRam_4_ = {_zz_MuraxPipelinedMemoryBusRam_9_, _zz_MuraxPipelinedMemoryBusRam_8_, _zz_MuraxPipelinedMemoryBusRam_7_, _zz_MuraxPipelinedMemoryBusRam_6_};
   end
@@ -3704,7 +3704,7 @@ module CpuComplex (
   reg  mainBusDecoder_logic_rspNoHit;
   reg [0:0] mainBusDecoder_logic_rspSourceId;
   assign _zz_CpuComplex_12_ = (! cpu_dBus_cmd_halfPipe_regs_valid);
-  assign _zz_CpuComplex_13_ = (32'b11111111111111111110000000000000);
+  assign _zz_CpuComplex_13_ = (32'b11111111111111111000000000000000);
   assign _zz_CpuComplex_14_ = (32'b11111111111100000000000000000000);
   MuraxMasterArbiter mainBusArbiter ( 
     .io_iBus_cmd_valid(cpu_iBus_cmd_valid),

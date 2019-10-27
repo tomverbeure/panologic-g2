@@ -27,7 +27,14 @@ case class CpuComplexConfig(
 object CpuComplexConfig{
 
     def default =  CpuComplexConfig(
-        onChipRamSize         = 8 kB,
+
+        // Files to update when changing memory size:
+        // - ./spinal/sw/Makefile (MEM_WORDS)
+        // - ./spinal/sw/start.S (stack pointer)
+        // - ./spinal/ise/progmem.bmm (it's complicated...)
+        // - ./spinal/src/main/scala/cc/CpuComplex.scala (onChipRamSize)
+
+        onChipRamSize         = 32 kB,
         onChipRamHexFile      = null,
         pipelineDBus          = true,
         pipelineMainBus       = true,

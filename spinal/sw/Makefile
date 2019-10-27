@@ -1,5 +1,11 @@
 
-MEM_WORDS       = 2048
+# Files to update when changing memory size:
+# - ./spinal/sw/Makefile (MEM_WORDS)
+# - ./spinal/sw/start.S (stack pointer)
+# - ./spinal/ise/progmem.bmm (it's complicated...)
+# - ./spinal/src/main/scala/cc/CpuComplex.scala (onChipRamSize)
+
+MEM_WORDS       = 8192
 
 OBJ_FILES       = start.o progmem.o print.o i2c.o gmii.o dvi.o usb.o
 
@@ -20,12 +26,12 @@ OBJDUMP         = $(TARGET)-objdump
 .PHONY: all clean syntax time stat flash
 
 #all: progmem.dis progmem.bin progmem0.coe progmem0.mif progmem0.hex progmem.mem
-all: progmem.dis progmem.bin progmem8k.bin progmem.mem progmem.hex
+all: progmem.dis progmem.bin progmem_pad.bin progmem.mem progmem.hex
 
 progmem.dis: progmem_dis.elf
 	$(OBJDUMP) -s -D $< > $@
 
-progmem.hex: progmem8k.bin
+progmem.hex: progmem_pad.bin
 	$(OBJCOPY) -O ihex -I binary $< $@
 
 progmem0.hex: progmem.bin
@@ -55,8 +61,8 @@ progmem.mem: progmem.bin
 progmem.bin: progmem.elf
 	$(OBJCOPY) -O binary $< $@
 
-progmem8k.bin: progmem.elf
-	$(OBJCOPY) --pad-to=8192 -O binary $< $@
+progmem_pad.bin: progmem.elf
+	$(OBJCOPY) --pad-to=$(MEM_WORDS) -O binary $< $@
 
 progmem.elf: fpxx_sin_table.h $(OBJ_FILES) top_defines.h sections.lds Makefile
 	$(LD) $(LDFLAGS) -s -o $@ $(OBJ_FILES) > progmem.map
