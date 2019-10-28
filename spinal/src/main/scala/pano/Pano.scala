@@ -19,7 +19,8 @@ case class PanoConfig(
               includeVga        : Boolean,
               includeGmii       : Boolean,
               includeUlpi       : Boolean,
-              includeUart       : Boolean
+              includeUart       : Boolean,
+              includeCodec      : Boolean
       )
 {
     def includeDviI2C = includeDvi || includeHdmi
@@ -54,6 +55,10 @@ class Pano(config : PanoConfig) extends Component {
 
         // ULPI Interface
         val ulpi                = if (config.includeUlpi) slave(Ulpi()) else null
+    
+        // Codec Interface
+        val codec_scl           = if (config.includeCodec) master(TriState(Bool)) else null
+        val codec_sda           = if (config.includeCodec) master(TriState(Bool)) else null
     }
 
     noIoPrefix()
@@ -267,6 +272,11 @@ class Pano(config : PanoConfig) extends Component {
             u_pano_core.io.dvi_ctrl_sda <> io.dvi_spd
         }
 
+        if (config.includeCodec){
+            u_pano_core.io.codec_scl <> io.codec_scl
+            u_pano_core.io.codec_sda <> io.codec_sda
+        }
+
         if (config.includeGmii){
             u_pano_core.io.gmii         <> io.gmii
         }
@@ -327,7 +337,8 @@ object PanoVerilog{
               includeVga        = false,
               includeGmii       = true,
               includeUlpi       = true,
-              includeUart       = false
+              includeUart       = false,
+              includeCodec      = true
             )
 
 

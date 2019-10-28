@@ -28,6 +28,7 @@ case class CpuTop(panoConfig: PanoConfig) extends Component {
         val txt_gen_apb         = master(Apb3(VideoTxtGen.getApb3Config()))
         val ulpi_apb            = if (panoConfig.includeUlpi)   master(Apb3(UlpiCtrl.getApb3Config()))    else null
         val usb_host_apb        = if (panoConfig.includeUlpi)   master(Apb3(UsbHost.getApb3Config()))     else null
+        val codec_ctrl_apb      = if (panoConfig.includeCodec)  master(Apb3(CCGpio.getApb3Config()))      else null
 
         val switch_             = in(Bool)
     }
@@ -50,6 +51,9 @@ case class CpuTop(panoConfig: PanoConfig) extends Component {
     }
     if (panoConfig.includeUart){
         apbMapping += io.uart_ctrl_apb      -> (0x00500, 256 Byte)
+    }
+    if (panoConfig.includeCodec){
+        apbMapping += io.codec_ctrl_apb     -> (0x00600, 256 Byte)
     }
     if (panoConfig.includeGmii){
         apbMapping += io.gmii_ctrl_apb      -> (0x10000, 4 kB)

@@ -30,6 +30,10 @@ class PanoCore(voClkDomain: ClockDomain, panoConfig: PanoConfig) extends Compone
         val ulpi                = if (panoConfig.includeUlpi)   slave(Ulpi())          else null
 
         val vo                  = out(VgaData())
+
+        val codec_scl           = if (panoConfig.includeCodec) master(TriState(Bool)) else null
+        val codec_sda           = if (panoConfig.includeCodec) master(TriState(Bool)) else null
+
     }
 
 
@@ -229,6 +233,22 @@ class PanoCore(voClkDomain: ClockDomain, panoConfig: PanoConfig) extends Compone
         uartCtrl.io.uart.rxd    := True
     }
 
+    if (panoConfig.includeCodec){
+        //============================================================
+        // Codec I2C control
+        //============================================================
+
+        val u_codec_ctrl = CCGpio(2)
+        u_codec_ctrl.io.apb             <> u_cpu_top.io.codec_ctrl_apb
+
+        io.codec_scl.writeEnable     <> !u_codec_ctrl.io.gpio.write(0)
+        io.codec_scl.write           <> u_codec_ctrl.io.gpio.write(0)
+        io.codec_scl.read            <> u_codec_ctrl.io.gpio.read(0)
+
+        io.codec_sda.writeEnable     <> !u_codec_ctrl.io.gpio.write(1)
+        io.codec_sda.write           <> u_codec_ctrl.io.gpio.write(1)
+        io.codec_sda.read            <> u_codec_ctrl.io.gpio.read(1)
+    }
 }
 
 

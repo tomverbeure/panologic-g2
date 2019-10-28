@@ -7,7 +7,7 @@
 
 MEM_WORDS       = 32768
 
-OBJ_FILES       = start.o progmem.o print.o i2c.o gmii.o dvi.o usb.o
+OBJ_FILES       = start.o progmem.o print.o i2c.o gmii.o dvi.o usb.o audio.o
 
 TOOLS_PREFIX    = /opt/riscv32i/bin
 TARGET          = $(TOOLS_PREFIX)/riscv32-unknown-elf

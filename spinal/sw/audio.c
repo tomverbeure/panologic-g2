@@ -1,9 +1,10 @@
 #include <stdint.h>
-#include "pano_io.h"
-
+#include "top_defines.h"
 #include "audio.h"
-
 #include "i2c.h"
+#include "print.h"
+
+#define WM8750L_I2C_ADR       0x34
 
 short int audio_registers[][2] = {
     // For now, use default volume settings for LOUT1/ROUT1
@@ -141,18 +142,24 @@ i2c_ctx_t codec_i2c_ctx;
 
 void audio_init()
 {
-   codec_i2c_ctx.base_addr = 0;
+   byte Test = 0x55;
+   int idx = 0;
+
+   codec_i2c_ctx.base_addr = CODEC_I2C_BASE_ADDR;
    codec_i2c_ctx.scl_pin_nr = 0;
    codec_i2c_ctx.sda_pin_nr = 1;
 
     i2c_init(&codec_i2c_ctx);
 
-    int idx = 0;
     while(audio_registers[idx][0] != -1){
         int addr  = audio_registers[idx][0];
         int value = audio_registers[idx][1];
 
-        i2c_write_reg(&codec_i2c_ctx, WM8750L_I2C_ADR, (addr<<1) | (value>>8), (value & 0xff));
+        if(!i2c_write_reg(&codec_i2c_ctx, WM8750L_I2C_ADR, (addr<<1) | (value>>8), (value & 0xff))) {
+           print("i2c_write_reg failed\n");
+           break;
+        }
         ++idx;
     }
 }
+
