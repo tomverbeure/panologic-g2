@@ -4,38 +4,35 @@
 #include "i2c.h"
 #include "reg.h"
 
-#define IOWR_ALTERA_AVALON_PIO_SET_BITS(addr, bits) \
-   (*(volatile uint32_t *)(0x80000000 |(addr + CCGPIO_SET_OFFSET)) = bits)
-#define IOWR_ALTERA_AVALON_PIO_CLEAR_BITS(addr, bits) \
-      (*(volatile uint32_t *)(0x80000000 |(addr + CCGPIO_CLR_OFFSET)) = bits)
-#define IORD_ALTERA_AVALON_PIO_DATA(addr) \
-         *((volatile uint32_t *)(0x80000000 |(addr + DVI_CTRL_RD_ADDR)))
+#define I2C_SET_BITS(addr, bits)     (REG_OFF_WR(addr, CCGPIO_SET, bits))
+#define I2C_CLR_BITS(addr, bits)     (REG_OFF_WR(addr, CCGPIO_CLR, bits))
+#define I2C_RD_BITS(addr)            (REG_OFF_RD(addr, CCGPIO_RD))
 
 void i2c_set_scl(i2c_ctx_t *ctx, int bit)
 {
     if (bit)
-        IOWR_ALTERA_AVALON_PIO_SET_BITS(ctx->base_addr, 1 << ctx->scl_pin_nr);
+        I2C_SET_BITS(ctx->base_addr, 1 << ctx->scl_pin_nr);
     else
-        IOWR_ALTERA_AVALON_PIO_CLEAR_BITS(ctx->base_addr, 1 << ctx->scl_pin_nr);
+        I2C_CLR_BITS(ctx->base_addr, 1 << ctx->scl_pin_nr);
 }
 
 void i2c_set_sda(i2c_ctx_t *ctx, int bit)
 {
     if (bit)
-        IOWR_ALTERA_AVALON_PIO_SET_BITS(ctx->base_addr, 1 << ctx->sda_pin_nr);
+        I2C_SET_BITS(ctx->base_addr, 1 << ctx->sda_pin_nr);
     else
-        IOWR_ALTERA_AVALON_PIO_CLEAR_BITS(ctx->base_addr, 1 << ctx->sda_pin_nr);
+        I2C_CLR_BITS(ctx->base_addr, 1 << ctx->sda_pin_nr);
 }
 
 
 static int i2c_get_scl(i2c_ctx_t *ctx)
 {
-    return (IORD_ALTERA_AVALON_PIO_DATA(ctx->base_addr) >> ctx->scl_pin_nr) & 1;
+    return (I2C_RD_BITS(ctx->base_addr) >> ctx->scl_pin_nr) & 1;
 }
 
 static int i2c_get_sda(i2c_ctx_t *ctx)
 {
-    return (IORD_ALTERA_AVALON_PIO_DATA(ctx->base_addr) >> ctx->sda_pin_nr) & 1;
+    return (I2C_RD_BITS(ctx->base_addr) >> ctx->sda_pin_nr) & 1;
 }
 
 void i2c_init(i2c_ctx_t *ctx)
@@ -49,7 +46,9 @@ void i2c_dly()
 {
     int i;
     for(i=0;i<15;++i){
-        IOWR_ALTERA_AVALON_PIO_SET_BITS(DVI_CTRL_SET_ADDR, 0x80);
+        // Any random register without side effects...
+        // This needs to be replaced with a global timer wait or something.
+        I2C_RD_BITS(DVI_CTRL_BASE_ADDR);
     }
 }
 

@@ -4,6 +4,7 @@ package gmii
 import spinal.core._
 import spinal.lib._
 import spinal.lib.bus.amba3.apb._
+import spartan6._
 
 case class GmiiRxCtrl() extends Component {
 
@@ -13,8 +14,14 @@ case class GmiiRxCtrl() extends Component {
         val rx_fifo_rd_count    = out(UInt(16 bits))
     }
 
+    val rx_clk   = Bool
+
+    val u_rx_buf = new BUFG()
+    u_rx_buf.io.I <> io.rx.clk
+    u_rx_buf.io.O <> rx_clk
+
     val gmiiRxDomain = ClockDomain(
-        clock       = io.rx.clk,
+        clock       = rx_clk,
         frequency   = FixedFrequency(125 MHz),
         config      = ClockDomainConfig(
                         resetKind = BOOT
@@ -23,9 +30,25 @@ case class GmiiRxCtrl() extends Component {
 
     val rx_domain = new ClockingArea(gmiiRxDomain) {
 
+        val rxDv    = Bool
+        val rxEr    = Bool
+        val rxD     = Bits(8 bits)
+
+        // I tried using IDDR2 cells to have tight control over setup and hold on the IOs, but a hold
+        // time of only 0.5ns, a clock insertion delay of ~4ns, and a short delay between data input and
+        // IDDR2 input FF made it impossible to not violate hold. (I did not experiment with IODELAY2 cells.)
+        // Using core FFs adds more delay in the data path, which makes keeping hold easier.
+        // The double FFs here are added to still allow having 1 FF close to the PAD while the other is
+        // close to the real logic.
+        // Without the "keep = true", ISE merges the 2 FF into a shift register, which means the 2 FFs
+        // are again placed together, and that's not what I wanted.
+        rxDv := RegNext(RegNext(io.rx.dv).addAttribute("keep", "true")).addAttribute("keep", "true")
+        rxEr := RegNext(RegNext(io.rx.er).addAttribute("keep", "true")).addAttribute("keep", "true")
+        rxD  := RegNext(RegNext(io.rx.d).addAttribute("keep", "true")).addAttribute("keep", "true")
+
         val rx_fifo_wr = Stream(Bits(10 bits))
-        rx_fifo_wr.valid    := (io.rx.dv | io.rx.er) & rx_fifo_wr.ready
-        rx_fifo_wr.payload  := io.rx.dv ## io.rx.er ## io.rx.d
+        rx_fifo_wr.valid    := (rxDv | rxEr) & rx_fifo_wr.ready
+        rx_fifo_wr.payload  := rxDv ## rxEr ## rxD
     }
 
     val u_rx_fifo = StreamFifoCC(Bits(10 bits), 2048, gmiiRxDomain, ClockDomain.current)
