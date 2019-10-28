@@ -15,11 +15,21 @@ case class GmiiRxCtrl() extends Component {
         val rx_fifo_rd_count    = out(UInt(16 bits))
     }
 
-    val rx_bufg = new BUFH()
-    rx_bufg.io.I <> io.rx.clk
+    val rx_clk   = Bool
+    val io_rx_dv = Bool
+    val io_rx_er = Bool
+    val io_rx_d  = Bits(8 bits)
+
+    io_rx_dv := io.rx.dv
+    io_rx_er := io.rx.er
+    io_rx_d  := io.rx.d
+
+    val u_rx_buf = new BUFH()
+    u_rx_buf.io.I <> io.rx.clk
+    u_rx_buf.io.O <> rx_clk
 
     val gmiiRxDomain = ClockDomain(
-        clock       = rx_bufg.io.O,
+        clock       = rx_clk,
         frequency   = FixedFrequency(125 MHz),
         config      = ClockDomainConfig(
                         resetKind = BOOT
@@ -32,9 +42,9 @@ case class GmiiRxCtrl() extends Component {
         val rxEr    = Bool
         val rxD     = Bits(8 bits)
 
-        rxDv := RegNext(io.rx.dv)
-        rxEr := RegNext(io.rx.er)
-        rxD  := RegNext(io.rx.d)
+        rxDv := RegNext(io_rx_dv)
+        rxEr := RegNext(io_rx_er)
+        rxD  := RegNext(io_rx_d)
 
         val pktErr  = Reg(Bool)
         val pktEnd  = Reg(Bool)
