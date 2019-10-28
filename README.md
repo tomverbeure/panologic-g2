@@ -282,9 +282,14 @@ The table below is based on
     |71     | TXD[1] |
     |72     | TXD[2] |
 
+    [GMII Timing and Electrical Specification presentation](http://www.ieee802.org/3/z/public/presentations/nov1996/AIgmitim.pdf)
+
     [This datasheet of the 1111](https://www.mikrocontroller.net/attachment/139158/88E1111_DS.pdf) is the closest.
     Both the 1111 and then 1119R have a regular GMII interface. Since GMII is a standard, it should be possible to 
     get this working without. 
+
+    According to that datasheet (section 4.9.2), there is a minimum 2.5ns setup time of RX_CLK wrt RXD/RX_DV/RX_ER and only a hold time of 0.5ns.
+    So we have to clock RXD/RX_DV/RX_ER on the rising edge of RX_CLK and ensuring that the minimum setup time of 2.5ns is maintained.
     
     [Feature Comparison sheet](http://static6.arrow.com/aropdfconversion/80d635a18100a0f0c187b633911ff93001715194/ethernetphypsg_v2_ndafr002.pdf) 
     of all components in the same product series. The 1119R is the only one that still supports the original
@@ -295,6 +300,7 @@ The table below is based on
     
     [More driver code](https://github.com/Undrizzle/apps/blob/master/DSDT_3.0/phy/) that supports 88E1119R directly 
     and highlights the differences with 88E111.
+
 
 * [Micron M25P128 Serial Flash with SPI](https://www.micron.com/~/media/documents/products/data-sheet/nor-flash/serial-nor/m25p/m25p_128.pdf)
 
