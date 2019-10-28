@@ -7,7 +7,7 @@
 int cur_x = 0;
 int cur_y = 0;
 
-#define TXT_BUF ((volatile uint32_t *)(0x80000000 | TXT_BUF_ADDR))
+#define TXT_BUF ((volatile uint32_t *)(MMIO_ADDR | TXT_BUF_ADDR))
 int txt_buf_width         = 130;
 int txt_buf_height        = 60;
 
