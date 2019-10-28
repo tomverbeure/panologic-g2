@@ -16,6 +16,8 @@ import ulpi._
 class PanoCore(voClkDomain: ClockDomain, panoConfig: PanoConfig) extends Component {
 
     val io = new Bundle {
+        val clk_125             = in(Bool)
+
         val led_red             = out(Bool)
         val led_green           = out(Bool)
         val led_blue            = out(Bool)
@@ -138,6 +140,7 @@ class PanoCore(voClkDomain: ClockDomain, panoConfig: PanoConfig) extends Compone
         val u_gmii_ctrl = GmiiCtrl()
         u_gmii_ctrl.io.apb              <> u_cpu_top.io.gmii_ctrl_apb
         u_gmii_ctrl.io.gmii             <> io.gmii
+        u_gmii_ctrl.io.clk_125          <> io.clk_125
     }
 
     if (panoConfig.includeUlpi){

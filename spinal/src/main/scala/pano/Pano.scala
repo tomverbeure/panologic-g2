@@ -256,6 +256,10 @@ class Pano(config : PanoConfig) extends Component {
 
         val u_pano_core = new PanoCore(voClkDomain, config)
 
+        val clk_125_bufg = new BUFG()
+        clk_125_bufg.io.I <> io.osc_clk
+
+        u_pano_core.io.clk_125      <> clk_125_bufg.io.O
         u_pano_core.io.led_red      <> io.led_red
         u_pano_core.io.led_green    <> io.led_green
         u_pano_core.io.led_blue     <> io.led_blue

@@ -29,7 +29,7 @@ case class GmiiTx() extends Bundle with IMasterSlave
     val d           = Bits(8 bits)
 
     override def asMaster: Unit = {
-        in(gclk)
+        out(gclk)
         in(clk)
         out(en)
         out(er)
