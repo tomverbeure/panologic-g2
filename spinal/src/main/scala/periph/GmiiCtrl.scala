@@ -28,15 +28,16 @@ case class GmiiRxCtrl() extends Component {
 
     val rx_domain = new ClockingArea(gmiiRxDomain) {
 
-        val rxDv = Reg(Bool)
-        val rxEr = Reg(Bool)
-        val rxD  = Reg(Bits(8 bits))
-        val pktErr = Reg(Bool)
-        val pktEnd = Reg(Bool)
+        val rxDv    = Bool
+        val rxEr    = Bool
+        val rxD     = Bits(8 bits)
 
-        rxDv := io.rx.dv
-        rxEr := io.rx.er
-        rxD  := io.rx.d
+        rxDv := RegNext(io.rx.dv)
+        rxEr := RegNext(io.rx.er)
+        rxD  := RegNext(io.rx.d)
+
+        val pktErr  = Reg(Bool)
+        val pktEnd  = Reg(Bool)
 
         val rx_fifo_wr = Stream(Bits(10 bits))
         rx_fifo_wr.valid    := (rxDv | rxEr | pktEnd) & rx_fifo_wr.ready
