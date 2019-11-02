@@ -30,6 +30,8 @@ Compared to the G1, the most important improvements of G2 are:
     by that Linux version. However, there is now an ISE 14.7 for Win10 version that not only supports Spartan-6,
     but it supports the larger devices such as the LX150/LX100 as well!
 
+    Download ISE 14.7 Windows 10 [here](https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/vivado-design-tools/archive-ise.html).
+
 * 128MByte of DDR2 SDRAM instead of 32MByte of LPDDR SDRAM.
 
 * 128Mbit serial flash instead of 8Mbit.
