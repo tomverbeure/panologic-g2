@@ -2,7 +2,7 @@
 #sim:
 #	sbt "test-only rt.PanoTester"
 
-.PHONY: submodule
+.PHONY: submodule prog_g1 prog_g2_rev_b prog_g2_rev_c
 submodule:
 	cd ../ && git submodule update --init
 
@@ -23,4 +23,11 @@ syn-g1: submodule
 
 waves:
 	gtkwave -o simWorkspace/PanoCoreDut/test.vcd &
-    
+
+ifeq ($(TOPDIR),)
+TOPDIR := .
+endif
+
+-include xc3sprog/Makefile
+
+
