@@ -144,6 +144,15 @@ The table below is based on
 | 31                 |   |                   | 1.2V         |  | USB J3     |          | 
 | 32                 |   |                   | GND          |  | GND        |          | 
 
+## Programming
+
+There are different ways to program a bitstream into a Pano G2:
+
+* Use Xilinx ISE and a Xilinx ISE compatible JTAG programmer (see photo above)
+* Use Xilinx ISE, a [Xilinx Virtual Cable server](https://github.com/wzab/xvcd-ff2232h) and an FT2232H-based JTAG dongle
+* Use xc3sprog
+* Use [OpenOCD](https://tomverbeure.github.io/2019/09/15/Loading-a-Spartan-6-bitstream-with-openocd.html)
+
 
 ## Resources
 
