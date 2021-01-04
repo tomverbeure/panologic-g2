@@ -10,13 +10,13 @@ syn: submodule
 	sbt "runMain pano.PanoVerilog"
 
 syn_ulpi:
-	sbt "runMain pano.UlpiCtrlVerilog"
+	sbt "runMain ulpi.UlpiCtrlVerilog"
 
 syn_apb3cc:
 	sbt "runMain pano.Apb3CCVerilog"
 
 syn_usbh:
-	sbt "runMain pano.UsbHostVerilog"
+	sbt "runMain ulpi.UsbHostVerilog"
 
 syn-g1: submodule
 	sbt "runMain pano.PanoG1Verilog"
