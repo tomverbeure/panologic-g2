@@ -30,6 +30,17 @@ class PanoCore(voClkDomain: ClockDomain, panoConfig: PanoConfig) extends Compone
         val ulpi                = if (panoConfig.includeUlpi)   slave(Ulpi())          else null
 
         val vo                  = out(VgaData())
+
+        val codec_scl           = if (panoConfig.includeCodec) master(TriState(Bool)) else null
+        val codec_sda           = if (panoConfig.includeCodec) master(TriState(Bool)) else null
+        var codec_clk_raw       = if (panoConfig.includeCodec) in(Bool)  else null
+        var codec_reset_        = if (panoConfig.includeCodec) in(Bool)  else null
+        var codec_mclk          = if (panoConfig.includeCodec) out(Bool) else null
+        var codec_bclk          = if (panoConfig.includeCodec) out(Bool) else null
+        var codec_dacdat        = if (panoConfig.includeCodec) out(Bool) else null
+        var codec_daclrc        = if (panoConfig.includeCodec) out(Bool) else null
+        var codec_adcdat        = if (panoConfig.includeCodec) in(Bool)  else null
+        var codec_adclrc        = if (panoConfig.includeCodec) out(Bool) else null
     }
 
 
@@ -229,6 +240,32 @@ class PanoCore(voClkDomain: ClockDomain, panoConfig: PanoConfig) extends Compone
         uartCtrl.io.uart.rxd    := True
     }
 
+    if (panoConfig.includeCodec){
+        //============================================================
+        // Codec I2C control
+        //============================================================
+
+        val u_codec_ctrl = CCGpio(2)
+        u_codec_ctrl.io.apb             <> u_cpu_top.io.codec_ctrl_apb
+
+        io.codec_scl.writeEnable     <> !u_codec_ctrl.io.gpio.write(0)
+        io.codec_scl.write           <> u_codec_ctrl.io.gpio.write(0)
+        io.codec_scl.read            <> u_codec_ctrl.io.gpio.read(0)
+
+        io.codec_sda.writeEnable     <> !u_codec_ctrl.io.gpio.write(1)
+        io.codec_sda.write           <> u_codec_ctrl.io.gpio.write(1)
+        io.codec_sda.read            <> u_codec_ctrl.io.gpio.read(1)
+
+        var audio = new Audio_test()
+        audio.io.clk12 <> io.codec_clk_raw
+        audio.io.reset12_ := io.codec_reset_
+        audio.io.codec_mclk <> io.codec_mclk
+        audio.io.codec_bclk <> io.codec_bclk
+        audio.io.codec_dacdat <> io.codec_dacdat
+        audio.io.codec_adcdat <> io.codec_adcdat
+        audio.io.codec_daclrc <> io.codec_daclrc
+        audio.io.codec_adclrc <> io.codec_adclrc
+    }
 }
 
 

@@ -1,9 +1,10 @@
 #include <stdint.h>
-#include "pano_io.h"
-
+#include "top_defines.h"
 #include "audio.h"
-
 #include "i2c.h"
+#include "print.h"
+
+#define WM8750L_I2C_ADR       0x34
 
 short int audio_registers[][2] = {
     // For now, use default volume settings for LOUT1/ROUT1
@@ -21,21 +22,21 @@ short int audio_registers[][2] = {
 
     // Disable digital soft mute, no de-emphasis
     { WM8750_ADC_DAC_CTRL_ADDR,         (0<<3) |    // DACMU: Disable digital soft mute
-                                        (3<<1) },   // DEEMP: 48 Khz sampling rate
+                                        (0<<1) },   // DEEMP: No de-emphasis
 
     // DSP Mode, mode B, LRP=1, Slave (Figure 23), 16 bits
     { WM8750_AUDIO_INTFC_ADDR,          (0<<7) |    // BCLKINV: BCLK not inverted
-                                        (0<<6) |    // MS     : Slave mode
+                                        (0<<6) |    // MS     : Master mode
                                         (0<<5) |    // LRSWAP : No L/R swap
                                         (1<<4) |    // LRP    : DSP mode B: MSB on first clock cycle
                                         (0<<2) |    // WL     : 16 bits
                                         (3<<0) },   // FORMAT : DSP mode
 
-    // MCLK 25 MHz, 48kHz sample rate
+    // MCLK 12MHz, 48kHz sample rate
     { WM8750_SAMPLE_RATE_ADDR,          (0<<7) |    // BCM    : Bit Clock Mode disabled
-                                        (1<<6) |    // CLKDIV2: MCLK divided by 2
+                                        (0<<6) |    // CLKDIV2: MCLK not divided by 2
                                         (0<<1) |    // SR     : ADC and DAC 48kHz
-                                        (0<<0) },   // USB    : 12MHz Normal clock mode 
+                                        (1<<0) },   // USB    : 12MHz USB clock mode 
     // Set left and right channel volume
     { WM8750_LCHAN_VOL_ADDR,            (0<<8) |    // LDVU   : No left DAC volume update
                                         (0xff) },   // LDACVOL: Set to 0 db
@@ -125,11 +126,11 @@ short int audio_registers[][2] = {
     // LOUT2/ROUT2 configuration for mono
     { WM8750_LOUT2_VOL_ADDR,            (0<<8) |    // LO2VU    : Don't update LOUT2 volume yet
                                         (0<<7) |    // LO2ZC    : Change gain on zero cross only
-                                      (120<<0) },   // LOUT2VOL : Volume...
+                                      (100<<0) },   // LOUT2VOL : Volume...
 
     { WM8750_ROUT2_VOL_ADDR,            (1<<8) |    // RO2VU    : Update LOUT2 and ROUT2 volume 
                                         (0<<7) |    // RO2ZC    : Change gain on zero cross only
-                                      (120<<0) },   // ROUT2VOL : Volume...
+                                      (100<<0) },   // ROUT2VOL : Volume...
 
     // Mono output isn't used
     { WM8750_MONOOUT_VOL_ADDR,          0 },
@@ -141,18 +142,24 @@ i2c_ctx_t codec_i2c_ctx;
 
 void audio_init()
 {
-   codec_i2c_ctx.base_addr = 0;
+   int idx = 0;
+
+   print("audio_init\n");
+   codec_i2c_ctx.base_addr = CODEC_I2C_BASE_ADDR;
    codec_i2c_ctx.scl_pin_nr = 0;
    codec_i2c_ctx.sda_pin_nr = 1;
 
     i2c_init(&codec_i2c_ctx);
 
-    int idx = 0;
     while(audio_registers[idx][0] != -1){
         int addr  = audio_registers[idx][0];
         int value = audio_registers[idx][1];
 
-        i2c_write_reg(&codec_i2c_ctx, WM8750L_I2C_ADR, (addr<<1) | (value>>8), (value & 0xff));
+        if(!i2c_write_reg(&codec_i2c_ctx, WM8750L_I2C_ADR, (addr<<1) | (value>>8), (value & 0xff))) {
+           print("i2c_write_reg failed\n");
+           break;
+        }
         ++idx;
     }
 }
+

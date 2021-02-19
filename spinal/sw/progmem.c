@@ -8,6 +8,7 @@
 #include "gmii.h"
 #include "dvi.h"
 #include "usb.h"
+#include "audio.h"
 
 static inline uint32_t rdcycle(void) {
     uint32_t cycle;
@@ -49,6 +50,8 @@ int main() {
     REG_WR(LED_DIR, 0xff);
 
     dvi_ctrl_init();
+    clear();
+    audio_init();
 
 #if 0
     while(1){
@@ -60,7 +63,6 @@ int main() {
 #endif
 
 #if 1
-    clear();
     print("Pano Logic G2 Reverse Engineering\n");
     print("---------------------------------\n");
     print("\n");

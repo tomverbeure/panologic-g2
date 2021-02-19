@@ -19,7 +19,8 @@ case class PanoConfig(
               includeVga        : Boolean,
               includeGmii       : Boolean,
               includeUlpi       : Boolean,
-              includeUart       : Boolean
+              includeUart       : Boolean,
+              includeCodec      : Boolean
       )
 {
     def includeDviI2C = includeDvi || includeHdmi
@@ -54,6 +55,16 @@ class Pano(config : PanoConfig) extends Component {
 
         // ULPI Interface
         val ulpi                = if (config.includeUlpi) slave(Ulpi()) else null
+    
+        // Codec Interface
+        val codec_scl           = if (config.includeCodec) master(TriState(Bool)) else null
+        val codec_sda           = if (config.includeCodec) master(TriState(Bool)) else null
+        var codec_mclk          = if (config.includeCodec) out(Bool) else null
+        var codec_bclk          = if (config.includeCodec) out(Bool) else null
+        var codec_dacdat        = if (config.includeCodec) out(Bool) else null
+        var codec_daclrc        = if (config.includeCodec) out(Bool) else null
+        var codec_adcdat        = if (config.includeCodec) in(Bool)  else null
+        var codec_adclrc        = if (config.includeCodec) out(Bool) else null
     }
 
     noIoPrefix()
@@ -84,6 +95,7 @@ class Pano(config : PanoConfig) extends Component {
     //============================================================
 
     val main_clk_raw = Bool
+    val codec_clk_raw = Bool
 
     val u_main_clk_gen = if (config.isG2) new Area {
         val u_main_clk_pll = new DCM_CLKGEN(
@@ -239,6 +251,26 @@ class Pano(config : PanoConfig) extends Component {
     }
 
     //============================================================
+    // Codec 12MHz clock
+    //============================================================
+
+    val u_codec_clk_gen = if (config.includeCodec) new Area {
+        val u_codec_clk_pll = new DCM_CLKGEN(
+                clkfx_divide    = 125,
+                clkfx_multiply  = 12,
+                clkin_period    = "8.0"
+            )
+
+        u_codec_clk_pll.io.CLKIN      <> io.osc_clk
+        u_codec_clk_pll.io.CLKFX      <> codec_clk_raw
+        u_codec_clk_pll.io.RST        <> False
+        u_codec_clk_pll.io.FREEZEDCM  <> False
+        u_codec_clk_pll.io.PROGCLK    <> False
+        u_codec_clk_pll.io.PROGDATA   <> False
+        u_codec_clk_pll.io.PROGEN     <> False
+    }
+
+    //============================================================
     // Core logic
     //============================================================
 
@@ -265,6 +297,19 @@ class Pano(config : PanoConfig) extends Component {
         if (config.includeDviI2C){
             u_pano_core.io.dvi_ctrl_scl <> io.dvi_spc
             u_pano_core.io.dvi_ctrl_sda <> io.dvi_spd
+        }
+
+        if (config.includeCodec){
+            u_pano_core.io.codec_scl <> io.codec_scl
+            u_pano_core.io.codec_sda <> io.codec_sda
+            u_pano_core.io.codec_clk_raw <> codec_clk_raw
+            u_pano_core.io.codec_reset_ <> main_reset_
+            u_pano_core.io.codec_mclk <> io.codec_mclk
+            u_pano_core.io.codec_bclk <> io.codec_bclk
+            u_pano_core.io.codec_dacdat <> io.codec_dacdat
+            u_pano_core.io.codec_daclrc <> io.codec_daclrc
+            u_pano_core.io.codec_adcdat <> io.codec_adcdat
+            u_pano_core.io.codec_adclrc <> io.codec_adclrc
         }
 
         if (config.includeGmii){
@@ -308,9 +353,7 @@ class Pano(config : PanoConfig) extends Component {
             u_hdmi.io.g               <> vo.g
             u_hdmi.io.b               <> vo.b
         }
-
     }
-
 }
 
 object PanoVerilog{
@@ -327,7 +370,8 @@ object PanoVerilog{
               includeVga        = false,
               includeGmii       = true,
               includeUlpi       = true,
-              includeUart       = false
+              includeUart       = false,
+              includeCodec      = true
             )
 
 

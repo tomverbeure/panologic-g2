@@ -25,13 +25,16 @@
 #define BUTTON_ADDR                 0x00000010
 
 
-// val u_dvi_ctrl = CCGpio(2)
+// From CpuTop.scala:  apbMapping += io.dvi_ctrl_apb -> (0x00100, 256 Byte)
 #define DVI_CTRL_BASE_ADDR          0x00000100
 #define DVI_CTRL_DIR_ADDR           (DVI_CTRL_BASE_ADDR + CCGPIO_DIR_ADDR)
 #define DVI_CTRL_WR_ADDR            (DVI_CTRL_BASE_ADDR + CCGPIO_WR_ADDR)
 #define DVI_CTRL_SET_ADDR           (DVI_CTRL_BASE_ADDR + CCGPIO_SET_ADDR)
 #define DVI_CTRL_CLR_ADDR           (DVI_CTRL_BASE_ADDR + CCGPIO_CLR_ADDR)
 #define DVI_CTRL_RD_ADDR            (DVI_CTRL_BASE_ADDR + CCGPIO_RD_ADDR)
+
+// From CpuTop.scala:  apbMapping += io.codec_ctrl_apb -> (0x00600, 256 Byte)
+#define CODEC_I2C_BASE_ADDR         0x00000600
 
 #define GMII_MDIO_ADDR              0x00010000
 #define GMII_MDC_VAL_BIT                0
